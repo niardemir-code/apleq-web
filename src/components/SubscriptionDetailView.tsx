@@ -56,7 +56,6 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [confirmDeleteMemberId, setConfirmDeleteMemberId] = useState<string | number | null>(null);
-  const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [invMsg, setInvMsg] = useState('');
   const { convertToEur, isEur, getRateFor } = useCurrency();
   const { platforms } = useSharingPlatforms();
@@ -118,21 +117,24 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
         ...subscription,
         members: [...(subscription.members || []), reservedMember],
       });
-      setInviteCode(code);
-      setInvMsg('Invitación creada. Aparece en la lista como "Pendiente alta".');
+      setInvMsg('');
     } catch (e) {
       console.warn('Error al crear invitación:', e);
       setInvMsg('No se pudo generar el código. Revisa los permisos de Firestore.');
     }
   };
 
-  const handleCopyInvite = async () => {
-    if (!inviteCode) return;
+  const handleShareInvite = async (code: string) => {
+    const text = `Te han invitado a compartir gastos en Apleq. Únete con este código: ${formatInviteCode(code)}`;
     try {
-      await navigator.clipboard.writeText(formatInviteCode(inviteCode));
-      setInvMsg('¡Copiado!');
+      if (navigator.share) {
+        await navigator.share({ title: 'Invitación a Apleq', text });
+      } else {
+        await navigator.clipboard.writeText(text);
+        setInvMsg('Invitación copiada al portapapeles');
+      }
     } catch {
-      setInvMsg('No se pudo copiar');
+      // el usuario canceló el compartir
     }
   };
 
@@ -525,6 +527,17 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                             {formatInviteCode(member.inviteCode)}
                           </span>
                         )}
+                        {member.inviteCode && (
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 cursor-pointer"
+                            title="Compartir invitación (WhatsApp, email...)"
+                            onClick={(e) => { e.stopPropagation(); handleShareInvite(member.inviteCode!); }}
+                          >
+                            <Share2 className="w-3 h-3" />
+                            <span>Compartir</span>
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -638,22 +651,6 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                     <Send className="w-4 h-4" />
                     <span>Invitar a un hueco</span>
                   </button>
-
-                  {inviteCode && (
-                    <div className="mt-2 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center">
-                      <p className="text-[11px] text-muted-foreground">Código de invitación (caduca en 7 días):</p>
-                      <p className="text-lg font-black tracking-widest text-emerald-600 dark:text-emerald-400 my-1">
-                        {formatInviteCode(inviteCode)}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={handleCopyInvite}
-                        className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
-                      >
-                        Copiar código
-                      </button>
-                    </div>
-                  )}
 
                   {invMsg && (
                     <p className="text-[11px] text-muted-foreground text-center mt-1">{invMsg}</p>
