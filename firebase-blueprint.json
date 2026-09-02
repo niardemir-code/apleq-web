@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Member": {
+      "title": "Member",
+      "description": "Co-subscriber / sharing member in a subscription",
+      "type": "object",
+      "properties": {
+        "memberName": { "type": "string", "description": "Name or alias of the member" },
+        "sharingPlatform": { "type": "string", "description": "Platform used for sharing (Sharesub, Together Price, etc.)" },
+        "memberContact": { "type": "string", "description": "Contact info (email or phone)" },
+        "contributionAmount": { "type": "number", "description": "Monetary contribution amount of this member" },
+        "isPaidThisMonth": { "type": "boolean", "description": "Flag indicating if member paid current cycle" },
+        "isPendingPayment": { "type": "boolean", "description": "Flag for pending payment highlight" },
+        "isPendingRemoval": { "type": "boolean", "description": "Flag for pending removal highlight" },
+        "isPendingRegistration": { "type": "boolean", "description": "Flag for pending registration highlight" },
+        "notes": { "type": "string", "description": "Notes regarding this member" }
+      },
+      "required": ["memberName", "contributionAmount"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "description": "Shared subscription owned by a user with co-subscribers/members",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the owner user" },
+        "platformName": { "type": "string", "description": "Platform or service name (e.g., Netflix, Spotify)" },
+        "mainUserName": { "type": "string", "description": "Owner / Main account holder" },
+        "category": { "type": "string", "description": "Category (Streaming, Música, Productividad, Gaming, etc.)" },
+        "cost": { "type": "number", "description": "Total recurring cost for the subscription" },
+        "billingPeriod": { "type": "string", "enum": ["MONTHLY", "QUARTERLY", "SEMI_ANNUAL", "YEARLY"], "description": "Billing frequency" },
+        "currency": { "type": "string", "description": "Currency code symbol (e.g., EUR, USD)" },
+        "billingDay": { "type": "number", "description": "Renewal day of month (1-31)" },
+        "billingMonth": { "type": "number", "description": "Billing month (1-12)" },
+        "platformPricing": { "type": "string", "description": "Serialized platform pricing" },
+        "renewalDate": { "type": "string", "description": "Renewal / charge date for the subscription (YYYY-MM-DD)" },
+        "enableAlarm": { "type": "boolean", "description": "Flag indicating if alarm reminder is enabled before renewal" },
+        "alarmValue": { "type": "number", "description": "Alarm lead time quantity" },
+        "alarmUnit": { "type": "string", "enum": ["same_day", "hours", "days", "weeks", "months"], "description": "Alarm lead time unit" },
+        "alarmDaysBefore": { "type": "number", "description": "Lead time in days for alarm" },
+        "notes": { "type": "string", "description": "Custom notes regarding the subscription" },
+        "members": { "type": "array", "description": "List of co-subscribers and their payment status" },
+        "iconColorHex": { "type": "string", "description": "Accent hex color" },
+        "iconType": { "type": "string", "description": "Icon type" },
+        "iconKey": { "type": "string", "description": "Icon key or identifier" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Last update timestamp" }
+      },
+      "required": ["userId", "platformName", "cost", "billingPeriod", "currency"]
+    },
+    "SharingPlatform": {
+      "title": "SharingPlatform",
+      "description": "Sharing platform configuration (Sharesub, Together Price, Spliiit, etc.) with custom color and order",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Platform name" },
+        "colorHex": { "type": "string", "description": "Hex color code" },
+        "displayOrder": { "type": "number", "description": "Display order integer" }
+      },
+      "required": ["name", "colorHex"]
+    },
+    "Invite": {
+      "title": "Invite",
+      "description": "Invitation code for claiming a free slot in a subscription group",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "description": "6-character invite code" },
+        "groupId": { "type": "string", "description": "Subscription ID" },
+        "memberId": { "type": "string", "description": "Reserved member ID" },
+        "ownerUid": { "type": "string", "description": "UID of the group owner" },
+        "consumed": { "type": "boolean", "description": "Whether the invite has been consumed" },
+        "createdAt": { "type": "string", "description": "Creation ISO date" },
+        "expiresAt": { "type": "string", "description": "Expiration ISO date" }
+      },
+      "required": ["code", "groupId", "ownerUid", "consumed", "createdAt", "expiresAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/subscriptions/{subscriptionId}": {
+      "schema": "Subscription",
+      "description": "Subscriptions collection for a specific user containing embedded members"
+    },
+    "/users/{userId}/sharing_platforms/{platformId}": {
+      "schema": "SharingPlatform",
+      "description": "Sharing platforms configured by the user"
+    },
+    "/invites/{code}": {
+      "schema": "Invite",
+      "description": "Invite codes to claim slots"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --color-blue-50: #eef6ff;
+  --color-blue-100: #d9ebff;
+  --color-blue-200: #bcdcff;
+  --color-blue-300: #8ec7ff;
+  --color-blue-400: #58a8fb;
+  --color-blue-500: #1285fa;
+  --color-blue-600: #0a6ee0;
+  --color-blue-700: #0a58b8;
+  --color-blue-800: #0e4a94;
+  --color-blue-900: #123f78;
+  --color-blue-950: #0c2749;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-muted: #f1f5f9;
+    --border-color: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+  }
+
+  html.dark {
+    color-scheme: dark;
+    --bg-main: #0a0a0a;
+    --bg-card: #0f0f0f;
+    --bg-muted: #1e1e24;
+    --border-color: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  select option {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  /* Date/Time picker indicator styling */
+  input[type="date"],
+  input[type="month"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    color-scheme: light dark;
+  }
+
+  .dark input[type="date"],
+  .dark input[type="month"],
+  .dark input[type="time"],
+  .dark input[type="datetime-local"],
+  html.dark input[type="date"],
+  html.dark input[type="month"],
+  html.dark input[type="time"],
+  html.dark input[type="datetime-local"] {
+    color-scheme: dark;
+  }
+
+  /* Hide default browser glyphs in custom date wrappers so only our crisp icons show */
+  .custom-date-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    cursor: pointer;
+    width: 28px;
+    height: 100%;
+    position: absolute;
+    right: 4px;
+    top: 0;
+    z-index: 10;
+  }
+}
+
+.bg-main {
+  background-color: var(--bg-main);
+}
+
+.bg-card {
+  background-color: var(--bg-card);
+}
+
+.bg-muted {
+  background-color: var(--bg-muted);
+}
+
+.border-border {
+  border-color: var(--border-color);
+}
+
+.text-foreground {
+  color: var(--text-primary);
+}
+
+.text-muted-foreground {
+  color: var(--text-secondary);
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

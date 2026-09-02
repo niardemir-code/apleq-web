@@ -1,0 +1,6 @@
+{
+  "name": "Apleq - Gestor de Suscripciones Compartidas",
+  "description": "Gestor y optimizador de suscripciones compartidas con sincronización en tiempo real en Firestore, métricas de ahorro y control de pagos de miembros.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
