@@ -89,9 +89,13 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
     if (target?.inviteCode) {
       deleteInvite(target.inviteCode);
     }
+    const updatedMemberUids = updatedMembers
+      .filter((m) => m.linkedUid)
+      .map((m) => String(m.linkedUid));
     onUpdateSubscription({
       ...subscription,
       members: updatedMembers,
+      memberUids: updatedMemberUids,
     }).catch((err) => {
       console.error('Error deleting member directly:', err);
     });

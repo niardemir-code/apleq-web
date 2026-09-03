@@ -634,7 +634,7 @@ function SplitzyApp() {
               Sincronizando suscripciones con Cloud Firestore...
             </p>
           </div>
-        ) : filteredSubscriptions.length === 0 ? (
+        ) : filteredSubscriptions.length === 0 && participatingGroups.length === 0 ? (
           <EmptyState
             hasFilters={hasActiveFilters}
             onClearFilters={() =>
