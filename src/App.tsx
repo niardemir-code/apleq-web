@@ -22,7 +22,8 @@ import { SubscriptionMasterList } from './components/SubscriptionMasterList';
 import { SubscriptionDetailView } from './components/SubscriptionDetailView';
 import { SubscriptionModal } from './components/SubscriptionModal';
 import { JoinGroupModal } from './components/JoinGroupModal';
-import { ParticipatingGroups } from './components/ParticipatingGroups';
+import { ParticipatingList } from './components/ParticipatingList';
+import { ClientGroupDetailView } from './components/ClientGroupDetailView';
 import { MembersDetailModal } from './components/MembersDetailModal';
 import { SettingsModal } from './components/SettingsModal';
 import { NotificationsModal } from './components/NotificationsModal';
@@ -186,6 +187,7 @@ function SplitzyApp() {
 
   // Selected subscription for detail view
   const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<string | null>(null);
+  const [selectedClientGroupId, setSelectedClientGroupId] = useState<string | null>(null);
   const [showMobileDetail, setShowMobileDetail] = useState<boolean>(false);
 
   // Filters State
@@ -526,7 +528,19 @@ function SplitzyApp() {
     return filteredSubscriptions[0] || null;
   }, [filteredSubscriptions, selectedSubscriptionId]);
 
+  const selectedClientGroup = useMemo(() => {
+    if (selectedClientGroupId == null) return null;
+    return participatingGroups.find((g) => String(g.id) === String(selectedClientGroupId)) || null;
+  }, [participatingGroups, selectedClientGroupId]);
+
+  const handleSelectClientGroup = (id: string) => {
+    setSelectedClientGroupId(id);
+    setSelectedSubscriptionId(null);
+    setShowMobileDetail(true);
+  };
+
   const handleSelectSubscription = (subId: string) => {
+    setSelectedClientGroupId(null);
     setSelectedSubscriptionId(subId);
     setShowMobileDetail(true);
   };
@@ -640,39 +654,48 @@ function SplitzyApp() {
               <div className={`md:col-span-4 lg:col-span-4 ${showMobileDetail ? 'hidden md:block' : 'block'}`}>
                 <SubscriptionMasterList
                   subscriptions={filteredSubscriptions}
-                  selectedSubscriptionId={activeSelectedSubscription?.id || null}
+                  selectedSubscriptionId={selectedClientGroupId ? null : (activeSelectedSubscription?.id || null)}
                   onSelectSubscription={handleSelectSubscription}
                   filters={filters}
                   onChangeFilters={setFilters}
                   onNewSubscription={handleOpenNewSub}
                   totalCount={activeCount}
                 />
+                <ParticipatingList
+                  groups={participatingGroups}
+                  currentUid={user?.uid || ''}
+                  selectedId={selectedClientGroupId}
+                  onSelect={handleSelectClientGroup}
+                />
               </div>
 
               {/* Right Column: Full Subscription Details View */}
               <div className={`md:col-span-8 lg:col-span-8 ${!showMobileDetail ? 'hidden md:block' : 'block'}`}>
-                <SubscriptionDetailView
-                  key={activeSelectedSubscription ? `sub-detail-${activeSelectedSubscription.id}-${activeSelectedSubscription.customImageUri || ''}-${activeSelectedSubscription.iconType || ''}` : 'sub-detail-empty'}
-                  subscription={activeSelectedSubscription}
-                  onEdit={handleEditSub}
-                  onDelete={handleDeleteSubscription}
-                  onManageMembers={handleManageMembers}
-                  onToggleMemberPayment={handleToggleMemberPayment}
-                  onMarkAllPaid={handleMarkAllPaid}
-                  onUpdateSubscription={handleUpdateSubscriptionMembersDeep}
-                  onBackToList={() => setShowMobileDetail(false)}
-                  isMobile={showMobileDetail}
-                />
+                {selectedClientGroupId ? (
+                  <ClientGroupDetailView
+                    group={selectedClientGroup}
+                    currentUid={user?.uid || ''}
+                    onBackToList={() => setShowMobileDetail(false)}
+                    isMobile={showMobileDetail}
+                  />
+                ) : (
+                  <SubscriptionDetailView
+                    key={activeSelectedSubscription ? `sub-detail-${activeSelectedSubscription.id}-${activeSelectedSubscription.customImageUri || ''}-${activeSelectedSubscription.iconType || ''}` : 'sub-detail-empty'}
+                    subscription={activeSelectedSubscription}
+                    onEdit={handleEditSub}
+                    onDelete={handleDeleteSubscription}
+                    onManageMembers={handleManageMembers}
+                    onToggleMemberPayment={handleToggleMemberPayment}
+                    onMarkAllPaid={handleMarkAllPaid}
+                    onUpdateSubscription={handleUpdateSubscriptionMembersDeep}
+                    onBackToList={() => setShowMobileDetail(false)}
+                    isMobile={showMobileDetail}
+                  />
+                )}
               </div>
             </div>
           </div>
         )}
-
-        <ParticipatingGroups
-          groups={participatingGroups}
-          currentUid={user?.uid || ''}
-          indexRequiredUrl={participatingIndexUrl}
-        />
       </main>
 
       {/* Footer */}

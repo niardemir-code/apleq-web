@@ -176,6 +176,7 @@ export function formatPeriodShort(period?: BillingPeriod | string): string {
 }
 
 export function getMemberPlatformInfo(subscription: Subscription, memberOrPlatformName?: Member | string): {
+  name: string;
   currency: string;
   currencySymbol: string;
   period: BillingPeriod | string;
@@ -211,6 +212,7 @@ export function getMemberPlatformInfo(subscription: Subscription, memberOrPlatfo
   const currencySymbol = getCurrencySymbol(currency);
 
   return {
+    name: matched?.platformName || platformName || '',
     currency,
     currencySymbol,
     period,
@@ -310,10 +312,23 @@ export function calculateNextPaymentFromJoined(
  * Resolves or auto-computes the nextPaymentDate for any member following frequency and join date rules
  */
 export function resolveMemberNextPaymentDate(
-  member: Partial<Member>,
-  subBillingDay?: number,
+  memberOrSub: Partial<Member> | Partial<Subscription>,
+  subBillingDayOrMember?: number | Partial<Member>,
   referenceDate: Date = new Date()
 ): string {
+  let member: Partial<Member>;
+  let subBillingDay: number | undefined;
+
+  if (subBillingDayOrMember && typeof subBillingDayOrMember === 'object') {
+    // Called as resolveMemberNextPaymentDate(subscription, member)
+    member = subBillingDayOrMember as Partial<Member>;
+    subBillingDay = (memberOrSub as Partial<Subscription>).billingDay;
+  } else {
+    // Called as resolveMemberNextPaymentDate(member, subBillingDay)
+    member = memberOrSub as Partial<Member>;
+    subBillingDay = typeof subBillingDayOrMember === 'number' ? subBillingDayOrMember : undefined;
+  }
+
   if (member.nextPaymentDate && String(member.nextPaymentDate).trim() !== '') {
     return String(member.nextPaymentDate).split('T')[0];
   }

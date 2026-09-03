@@ -68,7 +68,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-foreground tracking-tight">
-              Suscripciones
+              Mis suscripciones
             </h2>
             <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-blue-500/10 text-blue-500 border border-blue-500/20">
               {subscriptions.length}
