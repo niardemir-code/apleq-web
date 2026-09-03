@@ -5,6 +5,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import { Subscription, FilterOptions, Member } from './types';
 import { 
   subscribeToUserSubscriptions, 
+  subscribeToParticipatingGroups,
   createSubscription, 
   updateSubscription, 
   updateSubscriptionMembers,
@@ -20,6 +21,8 @@ import { MetricsHeader } from './components/MetricsHeader';
 import { SubscriptionMasterList } from './components/SubscriptionMasterList';
 import { SubscriptionDetailView } from './components/SubscriptionDetailView';
 import { SubscriptionModal } from './components/SubscriptionModal';
+import { JoinGroupModal } from './components/JoinGroupModal';
+import { ParticipatingGroups } from './components/ParticipatingGroups';
 import { MembersDetailModal } from './components/MembersDetailModal';
 import { SettingsModal } from './components/SettingsModal';
 import { NotificationsModal } from './components/NotificationsModal';
@@ -44,6 +47,8 @@ import {
 function SplitzyApp() {
   const { user, loading: authLoading, signIn, authError, clearAuthError } = useAuth();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [participatingGroups, setParticipatingGroups] = useState<Subscription[]>([]);
+  const [participatingIndexUrl, setParticipatingIndexUrl] = useState<string | null>(null);
   const [loadingData, setLoadingData] = useState<boolean>(true);
   const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -105,9 +110,31 @@ function SplitzyApp() {
     return () => unsubscribe();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) {
+      setParticipatingGroups([]);
+      setParticipatingIndexUrl(null);
+      return;
+    }
+    const unsub = subscribeToParticipatingGroups(
+      user.uid,
+      (groups) => {
+        setParticipatingGroups(groups);
+        setParticipatingIndexUrl(null);
+      },
+      (_err, indexUrl) => {
+        if (indexUrl) {
+          setParticipatingIndexUrl(indexUrl);
+        }
+      }
+    );
+    return () => unsub();
+  }, [user]);
+
   // Modals state
   const [isSubModalOpen, setIsSubModalOpen] = useState(false);
   const [subModalInitialData, setSubModalInitialData] = useState<Subscription | null>(null);
+  const [isJoinOpen, setIsJoinOpen] = useState(false);
   
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
   const [selectedSubForMembers, setSelectedSubForMembers] = useState<Subscription | null>(null);
@@ -533,6 +560,7 @@ function SplitzyApp() {
       {/* Top Navigation */}
       <Navbar
         onNewSubscription={handleOpenNewSub}
+        onJoinGroup={() => setIsJoinOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
         subscriptionsCount={activeCount}
@@ -619,6 +647,7 @@ function SplitzyApp() {
               })
             }
             onNewSubscription={handleOpenNewSub}
+            onJoinGroup={() => setIsJoinOpen(true)}
           />
         ) : (
           <div>
@@ -675,6 +704,12 @@ function SplitzyApp() {
             )}
           </div>
         )}
+
+        <ParticipatingGroups
+          groups={participatingGroups}
+          currentUid={user?.uid || ''}
+          indexRequiredUrl={participatingIndexUrl}
+        />
       </main>
 
       {/* Footer */}
@@ -699,6 +734,8 @@ function SplitzyApp() {
         initialData={subModalInitialData}
         subscriptionToEdit={subModalInitialData}
       />
+
+      <JoinGroupModal isOpen={isJoinOpen} onClose={() => setIsJoinOpen(false)} />
 
       {currentSelectedSubForModal && (
         <MembersDetailModal

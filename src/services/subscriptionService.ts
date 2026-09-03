@@ -1,5 +1,6 @@
 import { 
   collection, 
+  collectionGroup,
   doc, 
   getDoc,
   onSnapshot, 
@@ -841,6 +842,59 @@ export function subscribeToUserSubscriptions(
   return () => {
     unsubscribe();
   };
+}
+
+export function subscribeToParticipatingGroups(
+  userId: string,
+  onData: (subscriptions: Subscription[]) => void,
+  onError?: (error: Error, indexUrl?: string) => void
+) {
+  if (!userId) {
+    onData([]);
+    return () => {};
+  }
+
+  const qParticipating = query(
+    collectionGroup(db, 'subscriptions'),
+    where('memberUids', 'array-contains', userId)
+  );
+
+  const unsubscribe = onSnapshot(
+    qParticipating,
+    (snapshot) => {
+      const result: Subscription[] = [];
+      snapshot.forEach((docSnap) => {
+        const ownerUid = docSnap.ref.parent.parent?.id || '';
+        // Only include groups where the user is a participant, not the owner
+        if (ownerUid !== userId) {
+          result.push(normalizeSubscriptionDoc(docSnap.id, docSnap.data(), ownerUid));
+        }
+      });
+      onData(result);
+    },
+    (error: any) => {
+      const rawMsg = error instanceof Error ? error.message : String(error?.message || error);
+      const isMissingIndex =
+        rawMsg.includes('COLLECTION_GROUP_CONTAINS') ||
+        rawMsg.includes('requires an index') ||
+        rawMsg.includes('indexes?create_exemption=');
+
+      if (isMissingIndex) {
+        const match = rawMsg.match(/https:\/\/console\.firebase\.google\.com[^\s]+/);
+        const indexUrl = match ? match[0] : undefined;
+        console.warn('A collection group index is required to list participating groups:', indexUrl || rawMsg);
+        onData([]);
+        if (onError) onError(error as Error, indexUrl);
+        return;
+      }
+
+      console.warn('Notice fetching participating groups:', rawMsg);
+      onData([]);
+      if (onError) onError(error as Error);
+    }
+  );
+
+  return () => unsubscribe();
 }
 
 export async function createSubscription(

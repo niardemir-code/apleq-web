@@ -1,17 +1,19 @@
 import React from 'react';
-import { Plus, Filter } from 'lucide-react';
+import { Plus, Filter, LogIn } from 'lucide-react';
 import { SplitzyLogo } from './SplitzyLogo';
 
 interface EmptyStateProps {
   hasFilters: boolean;
   onClearFilters: () => void;
   onNewSubscription: () => void;
+  onJoinGroup: () => void;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   hasFilters,
   onClearFilters,
   onNewSubscription,
+  onJoinGroup,
 }) => {
   if (hasFilters) {
     return (
@@ -59,6 +61,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Crear Primera Suscripción</span>
+        </button>
+        <button
+          id="btn-empty-join-group"
+          onClick={onJoinGroup}
+          type="button"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
+        >
+          <LogIn className="w-4 h-4 stroke-[2.5]" />
+          <span>Unirse a un grupo</span>
         </button>
       </div>
     </div>

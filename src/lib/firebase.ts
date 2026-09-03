@@ -11,6 +11,7 @@ import {
   getDocFromServer 
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase App
@@ -28,6 +29,13 @@ export const db = (firebaseConfig.firestoreDatabaseId && firebaseConfig.firestor
 
 // Initialize Storage
 export const storage = getStorage(app);
+
+export const functions = getFunctions(app);
+
+export async function claimInvite(code: string): Promise<void> {
+  const claimSlot = httpsCallable(functions, 'claimSlot');
+  await claimSlot({ code });
+}
 
 // Test Firestore connection on boot
 async function testConnection() {

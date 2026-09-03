@@ -13,6 +13,7 @@ import {
 
 interface NavbarProps {
   onNewSubscription: () => void;
+  onJoinGroup: () => void;
   onOpenSettings: () => void;
   onOpenNotifications?: () => void;
   subscriptionsCount: number;
@@ -22,6 +23,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({
   onNewSubscription,
+  onJoinGroup,
   onOpenSettings,
   onOpenNotifications,
   subscriptionsCount,
@@ -110,6 +112,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <Settings className="w-4 h-4 text-blue-500" />
             <span className="hidden sm:inline">Configuración</span>
+          </button>
+
+          {/* Join group CTA */}
+          <button
+            id="btn-nav-join-group"
+            onClick={onJoinGroup}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white active:scale-98 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+          >
+            <LogIn className="w-4 h-4 stroke-[2.5]" />
+            <span>Unirse<span className="hidden sm:inline"> a un grupo</span></span>
           </button>
 
           {/* Add subscription CTA */}
