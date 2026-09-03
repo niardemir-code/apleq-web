@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { 
@@ -34,6 +34,20 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { isDark, toggleTheme } = useTheme();
   const hasUnread = unreadNotificationsCount > 0;
   const hasNotifications = totalNotificationsCount > 0;
+
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isUserMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isUserMenuOpen]);
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-card/90 border-b border-border transition-colors duration-200">
@@ -141,8 +155,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
           ) : user ? (
             <div className="flex items-center gap-2 pl-1 sm:pl-2 border-l border-border">
-              <div className="relative group">
-                <div className="flex items-center gap-2.5 cursor-pointer bg-muted/70 border border-border rounded-full pl-1.5 pr-3 py-1 hover:border-blue-500/50 transition-colors">
+              <div className="relative" ref={userMenuRef}>
+                <div
+                  onClick={() => setIsUserMenuOpen((v) => !v)}
+                  className="flex items-center gap-2.5 cursor-pointer bg-muted/70 border border-border rounded-full pl-1.5 pr-3 py-1 hover:border-blue-500/50 transition-colors"
+                >
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
@@ -161,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
 
                 {/* Dropdown Menu on hover/click */}
-                <div className="absolute right-0 mt-1.5 w-56 p-2 rounded-2xl bg-card border border-border shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50">
+                <div className={`absolute right-0 mt-1.5 w-56 p-2 rounded-2xl bg-card border border-border shadow-2xl transition-all duration-150 z-50 ${isUserMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                   <div className="px-3 py-2 border-b border-border">
                     <p className="text-xs font-bold text-foreground truncate">
                       {user.displayName || 'Usuario'}
@@ -175,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                   <button
                     id="btn-user-logout"
-                    onClick={signOut}
+                    onClick={() => { setIsUserMenuOpen(false); signOut(); }}
                     type="button"
                     className="w-full mt-1 flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer"
                   >
