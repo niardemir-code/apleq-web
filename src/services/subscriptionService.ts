@@ -1009,11 +1009,16 @@ export async function updateSubscriptionMembers(
 ): Promise<void> {
   const docId = String(subId);
   const formattedMembers = formatMembersForFirestore(updatedMembers);
+  const memberUids = formattedMembers
+    .filter((m: any) => m.linkedUid)
+    .map((m: any) => String(m.linkedUid));
   const nowIso = new Date().toISOString();
   const nowMs = Date.now();
 
   const updateData = {
     members: formattedMembers,
+    memberUids: memberUids,
+    member_uids: memberUids,
     updatedAt: nowIso,
     updated_at: nowIso,
     updatedAtMs: nowMs,
