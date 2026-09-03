@@ -37,7 +37,6 @@ import {
 
 import { 
   LogIn, 
-  Sparkles, 
   RefreshCw, 
   Database,
   Calendar,
@@ -412,22 +411,6 @@ function SplitzyApp() {
     }
   };
 
-  const handleLoadSampleData = async () => {
-    if (user) {
-      const samples = getSampleSubscriptions(user.uid);
-      await batchImportSubscriptions(user.uid, samples);
-    } else {
-      const samples = getSampleSubscriptions('guest').map((s, idx) => ({
-        ...s,
-        id: `guest_sample_${Date.now()}_${idx}`,
-        userId: 'guest',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }));
-      setLocalGuestSubscriptions(samples);
-    }
-  };
-
   // Keep modal subscription synced with current subscriptions list
   const currentSelectedSubForModal = useMemo(() => {
     if (!selectedSubForMembers) return null;
@@ -682,26 +665,6 @@ function SplitzyApp() {
                 />
               </div>
             </div>
-
-            {/* Quick sample data seed */}
-            {activeCount < 4 && (
-              <div className="mt-8 p-4 rounded-2xl bg-card border border-border text-center flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
-                  <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span>
-                    ¿Quieres ver un ejemplo con Netflix, Spotify, ChatGPT y co-suscriptores de Together Price, Sharesub y amigos?
-                  </span>
-                </div>
-                <button
-                  id="btn-load-sample-data"
-                  onClick={handleLoadSampleData}
-                  type="button"
-                  className="px-3.5 py-1.5 rounded-xl bg-muted hover:bg-muted/80 border border-border text-foreground text-xs font-bold transition-colors shrink-0 cursor-pointer"
-                >
-                  Cargar datos de ejemplo
-                </button>
-              </div>
-            )}
           </div>
         )}
 
