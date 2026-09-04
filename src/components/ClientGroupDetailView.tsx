@@ -52,6 +52,12 @@ export function ClientGroupDetailView({ group, currentUid, onBackToList, isMobil
       </div>
 
       <div className="p-4 rounded-2xl bg-muted/40 border border-border space-y-2.5">
+        {group.showMainUserToMembers && group.mainUserName && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Titular / Usuario principal</span>
+            <span className="font-bold text-foreground text-right">{group.mainUserName}</span>
+          </div>
+        )}
         {platform && (
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Plataforma de compartición</span>

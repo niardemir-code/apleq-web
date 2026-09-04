@@ -487,6 +487,7 @@ export interface Subscription {
   plan?: string; // Legacy
   customPlanName?: string; // Legacy
   mainUserName: string; // Titular / Administrador principal
+  showMainUserToMembers?: boolean; // Si el gestor permite que los clientes vean el Titular/Usuario principal
   mainUserContact?: string; // Contacto del titular
   category: Category;
   cost: number; // Dinero que me cuesta a mí la suscripción completa

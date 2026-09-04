@@ -13,11 +13,13 @@ import {
 
 interface MetricsHeaderProps {
   subscriptions: Subscription[];
+  participatingCount?: number;
   onFilterPending?: () => void;
 }
 
 export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
   subscriptions,
+  participatingCount = 0,
   onFilterPending,
 }) => {
   const { convertToEur } = useCurrency();
@@ -138,11 +140,11 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
         </div>
 
         {/* Bottom Row: Suscripciones & Miembros activos */}
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mt-2.5 pt-2.5 border-t border-border">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mt-2.5 pt-2.5 border-t border-border">
           <div className="px-3.5 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center sm:justify-start gap-2">
             <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
             <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
-              {subscriptions.length} {subscriptions.length === 1 ? 'Suscripción' : 'Suscripciones'}
+              Tengo {subscriptions.length} {subscriptions.length === 1 ? 'suscripción' : 'suscripciones'}
             </span>
           </div>
 
@@ -150,6 +152,13 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
             <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
               {totalMembersCount} {totalMembersCount === 1 ? 'Miembro activo' : 'Miembros activos'}
+            </span>
+          </div>
+
+          <div className="px-3.5 py-2 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center sm:justify-start gap-2">
+            <Layers className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0" />
+            <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
+              Participo en {participatingCount} {participatingCount === 1 ? 'suscripción' : 'suscripciones'}
             </span>
           </div>
         </div>

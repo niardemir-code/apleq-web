@@ -393,6 +393,7 @@ export function normalizeSubscriptionDoc(id: string, data: any, defaultUserId: s
     currency: normalizeCurrencyToIso(data.currency),
     billingDay: isNaN(billingDay) ? 1 : Math.min(31, Math.max(1, billingDay)),
     freeSlots: typeof data.freeSlots === 'number' ? data.freeSlots : (typeof data.free_slots === 'number' ? data.free_slots : 0),
+    showMainUserToMembers: data.showMainUserToMembers === true || data.show_main_user_to_members === true,
     billingMonth: isNaN(billingMonth) ? 1 : Math.min(12, Math.max(1, billingMonth)),
     defaultContributionPerUser: isNaN(defaultContributionPerUser) ? 0 : defaultContributionPerUser,
     platformPricing: String(data.platformPricing || ''),
@@ -698,6 +699,11 @@ export function toAndroidSubscriptionPayload(sub: Partial<Subscription>, userId:
     const fSlots = Math.max(0, Number(sub.freeSlots ?? (sub as any).free_slots) || 0);
     payload.freeSlots = fSlots;
     payload.free_slots = fSlots;
+  }
+  if (sub.showMainUserToMembers !== undefined) {
+    const showMain = sub.showMainUserToMembers === true;
+    payload.showMainUserToMembers = showMain;
+    payload.show_main_user_to_members = showMain;
   }
   if (sub.billingMonth !== undefined) {
     const bMonth = Math.min(12, Math.max(1, Math.round(Number(sub.billingMonth) || 1)));

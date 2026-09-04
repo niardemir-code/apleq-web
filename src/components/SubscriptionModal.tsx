@@ -125,6 +125,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   const [platformName, setPlatformName] = useState('');
   const [category, setCategory] = useState<string>('Streaming');
   const [mainUserName, setMainUserName] = useState('');
+  const [showMainUserToMembers, setShowMainUserToMembers] = useState(false);
   const [cost, setCost] = useState<number | ''>(9.99);
   const [currency, setCurrency] = useState<string>('EUR');
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('MONTHLY');
@@ -159,6 +160,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       setPlatformName(activeSubToEdit.platformName || activeSubToEdit.name || '');
       setCategory(activeSubToEdit.category || 'Streaming');
       setMainUserName(activeSubToEdit.mainUserName || '');
+      setShowMainUserToMembers(activeSubToEdit.showMainUserToMembers ?? false);
       setCost(typeof activeSubToEdit.cost === 'number' ? activeSubToEdit.cost : 9.99);
       setCurrency(activeSubToEdit.currency || 'EUR');
       
@@ -208,6 +210,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       setPlatformName('');
       setCategory('Streaming');
       setMainUserName('');
+      setShowMainUserToMembers(false);
       setCost(9.99);
       setCurrency('EUR');
       setBillingPeriod('MONTHLY');
@@ -431,6 +434,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       platformName: platformName.trim(),
       category: (category as Category) || 'OTHER',
       mainUserName: mainUserName.trim(),
+      showMainUserToMembers: showMainUserToMembers,
       cost: typeof cost === 'number' ? cost : 0,
       currency: currency,
       billingPeriod: billingPeriod,
@@ -589,6 +593,17 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 />
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               </div>
+              <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={showMainUserToMembers}
+                  onChange={(e) => setShowMainUserToMembers(e.target.checked)}
+                  className="w-4 h-4 rounded accent-blue-600 cursor-pointer"
+                />
+                <span className="text-[11px] font-semibold text-muted-foreground">
+                  Visible para los clientes de esta suscripción
+                </span>
+              </label>
             </div>
 
             {/* 4. Coste y Moneda */}

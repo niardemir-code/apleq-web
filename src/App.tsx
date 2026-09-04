@@ -614,6 +614,7 @@ function SplitzyApp() {
         <div className="mb-6">
           <MetricsHeader
             subscriptions={user ? subscriptions : localGuestSubscriptions}
+            participatingCount={participatingGroups.length}
             onFilterPending={() =>
               setFilters((prev) => ({
                 ...prev,
