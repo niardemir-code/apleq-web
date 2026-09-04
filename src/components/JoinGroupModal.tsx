@@ -29,6 +29,15 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
     }
   };
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) setCode(text.trim());
+    } catch {
+      setMessage({ type: 'error', text: 'No se pudo leer el portapapeles. Pega con Ctrl+V.' });
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -50,6 +59,13 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
           maxLength={8}
           className="w-full bg-muted/60 text-foreground px-4 py-3 rounded-2xl border border-border text-center text-lg font-black tracking-widest uppercase focus:outline-none focus:border-blue-500"
         />
+        <button
+          type="button"
+          onClick={handlePaste}
+          className="mt-2 w-full py-2 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-xs font-bold text-foreground transition-colors cursor-pointer"
+        >
+          Pegar del portapapeles
+        </button>
         {message && (
           <p
             className={`text-xs mt-3 text-center font-semibold ${
