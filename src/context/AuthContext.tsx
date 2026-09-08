@@ -6,13 +6,23 @@ import {
   ReactNode 
 } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, loginWithGoogle, logoutUser, isAuthCancellation } from '../lib/firebase';
+import { 
+  auth, 
+  loginWithGoogle, 
+  logoutUser, 
+  isAuthCancellation, 
+  registerWithEmail, 
+  loginWithEmail,
+  friendlyAuthErrorMessage
+} from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
+  registerWithEmailPassword: (email: string, password: string, name: string) => Promise<void>;
+  loginWithEmailPassword: (email: string, password: string) => Promise<void>;
   authError: string | null;
   clearAuthError: () => void;
 }
@@ -61,6 +71,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const registerWithEmailPassword = async (email: string, password: string, name: string) => {
+    setAuthError(null);
+    await registerWithEmail(email, password, name);
+  };
+
+  const loginWithEmailPassword = async (email: string, password: string) => {
+    setAuthError(null);
+    await loginWithEmail(email, password);
+  };
+
   const clearAuthError = () => setAuthError(null);
 
   return (
@@ -70,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         signIn,
         signOut,
+        registerWithEmailPassword,
+        loginWithEmailPassword,
         authError,
         clearAuthError,
       }}

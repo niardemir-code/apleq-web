@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { EmailAuthModal } from './EmailAuthModal';
+import { DeleteAccountModal } from './DeleteAccountModal';
 import { 
   Plus, 
   Sun, 
@@ -37,6 +39,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isEmailAuthOpen, setIsEmailAuthOpen] = useState(false);
+  const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
 
   useEffect(() => {
     if (!isUserMenuOpen) return;
@@ -199,23 +203,45 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <LogOut className="w-4 h-4" />
                     <span>Cerrar sesión</span>
                   </button>
+                  <button
+                    id="btn-user-delete-account"
+                    onClick={() => { setIsUserMenuOpen(false); setIsDeleteAccountOpen(true); }}
+                    type="button"
+                    className="w-full mt-1 flex items-center gap-2 px-3 py-2 text-[11px] font-medium text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <span>Eliminar mi cuenta</span>
+                  </button>
                 </div>
               </div>
             </div>
           ) : (
-            <button
-              id="btn-user-signin"
-              onClick={signIn}
-              type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-muted border border-border text-foreground hover:border-blue-500/50 shadow-xs transition-all cursor-pointer"
-              title="Iniciar sesión con Google para sincronizar tus suscripciones"
-            >
-              <LogIn className="w-3.5 h-3.5 text-blue-500" />
-              <span className="hidden sm:inline">Conectar Google</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                id="btn-user-signin"
+                onClick={signIn}
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-muted border border-border text-foreground hover:border-blue-500/50 shadow-xs transition-all cursor-pointer"
+                title="Iniciar sesión con Google para sincronizar tus suscripciones"
+              >
+                <LogIn className="w-3.5 h-3.5 text-blue-500" />
+                <span className="hidden sm:inline">Conectar Google</span>
+              </button>
+              <button
+                id="btn-user-signin-email"
+                onClick={() => setIsEmailAuthOpen(true)}
+                type="button"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-muted/60 border border-border text-foreground hover:border-blue-500/50 shadow-xs transition-all cursor-pointer"
+                title="Registrarte o iniciar sesión con correo"
+              >
+                <span className="hidden sm:inline">O con correo</span>
+                <span className="sm:hidden">Correo</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
+      <EmailAuthModal isOpen={isEmailAuthOpen} onClose={() => setIsEmailAuthOpen(false)} />
+      <DeleteAccountModal isOpen={isDeleteAccountOpen} onClose={() => setIsDeleteAccountOpen(false)} />
     </header>
   );
 };

@@ -3,7 +3,10 @@ import {
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
-  signOut as firebaseSignOut 
+  signOut as firebaseSignOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -35,6 +38,16 @@ export const functions = getFunctions(app);
 export async function claimInvite(code: string): Promise<void> {
   const claimSlot = httpsCallable(functions, 'claimSlot');
   await claimSlot({ code });
+}
+
+export async function deleteAccountCall(): Promise<void> {
+  const deleteAccount = httpsCallable(functions, 'deleteAccount');
+  await deleteAccount();
+}
+
+export async function leaveGroupCall(ownerUid: string, groupId: string): Promise<void> {
+  const leaveGroup = httpsCallable(functions, 'leaveGroup');
+  await leaveGroup({ ownerUid, groupId });
 }
 
 // Test Firestore connection on boot
@@ -136,4 +149,36 @@ export async function loginWithGoogle() {
 
 export async function logoutUser() {
   return await firebaseSignOut(auth);
+}
+
+export async function registerWithEmail(email: string, password: string, name: string) {
+  const credential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+  if (name.trim()) {
+    await updateProfile(credential.user, { displayName: name.trim() });
+  }
+  return credential;
+}
+
+export async function loginWithEmail(email: string, password: string) {
+  return await signInWithEmailAndPassword(auth, email.trim(), password);
+}
+
+export function friendlyAuthErrorMessage(err: any): string {
+  const code = String(err?.code || '');
+  switch (code) {
+    case 'auth/email-already-in-use':
+      return 'Ya existe una cuenta con ese correo. Prueba a iniciar sesión.';
+    case 'auth/invalid-email':
+      return 'El correo no es válido.';
+    case 'auth/weak-password':
+      return 'La contraseña es demasiado débil (mínimo 6 caracteres).';
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Correo o contraseña incorrectos.';
+    case 'auth/too-many-requests':
+      return 'Demasiados intentos. Inténtalo de nuevo más tarde.';
+    default:
+      return err?.message || 'Ha ocurrido un error. Inténtalo de nuevo.';
+  }
 }
