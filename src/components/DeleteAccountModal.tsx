@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { deleteAccountCall } from '../lib/firebase';
+import { deleteAccountCall, logoutUser } from '../lib/firebase';
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -28,9 +28,15 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
           setTimeout(() => reject(new Error('TIMEOUT')), 25000)
         ),
       ]);
-      // La sesión se cierra sola: Firebase Auth ya no tiene esta cuenta,
-      // el listener onAuthStateChanged detectará user = null.
+      // La cuenta ya no existe en Firebase Auth, pero el token de sesión sigue
+      // siendo válido en el navegador hasta que caduque. Hay que cerrar sesión
+      // explícitamente para que la app vuelva a la pantalla de bienvenida.
       onClose();
+      await logoutUser().catch(() => {
+        // Si el cierre de sesión fallara, recargamos como último recurso:
+        // sin cuenta, la app debe volver a la pantalla de bienvenida igualmente.
+        window.location.reload();
+      });
     } catch (e: any) {
       console.error('Error al eliminar la cuenta:', e);
       if (e?.message === 'TIMEOUT') {

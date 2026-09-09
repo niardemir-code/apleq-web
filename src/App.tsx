@@ -225,6 +225,8 @@ function SplitzyApp() {
       name: platformName,
       platformName: platformName,
       mainUserName: subData.mainUserName || '',
+      showMainUserToMembers: subData.showMainUserToMembers === true,
+      mainUserContact: subData.mainUserContact || '',
       category: subData.category || 'General',
       cost: typeof subData.cost === 'number' ? subData.cost : 0,
       currency: subData.currency || 'EUR',
@@ -232,6 +234,11 @@ function SplitzyApp() {
       billingCycle: subData.billingPeriod === 'YEARLY' ? 'yearly' : 'monthly',
       billingDay: subData.billingDay || 1,
       billingMonth: subData.billingMonth || 1,
+      freeSlots: typeof subData.freeSlots === 'number' ? subData.freeSlots : 0,
+      defaultContributionPerUser:
+        typeof subData.defaultContributionPerUser === 'number'
+          ? subData.defaultContributionPerUser
+          : 0,
       renewalDate: subData.renewalDate || '',
       enableAlarm: Boolean(subData.enableAlarm),
       alarmValue: typeof subData.alarmValue === 'number' ? subData.alarmValue : 3,
