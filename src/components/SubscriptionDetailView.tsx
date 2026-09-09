@@ -446,14 +446,34 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
               <p className="text-xs text-muted-foreground font-medium">
                 No hay ningún co-suscriptor añadido en esta suscripción.
               </p>
-              <button
-                onClick={() => onManageMembers(subscription)}
-                type="button"
-                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400 text-xs font-bold transition-colors cursor-pointer"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Añadir miembros</span>
-              </button>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                <button
+                  onClick={() => onManageMembers(subscription)}
+                  type="button"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Añadir miembros</span>
+                </button>
+                {capacity > 0 && (
+                  <button
+                    onClick={handleGenerateInvite}
+                    type="button"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Invitar a un hueco</span>
+                  </button>
+                )}
+              </div>
+              {invMsg && (
+                <p className="text-[11px] text-muted-foreground mt-2">{invMsg}</p>
+              )}
+              {capacity === 0 && (
+                <p className="text-[11px] text-muted-foreground mt-3">
+                  Para invitar a alguien, primero configura cuántos huecos libres tiene esta suscripción desde "Editar".
+                </p>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
