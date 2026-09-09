@@ -1,21 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { friendlyAuthErrorMessage } from '../lib/firebase';
 
 interface EmailAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMode?: 'register' | 'login';
 }
 
-export function EmailAuthModal({ isOpen, onClose }: EmailAuthModalProps) {
+export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: EmailAuthModalProps) {
   const { registerWithEmailPassword, loginWithEmailPassword } = useAuth();
-  const [mode, setMode] = useState<'register' | 'login'>('register');
+  const [mode, setMode] = useState<'register' | 'login'>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) setMode(initialMode);
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
@@ -65,7 +70,7 @@ export function EmailAuthModal({ isOpen, onClose }: EmailAuthModalProps) {
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-sm bg-card border border-border rounded-3xl p-6 shadow-2xl"
+        className="w-full max-w-sm bg-card border border-border rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex gap-2 mb-5 bg-muted/60 rounded-2xl p-1">

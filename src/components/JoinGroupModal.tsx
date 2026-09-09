@@ -22,6 +22,11 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
       await claimInvite(clean);
       setMessage({ type: 'success', text: '¡Te has unido al grupo!' });
       setCode('');
+      // Cierre automático: pequeña pausa para que se alcance a leer el mensaje de éxito.
+      setTimeout(() => {
+        setMessage(null);
+        onClose();
+      }, 900);
     } catch (e: any) {
       setMessage({ type: 'error', text: e?.message || 'No se pudo unir. Revisa el código.' });
     } finally {

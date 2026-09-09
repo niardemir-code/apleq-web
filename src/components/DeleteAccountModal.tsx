@@ -22,12 +22,22 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
     setLoading(true);
     setError(null);
     try {
-      await deleteAccountCall();
+      await Promise.race([
+        deleteAccountCall(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('TIMEOUT')), 25000)
+        ),
+      ]);
       // La sesión se cierra sola: Firebase Auth ya no tiene esta cuenta,
       // el listener onAuthStateChanged detectará user = null.
       onClose();
     } catch (e: any) {
-      setError(e?.message || 'No se pudo eliminar la cuenta. Inténtalo de nuevo.');
+      console.error('Error al eliminar la cuenta:', e);
+      if (e?.message === 'TIMEOUT') {
+        setError('Está tardando más de lo normal. Comprueba tu conexión y vuelve a intentarlo; si el problema persiste, revisa la consola del navegador (F12) para más detalles.');
+      } else {
+        setError(e?.message || 'No se pudo eliminar la cuenta. Inténtalo de nuevo.');
+      }
       setLoading(false);
     }
   };

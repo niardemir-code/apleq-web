@@ -47,7 +47,7 @@ export function ClientGroupDetailView({ group, currentUid, onBackToList, isMobil
     setIsLeaving(true);
     setLeaveError(null);
     try {
-      await leaveGroupCall(group.userId, String(group.id));
+      await leaveGroupCall(String(group.id));
       setIsConfirmingLeave(false);
       if (onBackToList) onBackToList();
     } catch (e: any) {

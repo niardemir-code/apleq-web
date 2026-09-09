@@ -45,9 +45,9 @@ export async function deleteAccountCall(): Promise<void> {
   await deleteAccount();
 }
 
-export async function leaveGroupCall(ownerUid: string, groupId: string): Promise<void> {
+export async function leaveGroupCall(groupId: string): Promise<void> {
   const leaveGroup = httpsCallable(functions, 'leaveGroup');
-  await leaveGroup({ ownerUid, groupId });
+  await leaveGroup({ groupId });
 }
 
 // Test Firestore connection on boot
