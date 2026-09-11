@@ -13,7 +13,9 @@ import {
   toggleMemberPaymentStatus,
   markAllSubscriptionMembersAsPaid,
   batchImportSubscriptions,
-  rolloverDuePaymentCycles
+  rolloverDuePaymentCycles,
+  loadReadNotificationIdsFromCloud,
+  saveReadNotificationIdsToCloud
 } from './services/subscriptionService';
 import { getSampleSubscriptions } from './utils/sampleData';
 
@@ -124,6 +126,28 @@ function SplitzyApp() {
     });
   }, [user, loadingData, subscriptions]);
 
+  // Fusiona el estado de leído local con el de la nube, una vez por sesión iniciada.
+  const hasSyncedReadIdsRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!user) {
+      hasSyncedReadIdsRef.current = null;
+      return;
+    }
+    if (hasSyncedReadIdsRef.current === user.uid) return;
+    hasSyncedReadIdsRef.current = user.uid;
+
+    loadReadNotificationIdsFromCloud(user.uid).then((cloudIds) => {
+      setReadNotificationIds((current) => {
+        const merged = Array.from(new Set([...current, ...cloudIds]));
+        if (merged.length !== current.length) {
+          saveReadNotificationIds(merged);
+        }
+        saveReadNotificationIdsToCloud(user.uid, merged);
+        return merged;
+      });
+    });
+  }, [user]);
+
   useEffect(() => {
     if (!user) {
       setParticipatingGroups([]);
@@ -174,6 +198,7 @@ function SplitzyApp() {
     const allIds = Array.from(new Set([...readNotificationIds, ...notifications.map((n) => n.id)]));
     setReadNotificationIds(allIds);
     saveReadNotificationIds(allIds);
+    if (user) saveReadNotificationIdsToCloud(user.uid, allIds);
   };
 
   const handleToggleNotificationRead = (notifId: string) => {
@@ -186,6 +211,7 @@ function SplitzyApp() {
     }
     setReadNotificationIds(updated);
     saveReadNotificationIds(updated);
+    if (user) saveReadNotificationIdsToCloud(user.uid, updated);
   };
 
   const handleMarkMemberPaidFromNotification = async (subscriptionId: string, memberId: string) => {

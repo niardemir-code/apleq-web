@@ -1378,18 +1378,20 @@ export async function restoreAndroidBackupToFirestore(
     let membersRestored = 0;
 
     for (const rawSub of rawSubs) {
-      const subNumericId = rawSub.id;
-      const associatedMembers = rawMembers.filter((m) => m.subscriptionId === subNumericId);
+      const rawIdValid = rawSub.id !== undefined && rawSub.id !== null && !isNaN(Number(rawSub.id));
+      const numericId = rawIdValid ? String(rawSub.id) : String(Date.now() + subsRestored);
+      const associatedMembers = rawMembers.filter((m) => String(m.subscriptionId) === String(rawSub.id) || String(m.subscription_id) === String(rawSub.id));
       
       const combinedData: any = {
         ...rawSub,
+        id: numericId,
         members: associatedMembers,
       };
 
-      const normalized = normalizeSubscriptionDoc(String(subNumericId), combinedData, userId);
-      const payload = toAndroidSubscriptionPayload(normalized, userId);
+      const normalized = normalizeSubscriptionDoc(numericId, combinedData, userId);
+      const payload = toAndroidSubscriptionPayload({ ...normalized, id: numericId }, userId);
 
-      const newDocRef = doc(collection(db, path));
+      const newDocRef = doc(db, path, numericId);
       batch.set(newDocRef, payload);
       subsRestored++;
       membersRestored += associatedMembers.length;
@@ -1421,8 +1423,14 @@ export async function batchImportSubscriptions(
 
   let count = 0;
   for (const sub of subscriptions) {
-    const newDocRef = doc(collection(db, path));
-    const payload = toAndroidSubscriptionPayload(sub, userId);
+    // IMPORTANTE: se usa un id numérico generado aquí, y ese MISMO valor se usa
+    // tanto para la ruta del documento en Firestore como para el campo interno
+    // "id" del propio documento. Si no coinciden, Android no puede saber a qué
+    // ruta de Firestore corresponde una suscripción local, y no puede borrarla
+    // correctamente (ver historial de este archivo para más contexto).
+    const numericId = String(Date.now() + count);
+    const newDocRef = doc(db, path, numericId);
+    const payload = toAndroidSubscriptionPayload({ ...sub, id: numericId }, userId);
     batch.set(newDocRef, payload);
     count++;
   }
@@ -1475,6 +1483,31 @@ export async function deleteInvite(code: string): Promise<void> {
     await deleteDoc(doc(db, 'invites', code));
   } catch (e) {
     console.warn('No se pudo borrar la invitación:', e);
+  }
+}
+
+// --- Sincronización de notificaciones leídas ---
+export async function loadReadNotificationIdsFromCloud(userId: string): Promise<string[]> {
+  try {
+    const snap = await getDoc(doc(db, 'users', userId, 'settings', 'notificationReads'));
+    if (!snap.exists()) return [];
+    const data = snap.data();
+    return Array.isArray(data.readIds) ? data.readIds.map(String) : [];
+  } catch (e) {
+    console.warn('No se pudo cargar el estado de leído desde la nube', e);
+    return [];
+  }
+}
+
+export async function saveReadNotificationIdsToCloud(userId: string, ids: string[]): Promise<void> {
+  try {
+    await setDoc(
+      doc(db, 'users', userId, 'settings', 'notificationReads'),
+      { readIds: ids, updatedAt: new Date().toISOString() },
+      { merge: true }
+    );
+  } catch (e) {
+    console.warn('No se pudo guardar el estado de leído en la nube', e);
   }
 }
 

@@ -9,9 +9,10 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { 
-  getFirestore, 
-  doc, 
-  getDocFromServer 
+  initializeFirestore,
+  getFirestore,
+  FirestoreSettings,
+  doc
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getFunctions, httpsCallable } from 'firebase/functions';
@@ -25,10 +26,27 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-// Initialize Firestore (default or custom database ID)
-export const db = (firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)')
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
+// Initialize Firestore with robust connection settings (force long polling to prevent
+// 10-second backend connection timeouts in iframes and proxied environments)
+function initDb() {
+  const settings: FirestoreSettings = {
+    experimentalForceLongPolling: true,
+    ignoreUndefinedProperties: true,
+  };
+  const customDbId = (firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)')
+    ? firebaseConfig.firestoreDatabaseId
+    : undefined;
+
+  try {
+    return customDbId 
+      ? initializeFirestore(app, settings, customDbId)
+      : initializeFirestore(app, settings);
+  } catch (_e) {
+    return customDbId ? getFirestore(app, customDbId) : getFirestore(app);
+  }
+}
+
+export const db = initDb();
 
 // Initialize Storage
 export const storage = getStorage(app);
@@ -49,20 +67,6 @@ export async function leaveGroupCall(groupId: string): Promise<void> {
   const leaveGroup = httpsCallable(functions, 'leaveGroup');
   await leaveGroup({ groupId });
 }
-
-// Test Firestore connection on boot
-async function testConnection() {
-  try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-  } catch (error: any) {
-    // Expected when unauthenticated, offline, or test doc does not exist
-    if (error?.code === 'unavailable' || error?.message?.includes('offline') || error?.code === 'permission-denied') {
-      // Benign startup check notice
-      return;
-    }
-  }
-}
-testConnection();
 
 // Operation types for error auditing
 export enum OperationType {
