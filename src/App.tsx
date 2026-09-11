@@ -126,7 +126,7 @@ function SplitzyApp() {
     });
   }, [user, loadingData, subscriptions]);
 
-  // Fusiona el estado de leído local con el de la nube, una vez por sesión iniciada.
+  // Sincroniza el estado de leído con la nube, una vez por sesión iniciada.
   const hasSyncedReadIdsRef = useRef<string | null>(null);
   useEffect(() => {
     if (!user) {
@@ -137,14 +137,19 @@ function SplitzyApp() {
     hasSyncedReadIdsRef.current = user.uid;
 
     loadReadNotificationIdsFromCloud(user.uid).then((cloudIds) => {
-      setReadNotificationIds((current) => {
-        const merged = Array.from(new Set([...current, ...cloudIds]));
-        if (merged.length !== current.length) {
-          saveReadNotificationIds(merged);
-        }
-        saveReadNotificationIdsToCloud(user.uid, merged);
-        return merged;
-      });
+      if (cloudIds === null) {
+        // Primera vez (o sin conexión): se sube lo que ya había en local,
+        // sin tocar el estado local.
+        setReadNotificationIds((current) => {
+          saveReadNotificationIdsToCloud(user.uid, current);
+          return current;
+        });
+      } else {
+        // La nube ya existe: manda ella. Así, si algo se desmarcó como leído
+        // en otra plataforma, aquí también deja de estarlo.
+        setReadNotificationIds(cloudIds);
+        saveReadNotificationIds(cloudIds);
+      }
     });
   }, [user]);
 

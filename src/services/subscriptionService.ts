@@ -1487,15 +1487,22 @@ export async function deleteInvite(code: string): Promise<void> {
 }
 
 // --- Sincronización de notificaciones leídas ---
-export async function loadReadNotificationIdsFromCloud(userId: string): Promise<string[]> {
+/**
+ * Devuelve el estado de leído guardado en la nube, o null si el documento
+ * todavía no existe (primera sincronización) o si no se pudo contactar con
+ * Firestore. La diferencia entre "vacío" y "no existe" importa: una lista
+ * vacía real significa "nada leído todavía", mientras que null significa
+ * "no sabemos, no toques lo que hay en local".
+ */
+export async function loadReadNotificationIdsFromCloud(userId: string): Promise<string[] | null> {
   try {
     const snap = await getDoc(doc(db, 'users', userId, 'settings', 'notificationReads'));
-    if (!snap.exists()) return [];
+    if (!snap.exists()) return null;
     const data = snap.data();
     return Array.isArray(data.readIds) ? data.readIds.map(String) : [];
   } catch (e) {
     console.warn('No se pudo cargar el estado de leído desde la nube', e);
-    return [];
+    return null;
   }
 }
 
