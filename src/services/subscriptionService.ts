@@ -959,7 +959,11 @@ export async function updateSubscription(
   const payload = toAndroidSubscriptionPayload({ ...subData, id: docId }, userId);
 
   try {
-    await setDoc(userDocRef, payload, { merge: true });
+    // updateDoc (a diferencia de setDoc con merge) falla si el documento no existe,
+    // en vez de crearlo. Esta función solo debe actualizar suscripciones ya
+    // existentes: si el documento fue borrado en otra plataforma justo antes de que
+    // esta escritura llegara, no debe resucitarlo.
+    await updateDoc(userDocRef, payload);
 
     // Sync member subcollections concurrently in background
     if (payload.members && Array.isArray(payload.members)) {
@@ -979,7 +983,13 @@ export async function updateSubscription(
       }
       await Promise.allSettled(subcollectionPromises);
     }
-  } catch (error) {
+  } catch (error: any) {
+    const errCode = String(error?.code || '');
+    const errMsg = String(error?.message || '');
+    if (errCode === 'not-found' || errMsg.includes('No document to update') || errMsg.includes('not-found')) {
+      console.warn(`[updateSubscription] La suscripción ${docId} no existe en Firestore (posiblemente borrada en otra plataforma). Se ignora la actualización.`);
+      return;
+    }
     handleFirestoreError(error, OperationType.UPDATE, `users/${userId}/subscriptions/${docId}`);
     throw error;
   }
@@ -1042,7 +1052,11 @@ export async function updateSubscriptionMembers(
   const userDocRef = doc(db, 'users', userId, 'subscriptions', docId);
 
   try {
-    await setDoc(userDocRef, updateData, { merge: true });
+    // updateDoc (a diferencia de setDoc con merge) falla si el documento no existe,
+    // en vez de crearlo. Esta función solo debe actualizar suscripciones ya
+    // existentes: si el documento fue borrado en otra plataforma justo antes de que
+    // esta escritura llegara, no debe resucitarlo.
+    await updateDoc(userDocRef, updateData);
 
     // Concurrently update members subcollection and delete orphaned members
     const backgroundTasks: Promise<any>[] = [];
@@ -1077,6 +1091,12 @@ export async function updateSubscriptionMembers(
 
     await Promise.allSettled(backgroundTasks);
   } catch (err: any) {
+    const errCode = String(err?.code || '');
+    const errMsg = String(err?.message || '');
+    if (errCode === 'not-found' || errMsg.includes('No document to update') || errMsg.includes('not-found')) {
+      console.warn(`[updateSubscriptionMembers] La suscripción ${docId} no existe en Firestore (posiblemente borrada en otra plataforma). Se ignora la actualización.`);
+      return;
+    }
     handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/subscriptions/${docId}`);
   }
 }
