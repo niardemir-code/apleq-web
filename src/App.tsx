@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth, AuthProvider } from './context/AuthContext';
 import { useTheme, ThemeProvider } from './context/ThemeContext';
 import { CurrencyProvider } from './context/CurrencyContext';
@@ -12,7 +12,8 @@ import {
   deleteSubscription,
   toggleMemberPaymentStatus,
   markAllSubscriptionMembersAsPaid,
-  batchImportSubscriptions
+  batchImportSubscriptions,
+  rolloverDuePaymentCycles
 } from './services/subscriptionService';
 import { getSampleSubscriptions } from './utils/sampleData';
 
@@ -110,6 +111,18 @@ function SplitzyApp() {
 
     return () => unsubscribe();
   }, [user]);
+
+  // Reinicio de ciclos de cobro vencidos: se ejecuta una sola vez por sesión,
+  // después de que las suscripciones se hayan cargado de Firestore.
+  const hasRolledOverRef = useRef(false);
+  useEffect(() => {
+    if (!user || loadingData || hasRolledOverRef.current) return;
+    if (subscriptions.length === 0) return;
+    hasRolledOverRef.current = true;
+    rolloverDuePaymentCycles(user.uid, subscriptions).catch((e) => {
+      console.error('Error en el reinicio de ciclos de cobro', e);
+    });
+  }, [user, loadingData, subscriptions]);
 
   useEffect(() => {
     if (!user) {

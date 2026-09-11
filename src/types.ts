@@ -309,6 +309,96 @@ export function calculateNextPaymentFromJoined(
 }
 
 /**
+ * Avanza una fecha (YYYY-MM-DD) al siguiente ciclo de cobro, repitiendo periodos
+ * hasta superar la fecha de referencia. Réplica de calculateNextCycleDate de Android.
+ */
+export function advancePaymentCycle(
+  fromDateStr: string,
+  freqValue: number = 1,
+  freqUnit: PaymentFrequencyUnit = 'months',
+  referenceDate: Date = new Date()
+): string {
+  const cleanStr = String(fromDateStr).split('T')[0];
+  const parts = cleanStr.split('-').map(Number);
+  if (parts.length < 3 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
+    return cleanStr;
+  }
+  const [y, m, d] = parts;
+  const baseDate = new Date(y, m - 1, d);
+  if (isNaN(baseDate.getTime())) return cleanStr;
+
+  const origDay = d;
+  const val = Math.max(1, freqValue || 1);
+  const refToday = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+
+  const addPeriod = (currDate: Date, count: number): Date => {
+    const result = new Date(currDate);
+    if (freqUnit === 'days') {
+      result.setDate(result.getDate() + val * count);
+    } else if (freqUnit === 'weeks') {
+      result.setDate(result.getDate() + val * 7 * count);
+    } else if (freqUnit === 'months') {
+      const targetMonth = result.getMonth() + val * count;
+      const targetYear = result.getFullYear() + Math.floor(targetMonth / 12);
+      const normalizedMonth = ((targetMonth % 12) + 12) % 12;
+      const maxDays = new Date(targetYear, normalizedMonth + 1, 0).getDate();
+      const actualDay = Math.min(origDay, maxDays);
+      return new Date(targetYear, normalizedMonth, actualDay);
+    } else if (freqUnit === 'years') {
+      const targetYear = result.getFullYear() + val * count;
+      const maxDays = new Date(targetYear, result.getMonth() + 1, 0).getDate();
+      const actualDay = Math.min(origDay, maxDays);
+      return new Date(targetYear, result.getMonth(), actualDay);
+    }
+    return result;
+  };
+
+  let nextDate = addPeriod(baseDate, 1);
+  let safety = 0;
+  while (nextDate < refToday && safety < 1200) {
+    safety++;
+    nextDate = addPeriod(nextDate, 1);
+  }
+
+  const resY = nextDate.getFullYear();
+  const resM = String(nextDate.getMonth() + 1).padStart(2, '0');
+  const resD = String(nextDate.getDate()).padStart(2, '0');
+  return `${resY}-${resM}-${resD}`;
+}
+
+/**
+ * Cuenta cuántos periodos completos han vencido entre una fecha y la de referencia.
+ */
+export function countElapsedCycles(
+  fromDateStr: string,
+  freqValue: number = 1,
+  freqUnit: PaymentFrequencyUnit = 'months',
+  referenceDate: Date = new Date()
+): number {
+  const cleanStr = String(fromDateStr).split('T')[0];
+  const parts = cleanStr.split('-').map(Number);
+  if (parts.length < 3) return 1;
+  const [y, m, d] = parts;
+  let cursor = new Date(y, m - 1, d);
+  const refToday = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+  let count = 0;
+  let safety = 0;
+  while (cursor <= refToday && safety < 240) {
+    count++;
+    const nextStr = advancePaymentCycle(
+      `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`,
+      1,
+      freqUnit,
+      cursor
+    );
+    const nParts = nextStr.split('-').map(Number);
+    cursor = new Date(nParts[0], nParts[1] - 1, nParts[2]);
+    safety++;
+  }
+  return Math.max(1, count);
+}
+
+/**
  * Resolves or auto-computes the nextPaymentDate for any member following frequency and join date rules
  */
 export function resolveMemberNextPaymentDate(
@@ -477,6 +567,8 @@ export interface Member {
   joinedDate: string | number; // Timestamp or YYYY-MM-DD
   lastPaymentDate?: string;
   notes?: string;
+  debtSinceDate?: string; // YYYY-MM-DD del primer cobro vencido sin pagar
+  unpaidCycles?: number; // Número de cuotas pendientes acumuladas
 }
 
 export interface Subscription {

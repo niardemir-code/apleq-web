@@ -273,6 +273,12 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                             </span>
                           )}
 
+                          {notif.debtText && (
+                            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                              {notif.debtText}
+                            </span>
+                          )}
+
                           {notif.alarmConfigText && (
                             <span className="text-[10px] text-muted-foreground/80 italic">
                               · {notif.alarmConfigText}

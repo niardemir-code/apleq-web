@@ -536,6 +536,11 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                             <span>Pendiente pago</span>
                           </span>
                         )}
+                        {(member.unpaidCycles || 0) >= 1 && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-rose-600 text-white shadow-2xs">
+                            <span>{member.unpaidCycles === 1 ? '1 cuota pendiente' : `${member.unpaidCycles} cuotas pendientes`}</span>
+                          </span>
+                        )}
                         {member.isPendingRegistration && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-500 text-white shadow-2xs">
                             <UserPlus className="w-2.5 h-2.5" />

@@ -43,7 +43,6 @@ import {
   Image as ImageIcon,
   Bell,
   Clock,
-  Calendar,
   Save
 } from 'lucide-react';
 
@@ -139,7 +138,6 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   const [enableAlarm, setEnableAlarm] = useState<boolean>(false);
   const [alarmValue, setAlarmValue] = useState<number>(3);
   const [alarmUnit, setAlarmUnit] = useState<AlarmUnit>('days');
-  const renewalDateInputRef = useRef<HTMLInputElement>(null);
 
   // Configured sharing platforms and prices list
   const [configuredPlatforms, setConfiguredPlatforms] = useState<PlatformPriceItem[]>([]);
@@ -769,36 +767,13 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      ref={renewalDateInputRef}
-                      type="date"
-                      value={renewalDate ? renewalDate.split('T')[0] : ''}
-                      onChange={(e) => setRenewalDate(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-card border border-border text-foreground text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (renewalDateInputRef.current) {
-                        if ('showPicker' in HTMLInputElement.prototype) {
-                          try {
-                            renewalDateInputRef.current.showPicker();
-                          } catch {
-                            renewalDateInputRef.current.focus();
-                          }
-                        } else {
-                          renewalDateInputRef.current.focus();
-                        }
-                      }
-                    }}
-                    className="p-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-blue-400 hover:border-blue-500/50 transition-colors shrink-0 cursor-pointer"
-                    title="Abrir calendario"
-                  >
-                    <Calendar className="w-4 h-4 text-blue-400" />
-                  </button>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={renewalDate ? renewalDate.split('T')[0] : ''}
+                    onChange={(e) => setRenewalDate(e.target.value)}
+                    className="custom-date-input w-full px-3.5 py-2.5 pr-3.5 rounded-xl bg-card border border-border text-foreground text-xs font-semibold focus:outline-none focus:border-blue-500 cursor-pointer transition-colors"
+                  />
                 </div>
                 <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 pt-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />

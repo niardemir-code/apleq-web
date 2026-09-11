@@ -48,12 +48,14 @@
     color: var(--text-primary);
   }
 
-  /* Date/Time picker indicator styling */
+  /* El esquema se fija explícitamente en cada tema. Con "light dark" el navegador
+     seguía la preferencia del sistema operativo, así que con Windows en oscuro y la
+     app en claro el icono se pintaba blanco sobre fondo blanco y desaparecía. */
   input[type="date"],
   input[type="month"],
   input[type="time"],
   input[type="datetime-local"] {
-    color-scheme: light dark;
+    color-scheme: light;
   }
 
   .dark input[type="date"],
@@ -67,16 +69,18 @@
     color-scheme: dark;
   }
 
-  /* Hide default browser glyphs in custom date wrappers so only our crisp icons show */
+  /* El indicador nativo es el que abre el selector: visible y clicable en todo su ancho.
+     Sin position ni z-index, para que nada se le superponga. */
   .custom-date-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
+    opacity: 0.85;
     cursor: pointer;
-    width: 28px;
-    height: 100%;
-    position: absolute;
-    right: 4px;
-    top: 0;
-    z-index: 10;
+    padding: 2px;
+    margin-right: 2px;
+    transition: opacity 0.15s ease;
+  }
+
+  .custom-date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
   }
 }
 

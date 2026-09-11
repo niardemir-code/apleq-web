@@ -123,6 +123,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
   }, []);
 
   const members = subscription.members || [];
+  const targetMember = editingMemberId ? members.find((m) => String(m.id) === String(editingMemberId)) : null;
 
   const getFrequencyPeriodLabel = () => {
     const val = paymentFrequencyValue || 1;
@@ -322,6 +323,8 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
             currency: memberCurrency || 'EUR',
             isPaidThisMonth: isPaid,
             isPendingPayment: pendingPayment,
+            debtSinceDate: pendingPayment ? m.debtSinceDate : '',
+            unpaidCycles: pendingPayment ? m.unpaidCycles : 0,
             isPendingRemoval: pendingRemoval,
             isPendingRegistration: pendingRegistration,
             paymentMethod: method.trim(),
@@ -355,6 +358,8 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
         currency: memberCurrency || 'EUR',
         isPaidThisMonth: isPaid,
         isPendingPayment: pendingPayment,
+        debtSinceDate: undefined,
+        unpaidCycles: 0,
         isPendingRemoval: pendingRemoval,
         isPendingRegistration: pendingRegistration,
         paymentMethod: method.trim(),
@@ -665,29 +670,8 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 type="date"
                 value={joinedDate}
                 onChange={(e) => handleJoinedDateChange(e.target.value)}
-                className="custom-date-input w-full px-3.5 py-2.5 pr-10 rounded-xl bg-card border border-border text-foreground text-xs font-semibold outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                className="custom-date-input w-full px-3.5 py-2.5 pr-3.5 rounded-xl bg-card border border-border text-foreground text-xs font-semibold outline-none focus:border-blue-500 transition-colors cursor-pointer"
               />
-              <button
-                type="button"
-                onClick={() => {
-                  const el = document.getElementById('input-member-joined-date') as HTMLInputElement | null;
-                  if (el) {
-                    if (typeof el.showPicker === 'function') {
-                      try {
-                        el.showPicker();
-                      } catch {
-                        el.focus();
-                      }
-                    } else {
-                      el.focus();
-                    }
-                  }
-                }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors cursor-pointer z-20"
-                title="Seleccionar fecha"
-              >
-                <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-              </button>
             </div>
           </div>
 
@@ -712,29 +696,8 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                   type="date"
                   value={nextPaymentDate}
                   onChange={(e) => setNextPaymentDate(e.target.value)}
-                  className="custom-date-input w-full px-3.5 py-2.5 pr-10 rounded-xl bg-card border border-border text-foreground text-xs font-semibold outline-none focus:border-blue-500 transition-colors cursor-pointer"
+                  className="custom-date-input w-full px-3.5 py-2.5 pr-3.5 rounded-xl bg-card border border-border text-foreground text-xs font-semibold outline-none focus:border-blue-500 transition-colors cursor-pointer"
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const el = document.getElementById('input-member-next-payment-date') as HTMLInputElement | null;
-                    if (el) {
-                      if (typeof el.showPicker === 'function') {
-                        try {
-                          el.showPicker();
-                        } catch {
-                          el.focus();
-                        }
-                      } else {
-                        el.focus();
-                      }
-                    }
-                  }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors cursor-pointer z-20"
-                  title="Seleccionar fecha"
-                >
-                  <Calendar className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-                </button>
               </div>
               <p className="text-[10px] text-muted-foreground mt-1 px-1">
                 Calculada automáticamente según la fecha de unión y periodicidad, o modificable a mano.
@@ -1006,6 +969,24 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 <div className="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform" />
               </div>
             </div>
+
+            {pendingPayment && (targetMember?.unpaidCycles || 0) >= 1 && (
+              <div className="px-3.5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                <p className="text-xs font-extrabold text-rose-600 dark:text-rose-400">
+                  {targetMember!.unpaidCycles === 1
+                    ? 'Debe 1 cuota'
+                    : `Debe ${targetMember!.unpaidCycles} cuotas`}
+                </p>
+                {targetMember?.debtSinceDate && (
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Desde el {targetMember.debtSinceDate.split('-').reverse().join('/')}
+                  </p>
+                )}
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Apaga el interruptor cuando te haya pagado: la deuda se saldará por completo.
+                </p>
+              </div>
+            )}
 
             {/* 2. Pendiente eliminar (Rojo) */}
             <div

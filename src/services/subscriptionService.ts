@@ -26,7 +26,9 @@ import {
   BackupPreview,
   normalizeBillingPeriod,
   resolveMemberNextPaymentDate,
-  calculateNextPaymentFromJoined
+  calculateNextPaymentFromJoined,
+  advancePaymentCycle,
+  countElapsedCycles
 } from '../types';
 
 export function getSubscriptionsPath(userId: string): string {
@@ -238,6 +240,8 @@ function parseSafeMembers(rawMembers: any, subBillingDay?: number): Member[] {
       isPendingPayment: Boolean(isPendingPayment),
       isPendingRemoval: isPendingRemoval,
       isPendingRegistration: isPendingRegistration,
+      debtSinceDate: String(m.debtSinceDate || m.debt_since_date || ''),
+      unpaidCycles: typeof m.unpaidCycles === 'number' ? m.unpaidCycles : (typeof m.unpaid_cycles === 'number' ? m.unpaid_cycles : 0),
       paymentMethod: paymentMethodVal,
       nextPaymentDate: nextPaymentDateVal,
       paymentFrequencyValue: paymentFreqVal,
@@ -492,6 +496,10 @@ export function formatMembersForFirestore(members: Member[], subBillingDay?: num
       isPendingPayment: Boolean(isPendingPayment),
       isPendingRemoval: Boolean(isPendingRemoval),
       isPendingRegistration: Boolean(isPendingRegistration),
+      debtSinceDate: String(m.debtSinceDate || ''),
+      debt_since_date: String(m.debtSinceDate || ''),
+      unpaidCycles: typeof m.unpaidCycles === 'number' ? m.unpaidCycles : 0,
+      unpaid_cycles: typeof m.unpaidCycles === 'number' ? m.unpaidCycles : 0,
       notes: notesStr,
       paymentMethod: String(m.paymentMethod || ''),
       payment_method: String(m.paymentMethod || ''),
@@ -1110,12 +1118,70 @@ export async function toggleMemberPendingPayment(
         isPendingPayment: nextPending,
         isPaidThisMonth: !nextPending,
         paymentStatus: (!nextPending ? 'paid' : 'pending') as PaymentStatus,
+        // Al apagar el interruptor (el gestor ha cobrado), se salda toda la deuda.
+        debtSinceDate: nextPending ? m.debtSinceDate : '',
+        unpaidCycles: nextPending ? m.unpaidCycles : 0,
       };
     }
     return m;
   });
 
   await updateSubscriptionMembers(userId, subId, updatedMembers);
+}
+
+/**
+ * Reinicia el ciclo de cobro de los miembros cuya fecha de pago ya ha llegado.
+ * La fecha SIEMPRE avanza al siguiente ciclo futuro; el interruptor de pendiente
+ * de pago se enciende si no lo estaba ya, y se registra/incrementa la deuda.
+ * Réplica exacta de rolloverDuePaymentCycles de Android.
+ */
+export async function rolloverDuePaymentCycles(
+  userId: string,
+  subscriptions: Subscription[]
+): Promise<number> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let totalChanged = 0;
+
+  for (const sub of subscriptions) {
+    const members = sub.members || [];
+    let changedInThisSub = false;
+
+    const updatedMembers = members.map((m) => {
+      if (m.isPendingRemoval) return m;
+      if (!m.nextPaymentDate) return m;
+
+      const parts = String(m.nextPaymentDate).split('-').map(Number);
+      if (parts.length < 3) return m;
+      const dueDate = new Date(parts[0], parts[1] - 1, parts[2]);
+      if (dueDate > today) return m;
+
+      const freqVal = m.paymentFrequencyValue || 1;
+      const freqUnit = m.paymentFrequencyUnit || 'months';
+      const newDate = advancePaymentCycle(m.nextPaymentDate!, freqVal, freqUnit, today);
+      const elapsedCycles = countElapsedCycles(m.nextPaymentDate!, freqVal, freqUnit, today);
+
+      const yaDebia = m.isPendingPayment || !m.isPaidThisMonth;
+
+      changedInThisSub = true;
+      totalChanged++;
+
+      return {
+        ...m,
+        isPendingPayment: true,
+        isPaidThisMonth: false,
+        nextPaymentDate: newDate,
+        debtSinceDate: yaDebia && m.debtSinceDate ? m.debtSinceDate : m.nextPaymentDate,
+        unpaidCycles: (yaDebia ? (m.unpaidCycles || 0) : 0) + elapsedCycles,
+      };
+    });
+
+    if (changedInThisSub) {
+      await updateSubscriptionMembers(userId, String(sub.id), updatedMembers);
+    }
+  }
+
+  return totalChanged;
 }
 
 export async function toggleMemberPendingRemoval(

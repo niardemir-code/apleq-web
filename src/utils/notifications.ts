@@ -28,6 +28,8 @@ export interface AppNotification {
   timestamp: string;
   alarmConfigText?: string;
   paymentMethod?: string;
+  debtText?: string;
+  unpaidCycles?: number;
 }
 
 const READ_NOTIFICATIONS_STORAGE_KEY = 'splitzy_read_notification_ids';
@@ -135,17 +137,24 @@ export function generateNotificationsFromSubscriptions(
         }
       }
 
+      const hasDebt = (m.unpaidCycles || 0) >= 1;
+
       // Trigger condition:
-      // 1. Alarm explicitly set and triggered
-      // 2. Member marked as overdue
-      // 3. Member marked as pending and payment is in <= 3 days or past
-      const shouldNotify = isAlarmTriggered || isOverdue || (isPending && daysRemaining <= 3);
+      // 1. El miembro tiene cuotas pendientes (deuda) — manda sobre todo lo demás,
+      //    porque la fecha de pago ya no queda nunca en el pasado.
+      // 2. Alarm explicitly set and triggered
+      // 3. Member marked as overdue
+      // 4. Member marked as pending and payment is in <= 3 days or past
+      const shouldNotify = hasDebt || isAlarmTriggered || isOverdue || (isPending && daysRemaining <= 3);
 
       if (shouldNotify) {
         let status: 'upcoming' | 'today' | 'overdue' = 'upcoming';
         let dueDateText = '';
 
-        if (daysRemaining < 0) {
+        if (hasDebt) {
+          status = 'overdue';
+          dueDateText = m.unpaidCycles === 1 ? 'Pago pendiente' : `${m.unpaidCycles} pagos pendientes`;
+        } else if (daysRemaining < 0) {
           status = 'overdue';
           const overdueDays = Math.abs(daysRemaining);
           dueDateText = overdueDays === 1 ? 'Vencido ayer' : `Vencido hace ${overdueDays} días`;
@@ -173,7 +182,15 @@ export function generateNotificationsFromSubscriptions(
         else if (isAlarmTriggered) notifType = 'alarm';
         else notifType = 'pending';
 
-        const notifId = `notif_${sub.id}_${m.id}_${paymentDateStr || 'nopdate'}`;
+        const debtText = hasDebt && m.debtSinceDate
+          ? `Debe ${m.unpaidCycles === 1 ? '1 cuota' : m.unpaidCycles + ' cuotas'} desde el ${m.debtSinceDate.split('-').reverse().join('/')}`
+          : undefined;
+
+        // Para deudas, el id incluye el número de cuotas: si la deuda empeora,
+        // se genera un aviso nuevo aunque el anterior se hubiera descartado.
+        const notifId = hasDebt && m.debtSinceDate
+          ? `notif_${sub.id}_${m.id}_debt_${m.debtSinceDate}_${m.unpaidCycles}`
+          : `notif_${sub.id}_${m.id}_${paymentDateStr || 'nopdate'}`;
         const isRead = readIds.includes(notifId);
 
         notifications.push({
@@ -197,6 +214,8 @@ export function generateNotificationsFromSubscriptions(
           timestamp: new Date().toISOString(),
           alarmConfigText,
           paymentMethod: m.paymentMethod,
+          debtText,
+          unpaidCycles: m.unpaidCycles || 0,
         });
       }
     });
@@ -269,10 +288,11 @@ export function generateNotificationsFromSubscriptions(
 
   // Sort by urgency: Overdue first, then today, then upcoming nearest
   return notifications.sort((a, b) => {
-    // Unread first if user prefers, or by urgency
     if (a.isRead !== b.isRead) {
       return a.isRead ? 1 : -1;
     }
+    const debtDiff = (b.unpaidCycles || 0) - (a.unpaidCycles || 0);
+    if (debtDiff !== 0) return debtDiff;
     return a.daysRemaining - b.daysRemaining;
   });
 }
