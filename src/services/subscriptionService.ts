@@ -1676,6 +1676,8 @@ export async function sendChatMessage(
       senderId: myUid,
       text,
       createdAtMs: nowMs,
+      ownerUid,
+      clientUid,
     });
   } catch (e) {
     console.error('No se pudo enviar el mensaje', e);

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, ArrowLeft } from 'lucide-react';
 import { ChatMessage } from '../services/subscriptionService';
 
 interface ChatWindowProps {
@@ -9,9 +9,10 @@ interface ChatWindowProps {
   messages: ChatMessage[];
   onSend: (text: string) => void;
   onClose: () => void;
+  onBack?: () => void;
 }
 
-export function ChatWindow({ subscriptionName, otherPersonName, currentUid, messages, onSend, onClose }: ChatWindowProps) {
+export function ChatWindow({ subscriptionName, otherPersonName, currentUid, messages, onSend, onClose, onBack }: ChatWindowProps) {
   const [text, setText] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -33,9 +34,16 @@ export function ChatWindow({ subscriptionName, otherPersonName, currentUid, mess
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <div className="min-w-0">
-            <p className="text-sm font-black text-foreground truncate">{otherPersonName}</p>
-            <p className="text-[11px] text-muted-foreground truncate">{subscriptionName}</p>
+          <div className="flex items-center gap-2 min-w-0">
+            {onBack && (
+              <button type="button" onClick={onBack} className="p-1.5 rounded-lg hover:bg-muted cursor-pointer shrink-0" title="Volver a la lista">
+                <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-black text-foreground truncate">{otherPersonName}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{subscriptionName}</p>
+            </div>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted cursor-pointer shrink-0">
             <X className="w-4 h-4 text-muted-foreground" />

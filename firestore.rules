@@ -48,7 +48,12 @@ service cloud.firestore {
       );
 
       match /messages/{messageId} {
-        allow read, write: if isSignedIn();
+        allow read, write: if isSignedIn() && (
+          request.auth.uid == resource.data.ownerUid ||
+          request.auth.uid == resource.data.clientUid ||
+          request.auth.uid == request.resource.data.ownerUid ||
+          request.auth.uid == request.resource.data.clientUid
+        );
       }
     }
   }

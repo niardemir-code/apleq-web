@@ -872,7 +872,7 @@ function SplitzyApp() {
       </footer>
 
       {/* Modals */}
-      {chatListForSubscription && (
+      {chatListForSubscription && !openChatInfo && (
         <ChatListModal
           subscriptionName={chatListForSubscription.platformName || chatListForSubscription.name || 'Suscripción'}
           members={chatListForSubscription.members || []}
@@ -887,7 +887,7 @@ function SplitzyApp() {
               isOwnerSide: true,
             });
             markChatRead(chatId, true);
-            setChatListForSubscription(null);
+            // No se cierra la lista aquí: se queda de fondo para poder volver a ella.
           }}
           onClose={() => setChatListForSubscription(null)}
         />
@@ -900,7 +900,15 @@ function SplitzyApp() {
           currentUid={user?.uid || ''}
           messages={chatMessages}
           onSend={handleSendChatMessage}
-          onClose={() => setOpenChatInfo(null)}
+          onBack={
+            openChatInfo.isOwnerSide && chatListForSubscription
+              ? () => setOpenChatInfo(null) // la lista se queda de fondo, reaparece sola
+              : undefined
+          }
+          onClose={() => {
+            setOpenChatInfo(null);
+            setChatListForSubscription(null);
+          }}
         />
       )}
 
