@@ -15,7 +15,9 @@ import {
   batchImportSubscriptions,
   rolloverDuePaymentCycles,
   loadReadNotificationIdsFromCloud,
-  saveReadNotificationIdsToCloud
+  saveReadNotificationIdsToCloud,
+  loadClientAlarmPreference,
+  saveClientAlarmPreference
 } from './services/subscriptionService';
 import { getSampleSubscriptions } from './utils/sampleData';
 
@@ -35,6 +37,7 @@ import { EmptyState } from './components/EmptyState';
 import { SharingPlatformsProvider } from './context/SharingPlatformsContext';
 import { 
   generateNotificationsFromSubscriptions, 
+  generateClientReminders,
   getReadNotificationIds, 
   saveReadNotificationIds,
   AppNotification
@@ -55,6 +58,30 @@ function SplitzyApp() {
   const [participatingIndexUrl, setParticipatingIndexUrl] = useState<string | null>(null);
   const [loadingData, setLoadingData] = useState<boolean>(true);
   const [syncError, setSyncError] = useState<string | null>(null);
+
+  const [clientAlarmPrefs, setClientAlarmPrefs] = useState<Record<string, { enabled: boolean; leadDays: number }>>({});
+
+  useEffect(() => {
+    if (!user) return;
+    const missingIds = participatingGroups
+      .map((g) => String(g.id))
+      .filter((id) => !(id in clientAlarmPrefs));
+    if (missingIds.length === 0) return;
+
+    missingIds.forEach((groupId) => {
+      loadClientAlarmPreference(user.uid, groupId).then((pref) => {
+        setClientAlarmPrefs((current) => ({
+          ...current,
+          [groupId]: pref || { enabled: true, leadDays: 3 },
+        }));
+      });
+    });
+  }, [user, participatingGroups, clientAlarmPrefs]);
+
+  const handleSaveClientAlarmPreference = (groupId: string, enabled: boolean, leadDays: number) => {
+    setClientAlarmPrefs((current) => ({ ...current, [groupId]: { enabled, leadDays } }));
+    if (user) saveClientAlarmPreference(user.uid, groupId, enabled, leadDays);
+  };
 
   // Local demo fallback if user hasn't signed in yet
   const [localGuestSubscriptions, setLocalGuestSubscriptions] = useState<Subscription[]>(() => {
@@ -192,8 +219,12 @@ function SplitzyApp() {
   // Generate active notifications from subscriptions
   const activeSubscriptions = user ? subscriptions : localGuestSubscriptions;
   const notifications = useMemo(() => {
-    return generateNotificationsFromSubscriptions(activeSubscriptions, readNotificationIds);
-  }, [activeSubscriptions, readNotificationIds]);
+    const managerNotifs = generateNotificationsFromSubscriptions(activeSubscriptions, readNotificationIds);
+    const clientNotifs = user
+      ? generateClientReminders(participatingGroups, user.uid, clientAlarmPrefs, readNotificationIds)
+      : [];
+    return [...managerNotifs, ...clientNotifs];
+  }, [activeSubscriptions, readNotificationIds, participatingGroups, user, clientAlarmPrefs]);
 
   const unreadNotificationsCount = useMemo(() => {
     return notifications.filter((n) => !n.isRead).length;
@@ -716,6 +747,8 @@ function SplitzyApp() {
                     currentUid={user?.uid || ''}
                     onBackToList={() => setShowMobileDetail(false)}
                     isMobile={showMobileDetail}
+                    alarmPref={selectedClientGroup ? clientAlarmPrefs[String(selectedClientGroup.id)] : undefined}
+                    onSaveAlarmPref={handleSaveClientAlarmPreference}
                   />
                 ) : (
                   <SubscriptionDetailView

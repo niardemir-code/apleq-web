@@ -1518,3 +1518,38 @@ export async function saveReadNotificationIdsToCloud(userId: string, ids: string
   }
 }
 
+export async function loadClientAlarmPreference(
+  userId: string,
+  groupId: string
+): Promise<{ enabled: boolean; leadDays: number } | null> {
+  try {
+    const snap = await getDoc(doc(db, 'users', userId, 'groupAlarms', groupId));
+    if (!snap.exists()) return null;
+    const data = snap.data();
+    return {
+      enabled: typeof data.enabled === 'boolean' ? data.enabled : true,
+      leadDays: typeof data.leadDays === 'number' ? data.leadDays : 3,
+    };
+  } catch (e) {
+    console.warn('No se pudo cargar la preferencia de alarma del cliente', e);
+    return null;
+  }
+}
+
+export async function saveClientAlarmPreference(
+  userId: string,
+  groupId: string,
+  enabled: boolean,
+  leadDays: number
+): Promise<void> {
+  try {
+    await setDoc(
+      doc(db, 'users', userId, 'groupAlarms', groupId),
+      { enabled, leadDays, updatedAt: new Date().toISOString() },
+      { merge: true }
+    );
+  } catch (e) {
+    console.warn('No se pudo guardar la preferencia de alarma del cliente', e);
+  }
+}
+

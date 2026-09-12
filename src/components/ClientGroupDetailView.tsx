@@ -12,6 +12,8 @@ interface ClientGroupDetailViewProps {
   currentUid: string;
   onBackToList?: () => void;
   isMobile?: boolean;
+  alarmPref?: { enabled: boolean; leadDays: number };
+  onSaveAlarmPref?: (groupId: string, enabled: boolean, leadDays: number) => void;
 }
 
 function formatDateDMY(iso: string): string {
@@ -21,7 +23,14 @@ function formatDateDMY(iso: string): string {
   return iso;
 }
 
-export function ClientGroupDetailView({ group, currentUid, onBackToList, isMobile }: ClientGroupDetailViewProps) {
+export function ClientGroupDetailView({ 
+  group, 
+  currentUid, 
+  onBackToList, 
+  isMobile,
+  alarmPref,
+  onSaveAlarmPref
+}: ClientGroupDetailViewProps) {
   const [isConfirmingLeave, setIsConfirmingLeave] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
@@ -103,8 +112,54 @@ export function ClientGroupDetailView({ group, currentUid, onBackToList, isMobil
       </div>
 
       <div className="mt-3 p-3 rounded-2xl bg-muted/40 border border-border">
-        <p className="text-xs font-bold text-foreground">Tu alarma</p>
-        <p className="text-[11px] text-muted-foreground mt-0.5">Próximamente.</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-bold text-foreground">Tu alarma</p>
+          <div
+            onClick={() => {
+              if (!onSaveAlarmPref) return;
+              const current = alarmPref || { enabled: true, leadDays: 3 };
+              onSaveAlarmPref(String(group.id), !current.enabled, current.leadDays);
+            }}
+            className={`w-11 h-6 flex items-center rounded-full p-0.5 transition-colors shrink-0 cursor-pointer ${
+              (alarmPref?.enabled ?? true) ? 'bg-blue-500 justify-end' : 'bg-muted-foreground/30 justify-start'
+            }`}
+          >
+            <div className="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform" />
+          </div>
+        </div>
+        {(alarmPref?.enabled ?? true) ? (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-[11px] text-muted-foreground">Avisarme</span>
+            <button
+              type="button"
+              onClick={() => {
+                if (!onSaveAlarmPref) return;
+                const current = alarmPref || { enabled: true, leadDays: 3 };
+                onSaveAlarmPref(String(group.id), current.enabled, Math.max(1, current.leadDays - 1));
+              }}
+              className="w-6 h-6 flex items-center justify-center rounded-lg bg-muted hover:bg-muted/70 text-foreground text-sm font-bold cursor-pointer"
+            >
+              −
+            </button>
+            <span className="text-xs font-bold text-foreground min-w-[52px] text-center">
+              {alarmPref?.leadDays ?? 3} {(alarmPref?.leadDays ?? 3) === 1 ? 'día' : 'días'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                if (!onSaveAlarmPref) return;
+                const current = alarmPref || { enabled: true, leadDays: 3 };
+                onSaveAlarmPref(String(group.id), current.enabled, Math.min(30, current.leadDays + 1));
+              }}
+              className="w-6 h-6 flex items-center justify-center rounded-lg bg-muted hover:bg-muted/70 text-foreground text-sm font-bold cursor-pointer"
+            >
+              +
+            </button>
+            <span className="text-[11px] text-muted-foreground">antes</span>
+          </div>
+        ) : (
+          <p className="text-[11px] text-muted-foreground mt-1">No recibirás avisos de este pago.</p>
+        )}
       </div>
 
       <div className="mt-3 p-3 rounded-2xl bg-muted/40 border border-border">

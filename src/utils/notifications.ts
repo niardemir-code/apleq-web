@@ -296,3 +296,94 @@ export function generateNotificationsFromSubscriptions(
     return a.daysRemaining - b.daysRemaining;
   });
 }
+
+/**
+ * Genera avisos para los propios pagos del usuario como CLIENTE de otros
+ * grupos (no como gestor). Cada grupo tiene su propia preferencia de
+ * antelación, guardada aparte por el cliente; si no se ha configurado
+ * ninguna, se usa el valor por defecto: activada, 3 días.
+ */
+export function generateClientReminders(
+  participatingGroups: Subscription[],
+  currentUid: string,
+  alarmPrefs: Record<string, { enabled: boolean; leadDays: number }>,
+  readIds: string[] = [],
+  referenceDate: Date = new Date()
+): AppNotification[] {
+  if (!currentUid) return [];
+  const notifications: AppNotification[] = [];
+  const today = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+
+  participatingGroups.forEach((group) => {
+    const groupId = String(group.id);
+    const pref = alarmPrefs[groupId] || { enabled: true, leadDays: 3 };
+    if (!pref.enabled) return;
+
+    const myMember = (group.members || []).find(
+      (m) => m.linkedUid === currentUid || (m as any).linked_uid === currentUid
+    );
+    if (!myMember || myMember.isPendingRemoval) return;
+
+    const paymentDateStr = myMember.nextPaymentDate || '';
+    if (!paymentDateStr) return;
+    const parts = paymentDateStr.split('-').map(Number);
+    if (parts.length < 3) return;
+    const paymentDate = new Date(parts[0], parts[1] - 1, parts[2]);
+
+    const daysRemaining = Math.round((paymentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const unpaidCycles = myMember.unpaidCycles || 0;
+    const hasDebt = unpaidCycles >= 1;
+
+    // Solo avisa si está dentro de la ventana configurada, o si hay deuda propia.
+    if (!hasDebt && daysRemaining > pref.leadDays) return;
+    if (daysRemaining < -60) return;
+
+    const groupName = group.platformName || 'Suscripción';
+    const groupColor = group.iconColorHex || '#1285FA';
+    const amount = getMemberContributionAmount(group, myMember);
+    const currencySymbol = getCurrencySymbol(group.currency || 'EUR');
+
+    let dueDateText: string;
+    if (hasDebt) {
+      dueDateText = unpaidCycles === 1 ? 'Tienes un pago pendiente' : `Tienes ${unpaidCycles} pagos pendientes`;
+    } else if (daysRemaining < 0) {
+      dueDateText = `Tu pago venció hace ${-daysRemaining} días`;
+    } else if (daysRemaining === 0) {
+      dueDateText = '¡Tu pago vence hoy!';
+    } else if (daysRemaining === 1) {
+      dueDateText = 'Tu pago vence mañana';
+    } else {
+      dueDateText = `Tu pago vence en ${daysRemaining} días`;
+    }
+
+    const status: 'upcoming' | 'today' | 'overdue' =
+      hasDebt || daysRemaining < 0 ? 'overdue' : daysRemaining === 0 ? 'today' : 'upcoming';
+
+    const notifId = hasDebt
+      ? `client_notif_${groupId}_debt_${unpaidCycles}`
+      : `client_notif_${groupId}_${paymentDateStr}`;
+
+    notifications.push({
+      id: notifId,
+      type: hasDebt ? 'overdue' : 'alarm',
+      subscriptionId: groupId,
+      subscriptionName: groupName,
+      subscriptionColor: groupColor,
+      memberId: '',
+      memberName: 'Tu pago',
+      sharingPlatform: '',
+      amount,
+      currency: group.currency || 'EUR',
+      currencySymbol,
+      nextPaymentDate: paymentDateStr,
+      dueDateText,
+      daysRemaining,
+      status,
+      isRead: readIds.includes(notifId),
+      timestamp: new Date().toISOString(),
+      alarmConfigText: !hasDebt ? `Alarma configurada: ${pref.leadDays} días antes` : undefined,
+    });
+  });
+
+  return notifications;
+}
