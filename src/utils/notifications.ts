@@ -111,11 +111,6 @@ export function generateNotificationsFromSubscriptions(
       const isPending = m.isPendingPayment || m.paymentStatus === 'pending';
       const isPaid = m.paymentStatus === 'paid' && !m.isPendingPayment;
 
-      // If already paid and not overdue/pending, do not generate alert unless future alarm
-      if (isPaid && !hasAlarm) {
-        return;
-      }
-
       let daysRemaining = 999;
       let isAlarmTriggered = false;
 
@@ -131,7 +126,7 @@ export function generateNotificationsFromSubscriptions(
           const alarmLeadDays = getAlarmLeadTimeDays(m.alarmValue ?? m.alarmDaysBefore ?? 3, m.alarmUnit || 'days');
           
           // Alarm is triggered if today is within lead time window or if payment is overdue/today
-          if (hasAlarm && daysRemaining <= alarmLeadDays && !isPaid) {
+          if (hasAlarm && daysRemaining <= alarmLeadDays) {
             isAlarmTriggered = true;
           }
         }
@@ -139,13 +134,11 @@ export function generateNotificationsFromSubscriptions(
 
       const hasDebt = (m.unpaidCycles || 0) >= 1;
 
-      // Trigger condition:
-      // 1. El miembro tiene cuotas pendientes (deuda) — manda sobre todo lo demás,
-      //    porque la fecha de pago ya no queda nunca en el pasado.
-      // 2. Alarm explicitly set and triggered
-      // 3. Member marked as overdue
-      // 4. Member marked as pending and payment is in <= 3 days or past
-      const shouldNotify = hasDebt || isAlarmTriggered || isOverdue || (isPending && daysRemaining <= 3);
+      // Avisa si: el miembro tiene cuotas pendientes (deuda), o salta su alarma
+      // configurada, o quedan 3 días o menos para el próximo cobro — esto último
+      // sin exigir que ya esté marcado como pendiente de pago, para que coincida
+      // con el criterio de Android.
+      const shouldNotify = hasDebt || isAlarmTriggered || isOverdue || (daysRemaining >= 0 && daysRemaining <= 3);
 
       if (shouldNotify) {
         let status: 'upcoming' | 'today' | 'overdue' = 'upcoming';

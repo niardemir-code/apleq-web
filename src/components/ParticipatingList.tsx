@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { Subscription, getMemberPlatformInfo } from '../types';
 import { PlatformIconBadge } from '../utils/icons';
-import { ChevronRight, Search } from 'lucide-react';
+import { ChevronRight, Search, Mail } from 'lucide-react';
 
 interface ParticipatingListProps {
   groups: Subscription[];
   currentUid: string;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  unreadChatIdsForClient?: Set<string>;
 }
 
-export function ParticipatingList({ groups, currentUid, selectedId, onSelect }: ParticipatingListProps) {
+export function ParticipatingList({ groups, currentUid, selectedId, onSelect, unreadChatIdsForClient = new Set() }: ParticipatingListProps) {
   const [search, setSearch] = useState('');
   if (!groups || groups.length === 0) return null;
 
@@ -81,6 +82,12 @@ export function ParticipatingList({ groups, currentUid, selectedId, onSelect }: 
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
+                  {unreadChatIdsForClient.has(`${group.userId}_${group.id}_${currentUid}`) && (
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-blue-500" />
+                      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-600" />
+                    </div>
+                  )}
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Cliente</span>
                   <ChevronRight className={`w-4 h-4 ${isSelected ? 'text-emerald-500' : 'text-muted-foreground'}`} />
                 </div>

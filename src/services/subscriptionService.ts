@@ -10,6 +10,8 @@ import {
   getDocs,
   query, 
   where,
+  orderBy,
+  addDoc,
   writeBatch
 } from 'firebase/firestore';
 import { ref as storageRef, deleteObject } from 'firebase/storage';
@@ -1552,4 +1554,141 @@ export async function saveClientAlarmPreference(
     console.warn('No se pudo guardar la preferencia de alarma del cliente', e);
   }
 }
+
+// ===== CHATS =====
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  text: string;
+  createdAtMs: number;
+}
+
+export interface UnreadChatInfo {
+  chatId: string;
+  groupId: string;
+  ownerUid: string;
+  clientUid: string;
+  subscriptionName: string;
+  otherPersonName: string;
+  lastMessageText: string;
+  isOwnerSide: boolean;
+}
+
+export function buildChatId(ownerUid: string, groupId: string, clientUid: string): string {
+  return `${ownerUid}_${groupId}_${clientUid}`;
+}
+
+export function subscribeToUnreadChats(
+  uid: string,
+  callback: (chats: UnreadChatInfo[]) => void
+): () => void {
+  let ownerSide: UnreadChatInfo[] = [];
+  let clientSide: UnreadChatInfo[] = [];
+  const publish = () => callback([...ownerSide, ...clientSide]);
+
+  const mapDocs = (docs: any[], isOwnerSide: boolean): UnreadChatInfo[] =>
+    docs.map((d) => {
+      const data = d.data();
+      return {
+        chatId: d.id,
+        groupId: String(data.groupId || ''),
+        ownerUid: String(data.ownerUid || ''),
+        clientUid: String(data.clientUid || ''),
+        subscriptionName: String(data.subscriptionName || 'Suscripción'),
+        otherPersonName: isOwnerSide ? String(data.clientName || 'Cliente') : 'El gestor',
+        lastMessageText: String(data.lastMessageText || ''),
+        isOwnerSide,
+      };
+    });
+
+  const q1 = query(collection(db, 'chats'), where('ownerUid', '==', uid), where('unreadForOwner', '==', true));
+  const unsub1 = onSnapshot(
+    q1,
+    (snap) => { ownerSide = mapDocs(snap.docs, true); publish(); },
+    (err) => console.error('Error escuchando chats (gestor)', err)
+  );
+
+  const q2 = query(collection(db, 'chats'), where('clientUid', '==', uid), where('unreadForClient', '==', true));
+  const unsub2 = onSnapshot(
+    q2,
+    (snap) => { clientSide = mapDocs(snap.docs, false); publish(); },
+    (err) => console.error('Error escuchando chats (cliente)', err)
+  );
+
+  return () => { unsub1(); unsub2(); };
+}
+
+export function subscribeToChatMessages(
+  chatId: string,
+  callback: (messages: ChatMessage[]) => void
+): () => void {
+  const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAtMs', 'asc'));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const messages: ChatMessage[] = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          senderId: String(data.senderId || ''),
+          text: String(data.text || ''),
+          createdAtMs: Number(data.createdAtMs || 0),
+        };
+      });
+      callback(messages);
+    },
+    (err) => console.error('Error escuchando mensajes', err)
+  );
+}
+
+export async function sendChatMessage(
+  ownerUid: string,
+  clientUid: string,
+  groupId: string,
+  subscriptionName: string,
+  clientName: string,
+  myUid: string,
+  text: string
+): Promise<void> {
+  const chatId = buildChatId(ownerUid, groupId, clientUid);
+  const chatRef = doc(db, 'chats', chatId);
+  const nowMs = Date.now();
+  try {
+    await setDoc(
+      chatRef,
+      {
+        ownerUid,
+        clientUid,
+        groupId,
+        subscriptionName,
+        clientName,
+        lastMessageText: text,
+        lastMessageAt: nowMs,
+        lastMessageSenderId: myUid,
+        unreadForOwner: myUid !== ownerUid,
+        unreadForClient: myUid !== clientUid,
+      },
+      { merge: true }
+    );
+
+    await addDoc(collection(db, 'chats', chatId, 'messages'), {
+      senderId: myUid,
+      text,
+      createdAtMs: nowMs,
+    });
+  } catch (e) {
+    console.error('No se pudo enviar el mensaje', e);
+    throw e;
+  }
+}
+
+export async function markChatRead(chatId: string, asOwner: boolean): Promise<void> {
+  try {
+    await updateDoc(doc(db, 'chats', chatId), asOwner ? { unreadForOwner: false } : { unreadForClient: false });
+  } catch (e) {
+    console.warn('No se pudo marcar el chat como leído', e);
+  }
+}
+
 

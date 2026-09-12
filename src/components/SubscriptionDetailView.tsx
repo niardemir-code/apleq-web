@@ -28,7 +28,8 @@ import {
   Share2,
   Bell,
   Calendar,
-  Hourglass
+  Hourglass,
+  MessageCircle
 } from 'lucide-react';
 import { createInvite, deleteInvite, formatInviteCode } from '../services/subscriptionService';
 
@@ -42,6 +43,9 @@ interface SubscriptionDetailViewProps {
   onUpdateSubscription?: (updatedSub: Subscription) => Promise<void>;
   onBackToList?: () => void;
   isMobile?: boolean;
+  currentUid?: string;
+  unreadChatIdsForOwner?: Set<string>;
+  onOpenChatList?: () => void;
 }
 
 export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
@@ -53,6 +57,9 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
   onUpdateSubscription,
   onBackToList,
   isMobile,
+  currentUid = '',
+  unreadChatIdsForOwner = new Set(),
+  onOpenChatList,
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [confirmDeleteMemberId, setConfirmDeleteMemberId] = useState<string | number | null>(null);
@@ -222,6 +229,12 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
     return found?.colorHex || '#1285FA';
   };
 
+  const hasAnyUnreadChat = subscription
+    ? (subscription.members || []).some(
+        (m) => !!m.linkedUid && unreadChatIdsForOwner.has(`${currentUid}_${subscription.id}_${m.linkedUid}`)
+      )
+    : false;
+
   return (
     <div className="bg-card border border-border rounded-3xl shadow-lg flex flex-col transition-colors relative">
       {/* Top Accent Strip */}
@@ -299,6 +312,25 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
 
             {/* Quick Actions Header Toolbar */}
             <div className="flex items-center gap-2 shrink-0">
+              {onOpenChatList && (
+                <button
+                  id="btn-detail-chat"
+                  onClick={onOpenChatList}
+                  type="button"
+                  className={`relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
+                    hasAnyUnreadChat
+                      ? 'bg-blue-500/15 border-blue-500/50 text-blue-600 dark:text-blue-400'
+                      : 'bg-muted/60 hover:bg-muted border-border text-foreground'
+                  }`}
+                  title="Chats con miembros"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>Chats</span>
+                  {hasAnyUnreadChat && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-600 border-2 border-card" />
+                  )}
+                </button>
+              )}
               <button
                 id="btn-detail-edit"
                 onClick={() => onEdit(subscription)}

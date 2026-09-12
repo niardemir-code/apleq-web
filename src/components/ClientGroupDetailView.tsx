@@ -6,6 +6,7 @@ import {
   resolveMemberNextPaymentDate,
 } from '../types';
 import { leaveGroupCall } from '../lib/firebase';
+import { MessageCircle, ChevronRight } from 'lucide-react';
 
 interface ClientGroupDetailViewProps {
   group: Subscription | null;
@@ -14,6 +15,8 @@ interface ClientGroupDetailViewProps {
   isMobile?: boolean;
   alarmPref?: { enabled: boolean; leadDays: number };
   onSaveAlarmPref?: (groupId: string, enabled: boolean, leadDays: number) => void;
+  unreadChatIdsForClient?: Set<string>;
+  onOpenChat?: (chatId: string, subscriptionName: string, otherPersonName: string) => void;
 }
 
 function formatDateDMY(iso: string): string {
@@ -29,7 +32,9 @@ export function ClientGroupDetailView({
   onBackToList, 
   isMobile,
   alarmPref,
-  onSaveAlarmPref
+  onSaveAlarmPref,
+  unreadChatIdsForClient = new Set(),
+  onOpenChat
 }: ClientGroupDetailViewProps) {
   const [isConfirmingLeave, setIsConfirmingLeave] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -162,10 +167,36 @@ export function ClientGroupDetailView({
         )}
       </div>
 
-      <div className="mt-3 p-3 rounded-2xl bg-muted/40 border border-border">
-        <p className="text-xs font-bold text-foreground">Mensajes con el gestor</p>
-        <p className="text-[11px] text-muted-foreground mt-0.5">Próximamente.</p>
-      </div>
+      {group && (() => {
+        const chatId = `${group.userId}_${group.id}_${currentUid}`;
+        const hasUnread = unreadChatIdsForClient.has(chatId);
+        const subscriptionName = group.platformName || group.name || 'Suscripción';
+        return (
+          <button
+            type="button"
+            onClick={() => onOpenChat && onOpenChat(chatId, subscriptionName, 'El gestor')}
+            className={`mt-3 w-full flex items-center gap-3 p-3.5 rounded-2xl border text-left transition-colors cursor-pointer ${
+              hasUnread
+                ? 'bg-blue-500/10 border-blue-500/50'
+                : 'bg-muted/40 border-border hover:bg-muted/70'
+            }`}
+          >
+            <div className="relative shrink-0">
+              <MessageCircle className={`w-5 h-5 ${hasUnread ? 'text-blue-500' : 'text-muted-foreground'}`} />
+              {hasUnread && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-600 border-2 border-card" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-foreground">Mensajes con el gestor</p>
+              <p className={`text-[11px] mt-0.5 ${hasUnread ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-muted-foreground'}`}>
+                {hasUnread ? 'Tienes un mensaje nuevo' : 'Toca para abrir la conversación'}
+              </p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+          </button>
+        );
+      })()}
 
       <div className="mt-4 flex justify-end">
         <button

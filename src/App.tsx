@@ -17,7 +17,13 @@ import {
   loadReadNotificationIdsFromCloud,
   saveReadNotificationIdsToCloud,
   loadClientAlarmPreference,
-  saveClientAlarmPreference
+  saveClientAlarmPreference,
+  subscribeToUnreadChats,
+  subscribeToChatMessages,
+  sendChatMessage,
+  markChatRead,
+  UnreadChatInfo,
+  ChatMessage
 } from './services/subscriptionService';
 import { getSampleSubscriptions } from './utils/sampleData';
 
@@ -33,6 +39,8 @@ import { ClientGroupDetailView } from './components/ClientGroupDetailView';
 import { MembersDetailModal } from './components/MembersDetailModal';
 import { SettingsModal } from './components/SettingsModal';
 import { NotificationsModal } from './components/NotificationsModal';
+import { ChatWindow } from './components/ChatWindow';
+import { ChatListModal } from './components/ChatListModal';
 import { EmptyState } from './components/EmptyState';
 import { SharingPlatformsProvider } from './context/SharingPlatformsContext';
 import { 
@@ -81,6 +89,61 @@ function SplitzyApp() {
   const handleSaveClientAlarmPreference = (groupId: string, enabled: boolean, leadDays: number) => {
     setClientAlarmPrefs((current) => ({ ...current, [groupId]: { enabled, leadDays } }));
     if (user) saveClientAlarmPreference(user.uid, groupId, enabled, leadDays);
+  };
+
+  const [unreadChats, setUnreadChats] = useState<UnreadChatInfo[]>([]);
+  const [openChatInfo, setOpenChatInfo] = useState<{
+    chatId: string;
+    subscriptionName: string;
+    otherPersonName: string;
+    isOwnerSide: boolean;
+  } | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatListForSubscription, setChatListForSubscription] = useState<Subscription | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadChats([]);
+      return;
+    }
+    const unsubscribe = subscribeToUnreadChats(user.uid, setUnreadChats);
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    if (!openChatInfo) {
+      setChatMessages([]);
+      return;
+    }
+    const unsubscribe = subscribeToChatMessages(openChatInfo.chatId, setChatMessages);
+    return () => unsubscribe();
+  }, [openChatInfo?.chatId]);
+
+  const unreadChatIdsForOwner = useMemo(
+    () => new Set(unreadChats.filter((c) => c.isOwnerSide).map((c) => c.chatId)),
+    [unreadChats]
+  );
+  const unreadChatIdsForClient = useMemo(
+    () => new Set(unreadChats.filter((c) => !c.isOwnerSide).map((c) => c.chatId)),
+    [unreadChats]
+  );
+
+  const handleSendChatMessage = (text: string) => {
+    if (!openChatInfo || !user) return;
+    const parts = openChatInfo.chatId.split('_');
+    if (parts.length < 3) return;
+    const ownerUid = parts[0];
+    const groupId = parts[1];
+    const clientUid = parts.slice(2).join('_');
+    sendChatMessage(
+      ownerUid,
+      clientUid,
+      groupId,
+      openChatInfo.subscriptionName,
+      openChatInfo.isOwnerSide ? openChatInfo.otherPersonName : 'Cliente',
+      user.uid,
+      text
+    ).catch((e) => console.error('Error al enviar el mensaje', e));
   };
 
   // Local demo fallback if user hasn't signed in yet
@@ -223,8 +286,27 @@ function SplitzyApp() {
     const clientNotifs = user
       ? generateClientReminders(participatingGroups, user.uid, clientAlarmPrefs, readNotificationIds)
       : [];
-    return [...managerNotifs, ...clientNotifs];
-  }, [activeSubscriptions, readNotificationIds, participatingGroups, user, clientAlarmPrefs]);
+    const chatNotifs = unreadChats.map((chat) => ({
+      id: `chat_${chat.chatId}`,
+      type: 'alarm' as const,
+      subscriptionId: chat.groupId,
+      subscriptionName: chat.subscriptionName,
+      subscriptionColor: '#1285FA',
+      memberId: '',
+      memberName: chat.otherPersonName,
+      sharingPlatform: '',
+      amount: 0,
+      currency: 'EUR',
+      currencySymbol: '€',
+      nextPaymentDate: '',
+      dueDateText: `Nuevo mensaje: ${chat.lastMessageText.slice(0, 40)}`,
+      daysRemaining: 0,
+      status: 'today' as const,
+      isRead: false,
+      timestamp: new Date().toISOString(),
+    }));
+    return [...managerNotifs, ...clientNotifs, ...chatNotifs];
+  }, [activeSubscriptions, readNotificationIds, participatingGroups, user, clientAlarmPrefs, unreadChats]);
 
   const unreadNotificationsCount = useMemo(() => {
     return notifications.filter((n) => !n.isRead).length;
@@ -736,6 +818,7 @@ function SplitzyApp() {
                   currentUid={user?.uid || ''}
                   selectedId={selectedClientGroupId}
                   onSelect={handleSelectClientGroup}
+                  unreadChatIdsForClient={unreadChatIdsForClient}
                 />
               </div>
 
@@ -749,6 +832,11 @@ function SplitzyApp() {
                     isMobile={showMobileDetail}
                     alarmPref={selectedClientGroup ? clientAlarmPrefs[String(selectedClientGroup.id)] : undefined}
                     onSaveAlarmPref={handleSaveClientAlarmPreference}
+                    unreadChatIdsForClient={unreadChatIdsForClient}
+                    onOpenChat={(chatId, subscriptionName, otherPersonName) => {
+                      setOpenChatInfo({ chatId, subscriptionName, otherPersonName, isOwnerSide: false });
+                      markChatRead(chatId, false);
+                    }}
                   />
                 ) : (
                   <SubscriptionDetailView
@@ -762,6 +850,9 @@ function SplitzyApp() {
                     onUpdateSubscription={handleUpdateSubscriptionMembersDeep}
                     onBackToList={() => setShowMobileDetail(false)}
                     isMobile={showMobileDetail}
+                    currentUid={user?.uid || ''}
+                    unreadChatIdsForOwner={unreadChatIdsForOwner}
+                    onOpenChatList={() => activeSelectedSubscription && setChatListForSubscription(activeSelectedSubscription)}
                   />
                 )}
               </div>
@@ -781,6 +872,38 @@ function SplitzyApp() {
       </footer>
 
       {/* Modals */}
+      {chatListForSubscription && (
+        <ChatListModal
+          subscriptionName={chatListForSubscription.platformName || chatListForSubscription.name || 'Suscripción'}
+          members={chatListForSubscription.members || []}
+          currentUid={user?.uid || ''}
+          groupId={String(chatListForSubscription.id)}
+          unreadChatIdsForOwner={unreadChatIdsForOwner}
+          onMemberClick={(chatId, _clientUid, clientName) => {
+            setOpenChatInfo({
+              chatId,
+              subscriptionName: chatListForSubscription.platformName || 'Suscripción',
+              otherPersonName: clientName,
+              isOwnerSide: true,
+            });
+            markChatRead(chatId, true);
+            setChatListForSubscription(null);
+          }}
+          onClose={() => setChatListForSubscription(null)}
+        />
+      )}
+
+      {openChatInfo && (
+        <ChatWindow
+          subscriptionName={openChatInfo.subscriptionName}
+          otherPersonName={openChatInfo.otherPersonName}
+          currentUid={user?.uid || ''}
+          messages={chatMessages}
+          onSend={handleSendChatMessage}
+          onClose={() => setOpenChatInfo(null)}
+        />
+      )}
+
       <SubscriptionModal
         isOpen={isSubModalOpen}
         onClose={() => {

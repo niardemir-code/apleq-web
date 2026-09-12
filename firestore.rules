@@ -37,5 +37,19 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
     }
+
+    // Chats and chat messages
+    match /chats/{chatId} {
+      allow read, write: if isSignedIn() && (
+        request.auth.uid == resource.data.ownerUid ||
+        request.auth.uid == resource.data.clientUid ||
+        request.auth.uid == request.resource.data.ownerUid ||
+        request.auth.uid == request.resource.data.clientUid
+      );
+
+      match /messages/{messageId} {
+        allow read, write: if isSignedIn();
+      }
+    }
   }
 }
