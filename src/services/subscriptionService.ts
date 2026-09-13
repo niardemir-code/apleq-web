@@ -1621,9 +1621,16 @@ export function subscribeToUnreadChats(
 
 export function subscribeToChatMessages(
   chatId: string,
+  currentUid: string,
+  isOwnerSide: boolean,
   callback: (messages: ChatMessage[]) => void
 ): () => void {
-  const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAtMs', 'asc'));
+  const fieldToMatch = isOwnerSide ? 'ownerUid' : 'clientUid';
+  const q = query(
+    collection(db, 'chats', chatId, 'messages'),
+    where(fieldToMatch, '==', currentUid),
+    orderBy('createdAtMs', 'asc')
+  );
   return onSnapshot(
     q,
     (snap) => {

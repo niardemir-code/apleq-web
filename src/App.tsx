@@ -111,13 +111,18 @@ function SplitzyApp() {
   }, [user]);
 
   useEffect(() => {
-    if (!openChatInfo) {
+    if (!openChatInfo || !user) {
       setChatMessages([]);
       return;
     }
-    const unsubscribe = subscribeToChatMessages(openChatInfo.chatId, setChatMessages);
+    const unsubscribe = subscribeToChatMessages(
+      openChatInfo.chatId,
+      user.uid,
+      openChatInfo.isOwnerSide,
+      setChatMessages
+    );
     return () => unsubscribe();
-  }, [openChatInfo?.chatId]);
+  }, [openChatInfo?.chatId, openChatInfo?.isOwnerSide, user]);
 
   const unreadChatIdsForOwner = useMemo(
     () => new Set(unreadChats.filter((c) => c.isOwnerSide).map((c) => c.chatId)),
