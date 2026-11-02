@@ -33,7 +33,9 @@ service cloud.firestore {
 
     // Invites collection for claiming slots
     match /invites/{code} {
-      allow read: if isSignedIn();
+      // Se puede leer UNA invitación conociendo su código (get), pero no listar ni consultar la colección.
+      allow get: if isSignedIn();
+      allow list: if false;
       allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
     }
