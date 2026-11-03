@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { EmailAuthModal } from './EmailAuthModal';
 import { DeleteAccountModal } from './DeleteAccountModal';
+import { LanguageSelector } from './LanguageSelector';
+import { t } from '../i18n';
 import { 
   Plus, 
   Sun, 
@@ -81,12 +83,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
             title={
               hasUnread
-                ? `${unreadNotificationsCount} aviso(s) de cobro o alarma(s) sin leer`
+                ? t('nav.notifUnread', { n: unreadNotificationsCount })
                 : hasNotifications
-                ? `${totalNotificationsCount} notificación(es) activa(s)`
-                : 'Centro de notificaciones y alarmas'
+                ? t('nav.notifActive', { n: totalNotificationsCount })
+                : t('nav.notifCenter')
             }
-            aria-label="Notificaciones"
+            aria-label={t('nav.notifAria')}
           >
             <Bell className={`w-4 h-4 ${hasUnread ? 'animate-bounce stroke-[2.5]' : ''}`} />
 
@@ -103,14 +105,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
+          {/* Language selector */}
+          <LanguageSelector />
+
           {/* Quick theme toggle button */}
           <button
             id="btn-nav-quick-theme"
             onClick={toggleTheme}
             type="button"
             className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border transition-all cursor-pointer shadow-xs"
-            title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            aria-label="Alternar tema"
+            title={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
+            aria-label={t('nav.themeAria')}
           >
             {isDark ? (
               <Sun className="w-4 h-4 text-amber-500" />
@@ -125,11 +130,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenSettings}
             type="button"
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-muted/60 hover:bg-muted border border-border text-foreground transition-all cursor-pointer shadow-xs"
-            title="Configuración general, plataformas y copia JSON"
-            aria-label="Configuración"
+            title={t('nav.settingsTitle')}
+            aria-label={t('nav.settings')}
           >
             <Settings className="w-4 h-4 text-blue-500" />
-            <span className="hidden sm:inline">Configuración</span>
+            <span className="hidden sm:inline">{t('nav.settings')}</span>
           </button>
 
           {/* Join group CTA */}
@@ -140,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white active:scale-98 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
           >
             <LogIn className="w-4 h-4 stroke-[2.5]" />
-            <span>Unirse<span className="hidden sm:inline"> a un grupo</span></span>
+            <span>{t('nav.join')}<span className="hidden sm:inline">{t('nav.joinSuffix')}</span></span>
           </button>
 
           {/* Add subscription CTA */}
@@ -151,7 +156,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-blue-600 hover:bg-blue-500 text-white active:scale-98 shadow-md shadow-blue-600/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Nueva <span className="hidden sm:inline">Suscripción</span></span>
+            <span>{t('nav.newShort')}<span className="hidden sm:inline">{t('nav.newSuffix')}</span></span>
           </button>
 
           {/* User Profile / Google Sign-in */}
@@ -167,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
-                      alt={user.displayName || 'Usuario'}
+                      alt={user.displayName || t('nav.user')}
                       className="w-7 h-7 rounded-full bg-muted object-cover"
                       referrerPolicy="no-referrer"
                     />
@@ -185,14 +190,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className={`absolute right-0 mt-1.5 w-56 p-2 rounded-2xl bg-card border border-border shadow-2xl transition-all duration-150 z-50 ${isUserMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
                   <div className="px-3 py-2 border-b border-border">
                     <p className="text-xs font-bold text-foreground truncate">
-                      {user.displayName || 'Usuario'}
+                      {user.displayName || t('nav.user')}
                     </p>
                     <p className="text-[11px] text-muted-foreground truncate">
                       {user.email}
                     </p>
                   </div>
                   <div className="px-3 py-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                    {subscriptionsCount} suscripción(es) activas
+                    {t('nav.activeSubs', { n: subscriptionsCount })}
                   </div>
                   <button
                     id="btn-user-logout"
@@ -201,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     className="w-full mt-1 flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span>Cerrar sesión</span>
+                    <span>{t('nav.signOut')}</span>
                   </button>
                   <button
                     id="btn-user-delete-account"
@@ -209,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     type="button"
                     className="w-full mt-1 flex items-center gap-2 px-3 py-2 text-[11px] font-medium text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors cursor-pointer"
                   >
-                    <span>Eliminar mi cuenta</span>
+                    <span>{t('nav.deleteAccount')}</span>
                   </button>
                 </div>
               </div>
@@ -221,20 +226,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={signIn}
                 type="button"
                 className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-muted border border-border text-foreground hover:border-blue-500/50 shadow-xs transition-all cursor-pointer"
-                title="Iniciar sesión con Google para sincronizar tus suscripciones"
+                title={t('nav.googleTitle')}
               >
                 <LogIn className="w-3.5 h-3.5 text-blue-500" />
-                <span className="hidden sm:inline">Conectar Google</span>
+                <span className="hidden sm:inline">{t('nav.googleBtn')}</span>
               </button>
               <button
                 id="btn-user-signin-email"
                 onClick={() => setIsEmailAuthOpen(true)}
                 type="button"
                 className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl bg-muted/60 border border-border text-foreground hover:border-blue-500/50 shadow-xs transition-all cursor-pointer"
-                title="Registrarte o iniciar sesión con correo"
+                title={t('nav.emailTitle')}
               >
-                <span className="hidden sm:inline">O con correo</span>
-                <span className="sm:hidden">Correo</span>
+                <span className="hidden sm:inline">{t('nav.emailLong')}</span>
+                <span className="sm:hidden">{t('nav.emailShort')}</span>
               </button>
             </div>
           )}

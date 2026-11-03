@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { friendlyAuthErrorMessage } from '../lib/firebase';
+import { t } from '../i18n';
 
 interface EmailAuthModalProps {
   isOpen: boolean;
@@ -81,7 +82,7 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
               mode === 'register' ? 'bg-blue-600 text-white' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Crear cuenta
+            {t('auth.tabRegister')}
           </button>
           <button
             type="button"
@@ -90,17 +91,15 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
               mode === 'login' ? 'bg-blue-600 text-white' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Ya tengo cuenta
+            {t('auth.tabLogin')}
           </button>
         </div>
 
         <h2 className="text-lg font-black text-foreground mb-1">
-          {mode === 'register' ? 'Registrarme con correo' : 'Iniciar sesión con correo'}
+          {mode === 'register' ? t('auth.titleRegister') : t('auth.titleLogin')}
         </h2>
         <p className="text-xs text-muted-foreground mb-4">
-          {mode === 'register'
-            ? 'Crea tu cuenta para sincronizar tus suscripciones.'
-            : 'Introduce tus datos para acceder.'}
+          {mode === 'register' ? t('auth.subtitleRegister') : t('auth.subtitleLogin')}
         </p>
 
         <div className="space-y-3">
@@ -109,7 +108,7 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Tu nombre"
+              placeholder={t('auth.namePlaceholder')}
               className="w-full bg-muted/60 text-foreground px-4 py-3 rounded-2xl border border-border text-sm focus:outline-none focus:border-blue-500"
             />
           )}
@@ -117,7 +116,7 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Correo electrónico"
+            placeholder={t('auth.emailPlaceholder')}
             className="w-full bg-muted/60 text-foreground px-4 py-3 rounded-2xl border border-border text-sm focus:outline-none focus:border-blue-500"
           />
           <div>
@@ -125,14 +124,14 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña"
+              placeholder={t('auth.passwordPlaceholder')}
               className={`w-full bg-muted/60 text-foreground px-4 py-3 rounded-2xl border text-sm focus:outline-none ${
                 passwordTooShort ? 'border-rose-500' : 'border-border focus:border-blue-500'
               }`}
             />
             {mode === 'register' && (
               <p className={`text-[11px] mt-1.5 px-1 ${passwordTooShort ? 'text-rose-500 font-semibold' : 'text-muted-foreground'}`}>
-                {passwordTooShort ? 'Demasiado corta: mínimo 6 caracteres' : 'Mínimo 6 caracteres'}
+                {passwordTooShort ? t('auth.passwordTooShort', { n: 6 }) : t('auth.passwordMin', { n: 6 })}
               </p>
             )}
           </div>
@@ -142,14 +141,14 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Repite la contraseña"
+                placeholder={t('auth.confirmPlaceholder')}
                 className={`w-full bg-muted/60 text-foreground px-4 py-3 rounded-2xl border text-sm focus:outline-none ${
                   passwordsMismatch ? 'border-rose-500' : 'border-border focus:border-blue-500'
                 }`}
               />
               {passwordsMismatch && (
                 <p className="text-[11px] mt-1.5 px-1 text-rose-500 font-semibold">
-                  Las contraseñas no coinciden
+                  {t('auth.passwordMismatch')}
                 </p>
               )}
             </div>
@@ -168,7 +167,7 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
             onClick={handleClose}
             className="flex-1 py-3 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-sm font-bold text-foreground transition-colors cursor-pointer"
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -176,7 +175,7 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
             disabled={loading || !canSubmit}
             className="flex-1 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-sm font-bold text-white transition-colors cursor-pointer"
           >
-            {loading ? 'Un momento...' : mode === 'register' ? 'Crear cuenta' : 'Entrar'}
+            {loading ? t('auth.working') : mode === 'register' ? t('auth.tabRegister') : t('auth.submitLogin')}
           </button>
         </div>
       </div>

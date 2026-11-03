@@ -22,6 +22,7 @@ import {
   Trash2,
   Bell
 } from 'lucide-react';
+import { dateLocale } from '../i18n';
 
 interface SubscriptionCardProps {
   subscription: Subscription;
@@ -398,7 +399,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
                             className="inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-900/60 text-slate-300 border border-slate-700/60"
                           >
                             <Calendar className="w-2.5 h-2.5 text-blue-400" />
-                            <span>{new Date(member.nextPaymentDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}</span>
+                            <span>{new Date(member.nextPaymentDate).toLocaleDateString(dateLocale(), { day: '2-digit', month: '2-digit' })}</span>
                             {member.enableAlarm && (
                               <Bell className="w-2 h-2 text-blue-400 fill-blue-400 ml-0.5" />
                             )}

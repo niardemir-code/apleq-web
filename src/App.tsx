@@ -43,6 +43,7 @@ import { ChatWindow } from './components/ChatWindow';
 import { ChatListModal } from './components/ChatListModal';
 import { EmptyState } from './components/EmptyState';
 import { SharingPlatformsProvider } from './context/SharingPlatformsContext';
+import { LanguageProvider, LanguageKeyed } from './i18n';
 import { 
   generateNotificationsFromSubscriptions, 
   generateClientReminders,
@@ -974,14 +975,18 @@ function SplitzyApp() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <CurrencyProvider>
-          <SharingPlatformsProvider>
-            <SplitzyApp />
-          </SharingPlatformsProvider>
-        </CurrencyProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <CurrencyProvider>
+            <SharingPlatformsProvider>
+              <LanguageKeyed>
+                <SplitzyApp />
+              </LanguageKeyed>
+            </SharingPlatformsProvider>
+          </CurrencyProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }

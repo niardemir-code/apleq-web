@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, LogOut } from 'lucide-react';
 import { logoutUser } from '../lib/firebase';
+import { t } from '../i18n';
 
 interface Props {
   children: React.ReactNode;
@@ -52,11 +53,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
             </div>
 
             <h2 className="text-xl font-bold text-white mb-2">
-              Problema al cargar los datos
+              {t('err.title')}
             </h2>
 
             <p className="text-xs text-slate-400 mb-6 leading-relaxed">
-              {this.state.error?.message || 'Se ha producido un error al sincronizar con tu cuenta.'}
+              {this.state.error?.message || t('err.default')}
             </p>
 
             <div className="space-y-2.5">
@@ -66,7 +67,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-600/25"
               >
                 <RefreshCw className="w-4 h-4" />
-                <span>Reintentar y Recargar</span>
+                <span>{t('err.reload')}</span>
               </button>
 
               <button
@@ -75,7 +76,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
               >
                 <LogOut className="w-4 h-4 text-slate-400" />
-                <span>Cerrar sesión de Google y entrar como invitado</span>
+                <span>{t('err.signOut')}</span>
               </button>
             </div>
           </div>

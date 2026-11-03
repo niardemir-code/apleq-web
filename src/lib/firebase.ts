@@ -17,6 +17,7 @@ import {
 import { getStorage } from 'firebase/storage';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import firebaseConfig from '../../firebase-applet-config.json';
+import { t } from '../i18n';
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
@@ -171,18 +172,18 @@ export function friendlyAuthErrorMessage(err: any): string {
   const code = String(err?.code || '');
   switch (code) {
     case 'auth/email-already-in-use':
-      return 'Ya existe una cuenta con ese correo. Prueba a iniciar sesión.';
+      return t('authErr.emailInUse');
     case 'auth/invalid-email':
-      return 'El correo no es válido.';
+      return t('authErr.invalidEmail');
     case 'auth/weak-password':
-      return 'La contraseña es demasiado débil (mínimo 6 caracteres).';
+      return t('authErr.weakPassword', { n: 6 });
     case 'auth/user-not-found':
     case 'auth/wrong-password':
     case 'auth/invalid-credential':
-      return 'Correo o contraseña incorrectos.';
+      return t('authErr.badCredentials');
     case 'auth/too-many-requests':
-      return 'Demasiados intentos. Inténtalo de nuevo más tarde.';
+      return t('authErr.tooMany');
     default:
-      return err?.message || 'Ha ocurrido un error. Inténtalo de nuevo.';
+      return err?.message || t('authErr.generic');
   }
 }

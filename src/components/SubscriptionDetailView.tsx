@@ -32,6 +32,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { createInvite, deleteInvite, formatInviteCode } from '../services/subscriptionService';
+import { dateLocale } from '../i18n';
 
 interface SubscriptionDetailViewProps {
   subscription: Subscription | null;
@@ -609,7 +610,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                         className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-xl bg-muted/80 text-muted-foreground border border-border shrink-0 self-start sm:self-center"
                       >
                         <Calendar className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                        <span>{new Date(member.nextPaymentDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}</span>
+                        <span>{new Date(member.nextPaymentDate).toLocaleDateString(dateLocale(), { day: '2-digit', month: '2-digit' })}</span>
                         {member.enableAlarm && (
                           <Bell className="w-2.5 h-2.5 text-blue-500 fill-blue-500 ml-0.5 shrink-0" />
                         )}

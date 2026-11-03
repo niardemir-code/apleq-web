@@ -1,4 +1,5 @@
 import { Member, Subscription, getMemberPlatformInfo, getMemberContributionAmount } from '../types';
+import { dateLocale } from '../i18n';
 
 /**
  * Formats a clean, friendly payment reminder message for co-subscribers.
@@ -8,7 +9,7 @@ export function generateMemberReminderText(
   member: Member,
   ownerName?: string
 ): string {
-  const currentMonth = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(new Date());
+  const currentMonth = new Intl.DateTimeFormat(dateLocale(), { month: 'long', year: 'numeric' }).format(new Date());
   const monthCapitalized = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
   const mInfo = getMemberPlatformInfo(subscription, member);
   const memberName = member.memberName || member.name || 'Co-suscriptor';

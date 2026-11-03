@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { deleteAccountCall, logoutUser } from '../lib/firebase';
+import { t } from '../i18n';
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -40,9 +41,9 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
     } catch (e: any) {
       console.error('Error al eliminar la cuenta:', e);
       if (e?.message === 'TIMEOUT') {
-        setError('Está tardando más de lo normal. Comprueba tu conexión y vuelve a intentarlo; si el problema persiste, revisa la consola del navegador (F12) para más detalles.');
+        setError(t('del.slow'));
       } else {
-        setError(e?.message || 'No se pudo eliminar la cuenta. Inténtalo de nuevo.');
+        setError(e?.message || t('del.failed'));
       }
       setLoading(false);
     }
@@ -57,11 +58,9 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
         className="w-full max-w-sm bg-card border border-border rounded-3xl p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-black text-foreground mb-2">¿Eliminar tu cuenta?</h2>
+        <h2 className="text-lg font-black text-foreground mb-2">{t('del.title')}</h2>
         <p className="text-xs text-muted-foreground mb-1">
-          Esta acción es irreversible. Se borrarán todas tus suscripciones, y dejarás de aparecer
-          en los grupos de otros donde participas (esas plazas quedarán pendientes de eliminar).
-          No podrás recuperar tu cuenta ni tus datos.
+          {t('del.body')}
         </p>
         {error && (
           <p className="text-xs mt-3 font-bold text-rose-600 dark:text-rose-400">
@@ -75,7 +74,7 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
             disabled={loading}
             className="flex-1 py-3 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-sm font-bold text-foreground transition-colors cursor-pointer disabled:opacity-50"
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -83,7 +82,7 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
             disabled={loading}
             className="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-sm font-bold text-white transition-colors cursor-pointer"
           >
-            {loading ? 'Eliminando...' : 'Eliminar mi cuenta'}
+            {loading ? t('del.working') : t('nav.deleteAccount')}
           </button>
         </div>
       </div>

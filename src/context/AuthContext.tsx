@@ -15,6 +15,7 @@ import {
   loginWithEmail,
   friendlyAuthErrorMessage
 } from '../lib/firebase';
+import { t } from '../i18n';
 
 interface AuthContextType {
   user: User | null;
@@ -57,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err: any) {
       // Don't show error banner if user simply closed popup or cancelled permission
       if (!isAuthCancellation(err)) {
-        setAuthError(err?.message || 'Error al iniciar sesión con Google');
+        setAuthError(err?.message || t('auth.errGoogle'));
       }
     }
   };
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthError(null);
       await logoutUser();
     } catch (err: any) {
-      setAuthError(err?.message || 'Error al cerrar sesión');
+      setAuthError(err?.message || t('auth.errSignOut'));
     }
   };
 
