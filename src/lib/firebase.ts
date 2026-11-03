@@ -19,8 +19,15 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import firebaseConfig from '../../firebase-applet-config.json';
 import { t } from '../i18n';
 
-// Initialize Firebase App
-const app = initializeApp(firebaseConfig);
+// En el dominio propio, el login con Google se hace a través de ese mismo dominio
+// (así la ventana de Google muestra apleq.tecnofan.app y no el dominio de Firebase).
+const app = initializeApp({
+  ...firebaseConfig,
+  authDomain:
+    typeof window !== 'undefined' && window.location.hostname === 'apleq.tecnofan.app'
+      ? 'apleq.tecnofan.app'
+      : firebaseConfig.authDomain,
+});
 
 // Initialize Auth
 export const auth = getAuth(app);
