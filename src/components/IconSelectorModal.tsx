@@ -19,6 +19,7 @@ import {
   IconOption
 } from '../utils/icons';
 import { compressImageToMax512 } from '../utils/imageUtils';
+import { t, categoryName } from '../i18n';
 
 interface IconSelectorModalProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
   currentIconColorHex = '#1285FA',
   currentCustomImageUri = '',
   currentCustomImageBase64 = '',
-  platformName = 'Suscripción',
+  platformName = t('sub.defaultName'),
   subscriptionId,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -101,12 +102,12 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setUploadError('Por favor, selecciona un archivo de imagen válido (JPG, PNG, WebP).');
+      setUploadError(t('is.errType'));
       return;
     }
 
     if (file.size > 15 * 1024 * 1024) {
-      setUploadError('La imagen no debe superar los 15 MB.');
+      setUploadError(t('is.errSize'));
       return;
     }
 
@@ -122,7 +123,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
       setActiveTab('CUSTOM_IMAGE');
     } catch (err: any) {
       console.warn('Image compression error:', err);
-      setUploadError('No se pudo procesar la imagen. Por favor, intenta de nuevo.');
+      setUploadError(t('is.errProcess'));
     } finally {
       setIsUploading(false);
     }
@@ -195,10 +196,10 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-extrabold text-foreground tracking-tight">
-                Logo e icono de suscripción
+                {t('is.title')}
               </h2>
               <p className="text-xs text-muted-foreground">
-                Personaliza la apariencia del servicio
+                {t('is.subtitle')}
               </p>
             </div>
           </div>
@@ -215,7 +216,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
         <div className="p-4 bg-muted/30 border-b border-border flex items-center justify-between gap-4">
           <div className="flex items-center gap-3.5 min-w-0">
             <PlatformIconBadge
-              platformName={platformName || 'Suscripción'}
+              platformName={platformName || t('sub.defaultName')}
               iconType={customImageUri || customImageBase64 ? 'CUSTOM_IMAGE' : 'PRESET'}
               iconKey={selectedKey}
               customImageUri={customImageUri}
@@ -227,14 +228,14 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
             />
             <div className="min-w-0">
               <p className="text-sm font-extrabold text-foreground truncate">
-                {platformName || 'Vista previa'}
+                {platformName || t('is.preview')}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                   {customImageUri || customImageBase64 ? (
                     <>
                       <ImageIcon className="w-3 h-3 text-blue-500" />
-                      Imagen personalizada
+                      {t('is.customImage')}
                     </>
                   ) : (
                     <>
@@ -262,7 +263,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Catálogo
+              {t('is.tabCatalog')}
             </button>
             <button
               type="button"
@@ -273,7 +274,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Galería / Imagen
+              {t('is.tabGallery')}
             </button>
           </div>
         </div>
@@ -283,7 +284,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
           {/* Common Color Selector (Always Visible) */}
           <div className="p-4 rounded-2xl bg-muted/40 border border-border">
             <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2.5">
-              Color del icono / fondo
+              {t('is.colorLabel')}
             </label>
             <div className="flex flex-wrap items-center gap-2">
               {AVAILABLE_ICON_COLORS.map((c) => {
@@ -313,7 +314,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                   value={selectedColor.startsWith('#') ? selectedColor : '#1285FA'}
                   onChange={(e) => setSelectedColor(e.target.value)}
                   className="w-7 h-7 rounded-lg border-0 cursor-pointer bg-transparent"
-                  title="Seleccionar color personalizado"
+                  title={t('is.pickColor')}
                 />
                 <input
                   type="text"
@@ -336,7 +337,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Buscar servicio o icono (Netflix, Spotify, TV, Música...)"
+                    placeholder={t('is.searchPlaceholder')}
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border text-foreground placeholder-muted-foreground text-xs font-semibold focus:outline-none focus:border-blue-500"
                   />
                   {searchTerm && (
@@ -363,7 +364,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                           : 'bg-muted/60 text-muted-foreground hover:text-foreground hover:bg-muted'
                       }`}
                     >
-                      {cat === 'ALL' ? 'Todos' : cat}
+                      {cat === 'ALL' ? t('is.all') : categoryName(cat)}
                     </button>
                   ))}
                 </div>
@@ -374,7 +375,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                 {filteredPresets.length > 0 && (
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-                      Servicios populares ({filteredPresets.length})
+                      {t('is.popular', { n: filteredPresets.length })}
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                       {filteredPresets.map((preset) => {
@@ -404,7 +405,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                                 {preset.name}
                               </p>
                               <p className="text-[10px] text-muted-foreground truncate">
-                                {preset.category}
+                                {categoryName(preset.category)}
                               </p>
                             </div>
                           </button>
@@ -418,7 +419,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                 {filteredIcons.length > 0 && (
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-                      Iconos generales ({filteredIcons.length})
+                      {t('is.generalIcons', { n: filteredIcons.length })}
                     </h3>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                       {filteredIcons.map((item) => {
@@ -449,7 +450,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
 
                 {filteredPresets.length === 0 && filteredIcons.length === 0 && (
                   <div className="py-8 text-center text-muted-foreground text-xs">
-                    No se encontraron servicios ni iconos para "{searchTerm}".
+                    {t('is.noResults', { term: searchTerm })}
                   </div>
                 )}
               </div>
@@ -478,10 +479,10 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                   <div className="flex flex-col items-center justify-center gap-3">
                     <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                     <p className="text-sm font-bold text-foreground">
-                      Subiendo imagen a Firebase Storage...
+                      {t('is.uploading')}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Generando enlace seguro
+                      {t('is.secureLink')}
                     </p>
                   </div>
                 ) : customImageUri || customImageBase64 ? (
@@ -503,10 +504,10 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                     </div>
                     <div>
                       <p className="text-sm font-extrabold text-foreground">
-                        Imagen cargada correctamente
+                        {t('is.loaded')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Haz clic aquí para seleccionar otra imagen de tu dispositivo
+                        {t('is.chooseAnother')}
                       </p>
                     </div>
                   </div>
@@ -517,17 +518,17 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                     </div>
                     <div>
                       <p className="text-sm font-extrabold text-foreground">
-                        Selecciona o arrastra una imagen aquí
+                        {t('is.dropHere')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                        Soporta JPG, PNG y WebP. La imagen se almacenará en Firebase Storage y se sincronizará con tu app de Android.
+                        {t('is.supports')}
                       </p>
                     </div>
                     <button
                       type="button"
                       className="mt-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer"
                     >
-                      Examinar galería / archivos
+                      {t('is.browse')}
                     </button>
                   </div>
                 )}
@@ -544,10 +545,10 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                 <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/40 border border-border">
                   <div>
                     <p className="text-xs font-bold text-foreground">
-                      Restaurar icono predeterminado
+                      {t('is.restore')}
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      Elimina la imagen personalizada y vuelve al catálogo
+                      {t('is.restoreHelp')}
                     </p>
                   </div>
                   <button
@@ -556,7 +557,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>Eliminar</span>
+                    <span>{t('is.remove')}</span>
                   </button>
                 </div>
               )}
@@ -571,7 +572,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
             onClick={onClose}
             className="px-4 py-2.5 rounded-2xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -582,12 +583,12 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
             {isUploading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Subiendo imagen...</span>
+                <span>{t('is.uploadingBtn')}</span>
               </>
             ) : (
               <>
                 <Check className="w-4 h-4" />
-                <span>Aplicar icono</span>
+                <span>{t('is.apply')}</span>
               </>
             )}
           </button>

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { CURRENCY_DETAILED_OPTIONS, CurrencyOption } from '../types';
 import { CurrencyFlag } from './CurrencyFlag';
 import { ChevronDown, Check, Search } from 'lucide-react';
+import { t, currencyName } from '../i18n';
 
 export interface CurrencySelectProps {
   id?: string;
@@ -152,6 +153,7 @@ export const CurrencySelect: React.FC<CurrencySelectProps> = ({
     return (
       c.code.toLowerCase().includes(term) ||
       c.name.toLowerCase().includes(term) ||
+      currencyName(c.code, c.name).toLowerCase().includes(term) ||
       c.symbol.toLowerCase().includes(term)
     );
   });
@@ -244,7 +246,7 @@ export const CurrencySelect: React.FC<CurrencySelectProps> = ({
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Buscar moneda o país..."
+                  placeholder={t('cur.search')}
                   className={`w-full pl-8 pr-3 py-1.5 rounded-xl border text-xs font-medium outline-none transition-colors ${vStyles.search}`}
                 />
               </div>
@@ -254,7 +256,7 @@ export const CurrencySelect: React.FC<CurrencySelectProps> = ({
             <div className="overflow-y-auto flex-1 p-1 space-y-0.5 max-h-56 scrollbar-thin">
               {filteredOptions.length === 0 ? (
                 <div className="px-3 py-4 text-center text-xs opacity-60">
-                  No se encontraron monedas
+                  {t('cur.none')}
                 </div>
               ) : (
                 filteredOptions.map((opt) => {

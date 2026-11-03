@@ -1,0 +1,1823 @@
+# Prompt para AI Studio (Web): idioma, fase W3 (crear/editar suscripción, iconos, monedas, plataformas, unirse a un grupo)
+
+Continúa la traducción de la web (es / ca / en). Esta entrega traduce: la ventana de **crear y editar suscripción** (incluida la ventana de plataformas de compartición y la alarma), el **selector de logo e icono**, el **selector de moneda**, el catálogo de **plataformas de compartición** y la ventana **Unirse a un grupo**. También corrige dos textos del catalán de la fase anterior.
+
+Reglas:
+- Hacer **exactamente** lo que se indica, sin tocar nada más. No cambiar lógica ni datos guardados (las categorías siguen guardándose en castellano y solo se traducen al mostrarlas).
+- Seguirá en castellano en esta fase, a propósito: los nombres de los iconos y servicios del catálogo (`src/utils/icons.tsx`), el modal de miembros, Configuración, notificaciones, chat y la vista de cliente.
+- Al terminar: `npm run lint` y `npm run build` sin errores.
+
+## 1. Corrección de textos en catalán (`src/i18n/translations.ts`)
+
+Dentro del objeto `ca` (los otros idiomas no cambian):
+
+ANTES:
+```
+  'metrics.youPay': 'Et costa a tu',
+  'metrics.youReceive': 'Et aporten',
+```
+DESPUÉS:
+```
+  'metrics.youPay': 'Et costa',
+  'metrics.youReceive': 'T\'aporten',
+```
+
+## 2. Textos nuevos en `src/i18n/translations.ts`
+
+Añadir cada bloque **al final** del objeto correspondiente (justo antes de su cierre), sin tocar lo que ya hay.
+
+### 2a. En `es`: justo antes de la línea `} as const;`
+```ts
+  // --- W3: crear/editar suscripción, iconos, monedas, unirse a un grupo ---
+  'unitw.hour.one': 'hora',
+  'unitw.hour.other': 'horas',
+  'unitw.day.one': 'día',
+  'unitw.day.other': 'días',
+  'unitw.week.one': 'semana',
+  'unitw.week.other': 'semanas',
+  'unitw.month.one': 'mes',
+  'unitw.month.other': 'meses',
+  'sm.hoursBefore': 'Horas antes',
+  'sm.daysBefore': 'Días antes',
+  'sm.weeksBefore': 'Semanas antes',
+  'sm.monthsBefore': 'Meses antes',
+  'sm.iconTitle': 'Haz clic para personalizar el icono o subir una imagen',
+  'sm.newTitle': 'Nueva suscripción',
+  'sm.customizeLogo': 'Personalizar logo o imagen',
+  'sm.nameLabel': 'Nombre del servicio / suscripción',
+  'sm.changeIcon': 'Cambiar icono / logo',
+  'sm.namePlaceholder': 'Ej. Netflix, Spotify, Crunchyroll, Nintendo Switch...',
+  'sm.category': 'Categoría',
+  'sm.mainUser': 'Titular / Usuario principal',
+  'sm.mainUserPlaceholder': 'Tu nombre o el de la persona a cargo de la cuenta',
+  'sm.mainUserVisible': 'Visible para los clientes de esta suscripción',
+  'sm.price': 'Precio ({cur} / {period})',
+  'sm.currency': 'Moneda',
+  'sm.slots': 'Huecos libres (plazas para otros)',
+  'sm.slotsHelp': 'El gestor ocupa 1 plaza. La capacidad total será 1 + huecos.',
+  'sm.frequency': 'Frecuencia / Periodo de cobro',
+  'sm.billingDay': 'Día de cobro (1 al 31)',
+  'sm.billingMonth': 'Mes de cobro',
+  'sm.renewalDate': 'Fecha próximo cobro / renovación',
+  'sm.renewalAuto': 'Se calcula automáticamente en base a la frecuencia y día de cobro.',
+  'sm.alarmTitle': 'Alarma de aviso para el cobro de la suscripción',
+  'sm.alarmText': 'Recibir recordatorio personalizado antes de que se cobre la suscripción',
+  'sm.alarmConfig': 'Configurar antelación de la alarma:',
+  'sm.amount': 'Cantidad',
+  'sm.alarmUnit': 'Unidad de antelación',
+  'sm.alarmSame': 'Avisar **el mismo día** de la fecha de cobro de la suscripción.',
+  'sm.alarmBefore': 'Avisar **{n} {unit} antes** de la fecha de cobro de la suscripción.',
+  'sm.platforms': 'Plataformas de compartición',
+  'sm.platformsHelp': 'Configura hasta 3 plataformas con su precio, divisa y periodicidad',
+  'sm.managePlatforms': 'Gestionar catálogo de plataformas',
+  'sm.addPlatform': 'Añadir plataforma de compartición',
+  'sm.noPlatforms': 'No hay plataformas configuradas para esta suscripción.',
+  'sm.editItem': 'Editar {name}',
+  'sm.deleteItem': 'Eliminar {name}',
+  'sm.notes': 'Notas adicionales',
+  'sm.notesPlaceholder': 'Detalles sobre contraseñas, perfiles, reglas del grupo, etc.',
+  'sm.deleteTitle': 'Eliminar suscripción',
+  'sm.save': 'Guardar cambios',
+  'sm.create': 'Crear suscripción',
+  'sm.platEditTitle': 'Editar plataforma de compartición',
+  'sm.platAddTitle': 'Añadir plataforma de compartición',
+  'sm.platLabel': 'Plataforma de compartición *',
+  'sm.platSelect': 'Seleccionar plataforma',
+  'sm.platFallback': 'Plataforma',
+  'sm.pricePerUser': 'Precio por usuario / slot *',
+  'sm.platCurrency': 'Moneda con la que paga la plataforma *',
+  'sm.platFrequency': 'Frecuencia de pago de la plataforma *',
+  'sm.defaultMethod': 'Método habitual por defecto (opcional)',
+  'sm.methodPlaceholder': 'Ej. Bizum, Sharesub Wallet, Joiin...',
+  'sm.methodHelp': 'Se usará por defecto en el "Método habitual" de los miembros de esta suscripción.',
+  'sm.tariff': 'Tarifa:',
+  'sm.update': 'Actualizar',
+  'is.title': 'Logo e icono de suscripción',
+  'is.subtitle': 'Personaliza la apariencia del servicio',
+  'is.preview': 'Vista previa',
+  'is.customImage': 'Imagen personalizada',
+  'is.tabCatalog': 'Catálogo',
+  'is.tabGallery': 'Galería / Imagen',
+  'is.colorLabel': 'Color del icono / fondo',
+  'is.pickColor': 'Seleccionar color personalizado',
+  'is.searchPlaceholder': 'Buscar servicio o icono (Netflix, Spotify, TV, Música...)',
+  'is.all': 'Todos',
+  'is.popular': 'Servicios populares ({n})',
+  'is.generalIcons': 'Iconos generales ({n})',
+  'is.noResults': 'No se encontraron servicios ni iconos para "{term}".',
+  'is.uploading': 'Subiendo imagen a Firebase Storage...',
+  'is.secureLink': 'Generando enlace seguro',
+  'is.loaded': 'Imagen cargada correctamente',
+  'is.chooseAnother': 'Haz clic aquí para seleccionar otra imagen de tu dispositivo',
+  'is.dropHere': 'Selecciona o arrastra una imagen aquí',
+  'is.supports': 'Soporta JPG, PNG y WebP. La imagen se almacenará en Firebase Storage y se sincronizará con tu app de Android.',
+  'is.browse': 'Examinar galería / archivos',
+  'is.restore': 'Restaurar icono predeterminado',
+  'is.restoreHelp': 'Elimina la imagen personalizada y vuelve al catálogo',
+  'is.remove': 'Eliminar',
+  'is.uploadingBtn': 'Subiendo imagen...',
+  'is.apply': 'Aplicar icono',
+  'is.errType': 'Por favor, selecciona un archivo de imagen válido (JPG, PNG, WebP).',
+  'is.errSize': 'La imagen no debe superar los 15 MB.',
+  'is.errProcess': 'No se pudo procesar la imagen. Por favor, intenta de nuevo.',
+  'cur.search': 'Buscar moneda o país...',
+  'cur.none': 'No se encontraron monedas',
+  'jg.text': 'Introduce el código de invitación que te han compartido.',
+  'jg.placeholder': 'Ej. 7K3-P9M',
+  'jg.success': '¡Te has unido al grupo!',
+  'jg.failed': 'No se pudo unir. Revisa el código.',
+  'jg.joining': 'Uniéndote...',
+  'msp.subtitle': 'Añade o personaliza el nombre y color de tus plataformas',
+  'msp.addNew': 'Añadir nueva plataforma',
+  'msp.namePlaceholder': 'Nombre (ej. Sharesub, Pulpo, GoSplit...)',
+  'msp.pickColor': 'Elegir color personalizado',
+  'msp.available': 'Plataformas disponibles ({n})',
+  'msp.editTitle': 'Editar plataforma',
+  'msp.deleteTitle': 'Eliminar plataforma',
+  'msp.restoreConfirm': '¿Restaurar las plataformas de compartición a los valores predeterminados?',
+  'msp.restore': 'Restaurar por defecto',
+  'msp.done': 'Hecho',
+```
+
+### 2b. En `ca`: justo antes del `};` que cierra `export const ca: Dictionary = {`
+```ts
+  // --- W3: crear/editar suscripción, iconos, monedas, unirse a un grupo ---
+  'unitw.hour.one': 'hora',
+  'unitw.hour.other': 'hores',
+  'unitw.day.one': 'dia',
+  'unitw.day.other': 'dies',
+  'unitw.week.one': 'setmana',
+  'unitw.week.other': 'setmanes',
+  'unitw.month.one': 'mes',
+  'unitw.month.other': 'mesos',
+  'sm.hoursBefore': 'Hores abans',
+  'sm.daysBefore': 'Dies abans',
+  'sm.weeksBefore': 'Setmanes abans',
+  'sm.monthsBefore': 'Mesos abans',
+  'sm.iconTitle': 'Fes clic per personalitzar la icona o pujar una imatge',
+  'sm.newTitle': 'Nova subscripció',
+  'sm.customizeLogo': 'Personalitza el logotip o la imatge',
+  'sm.nameLabel': 'Nom del servei / subscripció',
+  'sm.changeIcon': 'Canvia la icona / el logotip',
+  'sm.namePlaceholder': 'Ex. Netflix, Spotify, Crunchyroll, Nintendo Switch...',
+  'sm.category': 'Categoria',
+  'sm.mainUser': 'Titular / Usuari principal',
+  'sm.mainUserPlaceholder': 'El teu nom o el de la persona a càrrec del compte',
+  'sm.mainUserVisible': 'Visible per als clients d\'aquesta subscripció',
+  'sm.price': 'Preu ({cur} / {period})',
+  'sm.currency': 'Moneda',
+  'sm.slots': 'Llocs lliures (places per a altres)',
+  'sm.slotsHelp': 'El gestor ocupa 1 plaça. La capacitat total serà 1 + llocs.',
+  'sm.frequency': 'Freqüència / Període de cobrament',
+  'sm.billingDay': 'Dia de cobrament (de l\'1 al 31)',
+  'sm.billingMonth': 'Mes de cobrament',
+  'sm.renewalDate': 'Data del proper cobrament / renovació',
+  'sm.renewalAuto': 'Es calcula automàticament a partir de la freqüència i el dia de cobrament.',
+  'sm.alarmTitle': 'Alarma d\'avís pel cobrament de la subscripció',
+  'sm.alarmText': 'Rebre un recordatori personalitzat abans que es cobri la subscripció',
+  'sm.alarmConfig': 'Configura l\'antelació de l\'alarma:',
+  'sm.amount': 'Quantitat',
+  'sm.alarmUnit': 'Unitat d\'antelació',
+  'sm.alarmSame': 'Avisar **el mateix dia** de la data de cobrament de la subscripció.',
+  'sm.alarmBefore': 'Avisar **{n} {unit} abans** de la data de cobrament de la subscripció.',
+  'sm.platforms': 'Plataformes de compartició',
+  'sm.platformsHelp': 'Configura fins a 3 plataformes amb el seu preu, divisa i periodicitat',
+  'sm.managePlatforms': 'Gestiona el catàleg de plataformes',
+  'sm.addPlatform': 'Afegeix una plataforma de compartició',
+  'sm.noPlatforms': 'No hi ha plataformes configurades per a aquesta subscripció.',
+  'sm.editItem': 'Edita {name}',
+  'sm.deleteItem': 'Elimina {name}',
+  'sm.notes': 'Notes addicionals',
+  'sm.notesPlaceholder': 'Detalls sobre contrasenyes, perfils, normes del grup, etc.',
+  'sm.deleteTitle': 'Elimina la subscripció',
+  'sm.save': 'Desa els canvis',
+  'sm.create': 'Crea la subscripció',
+  'sm.platEditTitle': 'Edita la plataforma de compartició',
+  'sm.platAddTitle': 'Afegeix una plataforma de compartició',
+  'sm.platLabel': 'Plataforma de compartició *',
+  'sm.platSelect': 'Selecciona una plataforma',
+  'sm.platFallback': 'Plataforma',
+  'sm.pricePerUser': 'Preu per usuari / lloc *',
+  'sm.platCurrency': 'Moneda amb què paga la plataforma *',
+  'sm.platFrequency': 'Freqüència de pagament de la plataforma *',
+  'sm.defaultMethod': 'Mètode habitual per defecte (opcional)',
+  'sm.methodPlaceholder': 'Ex. Bizum, Sharesub Wallet, Joiin...',
+  'sm.methodHelp': 'S\'usarà per defecte al «Mètode habitual» dels membres d\'aquesta subscripció.',
+  'sm.tariff': 'Tarifa:',
+  'sm.update': 'Actualitza',
+  'is.title': 'Logotip i icona de la subscripció',
+  'is.subtitle': 'Personalitza l\'aspecte del servei',
+  'is.preview': 'Vista prèvia',
+  'is.customImage': 'Imatge personalitzada',
+  'is.tabCatalog': 'Catàleg',
+  'is.tabGallery': 'Galeria / Imatge',
+  'is.colorLabel': 'Color de la icona / del fons',
+  'is.pickColor': 'Selecciona un color personalitzat',
+  'is.searchPlaceholder': 'Cerca un servei o una icona (Netflix, Spotify, TV, Música...)',
+  'is.all': 'Tots',
+  'is.popular': 'Serveis populars ({n})',
+  'is.generalIcons': 'Icones generals ({n})',
+  'is.noResults': 'No s\'han trobat serveis ni icones per a «{term}».',
+  'is.uploading': 'Pujant la imatge a Firebase Storage...',
+  'is.secureLink': 'Generant enllaç segur',
+  'is.loaded': 'Imatge carregada correctament',
+  'is.chooseAnother': 'Fes clic aquí per seleccionar una altra imatge del dispositiu',
+  'is.dropHere': 'Selecciona o arrossega una imatge aquí',
+  'is.supports': 'Admet JPG, PNG i WebP. La imatge s\'emmagatzemarà a Firebase Storage i es sincronitzarà amb la teva app d\'Android.',
+  'is.browse': 'Explora la galeria / els fitxers',
+  'is.restore': 'Restaura la icona predeterminada',
+  'is.restoreHelp': 'Elimina la imatge personalitzada i torna al catàleg',
+  'is.remove': 'Elimina',
+  'is.uploadingBtn': 'Pujant la imatge...',
+  'is.apply': 'Aplica la icona',
+  'is.errType': 'Si us plau, selecciona un fitxer d\'imatge vàlid (JPG, PNG, WebP).',
+  'is.errSize': 'La imatge no pot superar els 15 MB.',
+  'is.errProcess': 'No s\'ha pogut processar la imatge. Torna-ho a provar.',
+  'cur.search': 'Cerca una moneda o un país...',
+  'cur.none': 'No s\'han trobat monedes',
+  'jg.text': 'Introdueix el codi d\'invitació que t\'han compartit.',
+  'jg.placeholder': 'Ex. 7K3-P9M',
+  'jg.success': 'T\'has unit al grup!',
+  'jg.failed': 'No s\'ha pogut unir. Revisa el codi.',
+  'jg.joining': 'Unint-te...',
+  'msp.subtitle': 'Afegeix o personalitza el nom i el color de les teves plataformes',
+  'msp.addNew': 'Afegeix una nova plataforma',
+  'msp.namePlaceholder': 'Nom (ex. Sharesub, Pulpo, GoSplit...)',
+  'msp.pickColor': 'Tria un color personalitzat',
+  'msp.available': 'Plataformes disponibles ({n})',
+  'msp.editTitle': 'Edita la plataforma',
+  'msp.deleteTitle': 'Elimina la plataforma',
+  'msp.restoreConfirm': 'Vols restaurar les plataformes de compartició als valors predeterminats?',
+  'msp.restore': 'Restaura els valors per defecte',
+  'msp.done': 'Fet',
+```
+
+### 2c. En `en`: justo antes del `};` final del archivo (cierra `export const en: Dictionary = {`)
+```ts
+  // --- W3: crear/editar suscripción, iconos, monedas, unirse a un grupo ---
+  'unitw.hour.one': 'hour',
+  'unitw.hour.other': 'hours',
+  'unitw.day.one': 'day',
+  'unitw.day.other': 'days',
+  'unitw.week.one': 'week',
+  'unitw.week.other': 'weeks',
+  'unitw.month.one': 'month',
+  'unitw.month.other': 'months',
+  'sm.hoursBefore': 'Hours before',
+  'sm.daysBefore': 'Days before',
+  'sm.weeksBefore': 'Weeks before',
+  'sm.monthsBefore': 'Months before',
+  'sm.iconTitle': 'Click to customize the icon or upload an image',
+  'sm.newTitle': 'New subscription',
+  'sm.customizeLogo': 'Customize logo or image',
+  'sm.nameLabel': 'Service / subscription name',
+  'sm.changeIcon': 'Change icon / logo',
+  'sm.namePlaceholder': 'E.g. Netflix, Spotify, Crunchyroll, Nintendo Switch...',
+  'sm.category': 'Category',
+  'sm.mainUser': 'Account holder / Main user',
+  'sm.mainUserPlaceholder': 'Your name or that of the person in charge of the account',
+  'sm.mainUserVisible': 'Visible to the clients of this subscription',
+  'sm.price': 'Price ({cur} / {period})',
+  'sm.currency': 'Currency',
+  'sm.slots': 'Free slots (places for others)',
+  'sm.slotsHelp': 'The manager takes 1 place. Total capacity will be 1 + slots.',
+  'sm.frequency': 'Billing frequency / period',
+  'sm.billingDay': 'Billing day (1 to 31)',
+  'sm.billingMonth': 'Billing month',
+  'sm.renewalDate': 'Next billing / renewal date',
+  'sm.renewalAuto': 'Calculated automatically from the frequency and billing day.',
+  'sm.alarmTitle': 'Alarm for the subscription payment',
+  'sm.alarmText': 'Get a custom reminder before the subscription is charged',
+  'sm.alarmConfig': 'Set how far ahead the alarm goes off:',
+  'sm.amount': 'Amount',
+  'sm.alarmUnit': 'Lead-time unit',
+  'sm.alarmSame': 'Alert **on the same day** as the subscription billing date.',
+  'sm.alarmBefore': 'Alert **{n} {unit} before** the subscription billing date.',
+  'sm.platforms': 'Sharing platforms',
+  'sm.platformsHelp': 'Set up to 3 platforms with their price, currency and frequency',
+  'sm.managePlatforms': 'Manage platform catalog',
+  'sm.addPlatform': 'Add sharing platform',
+  'sm.noPlatforms': 'No platforms configured for this subscription.',
+  'sm.editItem': 'Edit {name}',
+  'sm.deleteItem': 'Delete {name}',
+  'sm.notes': 'Additional notes',
+  'sm.notesPlaceholder': 'Details about passwords, profiles, group rules, etc.',
+  'sm.deleteTitle': 'Delete subscription',
+  'sm.save': 'Save changes',
+  'sm.create': 'Create subscription',
+  'sm.platEditTitle': 'Edit sharing platform',
+  'sm.platAddTitle': 'Add sharing platform',
+  'sm.platLabel': 'Sharing platform *',
+  'sm.platSelect': 'Select platform',
+  'sm.platFallback': 'Platform',
+  'sm.pricePerUser': 'Price per user / slot *',
+  'sm.platCurrency': 'Currency the platform charges in *',
+  'sm.platFrequency': 'Platform payment frequency *',
+  'sm.defaultMethod': 'Default usual method (optional)',
+  'sm.methodPlaceholder': 'E.g. Bizum, Sharesub Wallet, Joiin...',
+  'sm.methodHelp': 'It will be used by default as the "Usual method" of this subscription\'s members.',
+  'sm.tariff': 'Rate:',
+  'sm.update': 'Update',
+  'is.title': 'Subscription logo and icon',
+  'is.subtitle': 'Customize the service\'s appearance',
+  'is.preview': 'Preview',
+  'is.customImage': 'Custom image',
+  'is.tabCatalog': 'Catalog',
+  'is.tabGallery': 'Gallery / Image',
+  'is.colorLabel': 'Icon / background color',
+  'is.pickColor': 'Pick a custom color',
+  'is.searchPlaceholder': 'Search a service or icon (Netflix, Spotify, TV, Music...)',
+  'is.all': 'All',
+  'is.popular': 'Popular services ({n})',
+  'is.generalIcons': 'General icons ({n})',
+  'is.noResults': 'No services or icons found for "{term}".',
+  'is.uploading': 'Uploading image to Firebase Storage...',
+  'is.secureLink': 'Generating secure link',
+  'is.loaded': 'Image loaded successfully',
+  'is.chooseAnother': 'Click here to choose another image from your device',
+  'is.dropHere': 'Select or drag an image here',
+  'is.supports': 'Supports JPG, PNG and WebP. The image is stored in Firebase Storage and synced with your Android app.',
+  'is.browse': 'Browse gallery / files',
+  'is.restore': 'Restore default icon',
+  'is.restoreHelp': 'Removes the custom image and goes back to the catalog',
+  'is.remove': 'Remove',
+  'is.uploadingBtn': 'Uploading image...',
+  'is.apply': 'Apply icon',
+  'is.errType': 'Please select a valid image file (JPG, PNG, WebP).',
+  'is.errSize': 'The image must not exceed 15 MB.',
+  'is.errProcess': 'The image could not be processed. Please try again.',
+  'cur.search': 'Search currency or country...',
+  'cur.none': 'No currencies found',
+  'jg.text': 'Enter the invitation code that was shared with you.',
+  'jg.placeholder': 'E.g. 7K3-P9M',
+  'jg.success': 'You\'ve joined the group!',
+  'jg.failed': 'Could not join. Check the code.',
+  'jg.joining': 'Joining...',
+  'msp.subtitle': 'Add or customize the name and color of your platforms',
+  'msp.addNew': 'Add new platform',
+  'msp.namePlaceholder': 'Name (e.g. Sharesub, Pulpo, GoSplit...)',
+  'msp.pickColor': 'Choose a custom color',
+  'msp.available': 'Available platforms ({n})',
+  'msp.editTitle': 'Edit platform',
+  'msp.deleteTitle': 'Delete platform',
+  'msp.restoreConfirm': 'Restore the sharing platforms to their default values?',
+  'msp.restore': 'Restore defaults',
+  'msp.done': 'Done',
+```
+
+## 3. `src/i18n/index.tsx`: añadir al FINAL del archivo
+
+```tsx
+function capitalize(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
+/** Nombre del mes (1-12) en el idioma actual, con inicial mayúscula. */
+export function monthName(month: number): string {
+  const m = Math.min(12, Math.max(1, month)) - 1;
+  return capitalize(new Date(2024, m, 1).toLocaleDateString(dateLocale(), { month: 'long' }));
+}
+
+/** Nombre de una moneda (EUR, USD...) en el idioma actual; si no se puede, el texto de respaldo. */
+export function currencyName(code: string, fallback?: string): string {
+  try {
+    const name = new Intl.DisplayNames([dateLocale()], { type: 'currency' }).of(code);
+    if (name) return capitalize(name);
+  } catch {
+    /* el navegador no lo soporta */
+  }
+  return fallback || code;
+}
+```
+
+## 4. Modificaciones en archivos existentes
+
+Cada bloque indica el texto actual (ANTES) y el nuevo (DESPUÉS). Salvo que se indique otra cosa, el ANTES aparece una sola vez en su archivo.
+
+### `src/components/SubscriptionModal.tsx`
+
+**Cambio 1**
+
+Añadir esta línea justo después del **último** `import` del archivo (sin cambiar los demás):
+```
+import { t, tp, tRich, categoryName, monthName } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+                title="Haz clic para personalizar el icono o subir una imagen"
+```
+DESPUÉS:
+```
+                title={t('sm.iconTitle')}
+```
+
+**Cambio 3**
+
+ANTES:
+```
+platformName={platformName || 'Suscripción'}
+```
+DESPUÉS:
+```
+platformName={platformName || t('sub.defaultName')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+{activeSubToEdit ? 'Editar suscripción' : 'Nueva suscripción'}
+```
+DESPUÉS:
+```
+{activeSubToEdit ? t('detail.editTitle') : t('sm.newTitle')}
+```
+
+**Cambio 5**
+
+ANTES:
+```
+<span>Personalizar logo o imagen</span>
+```
+DESPUÉS:
+```
+<span>{t('sm.customizeLogo')}</span>
+```
+
+**Cambio 6**
+
+ANTES:
+```
+Nombre del servicio / suscripción 
+```
+DESPUÉS:
+```
+{t('sm.nameLabel')} 
+```
+
+**Cambio 7**
+
+ANTES:
+```
+<span>Cambiar icono / logo</span>
+```
+DESPUÉS:
+```
+<span>{t('sm.changeIcon')}</span>
+```
+
+**Cambio 8**
+
+ANTES:
+```
+placeholder="Ej. Netflix, Spotify, Crunchyroll, Nintendo Switch..."
+```
+DESPUÉS:
+```
+placeholder={t('sm.namePlaceholder')}
+```
+
+**Cambio 9**
+
+ANTES:
+```
+                Categoría
+```
+DESPUÉS:
+```
+                {t('sm.category')}
+```
+
+**Cambio 10**
+
+ANTES:
+```
+                      {cat}
+```
+DESPUÉS:
+```
+                      {categoryName(cat)}
+```
+
+**Cambio 11**
+
+ANTES:
+```
+                Titular / Usuario principal
+```
+DESPUÉS:
+```
+                {t('sm.mainUser')}
+```
+
+**Cambio 12**
+
+ANTES:
+```
+placeholder="Tu nombre o el de la persona a cargo de la cuenta"
+```
+DESPUÉS:
+```
+placeholder={t('sm.mainUserPlaceholder')}
+```
+
+**Cambio 13**
+
+ANTES:
+```
+                  Visible para los clientes de esta suscripción
+```
+DESPUÉS:
+```
+                  {t('sm.mainUserVisible')}
+```
+
+**Cambio 14**
+
+ANTES:
+```
+Precio ({currency || 'EUR'} / {
+                    billingPeriod === 'MONTHLY' ? 'mensual' :
+                    billingPeriod === 'QUARTERLY' ? 'trimestral' :
+                    billingPeriod === 'SEMI_ANNUAL' ? 'semestral' : 'anual'
+                  }) 
+```
+DESPUÉS:
+```
+{t('sm.price', { cur: currency || 'EUR', period: (billingPeriod === 'MONTHLY' ? t('period.monthly') : billingPeriod === 'QUARTERLY' ? t('period.quarterly') : billingPeriod === 'SEMI_ANNUAL' ? t('period.semi') : t('period.yearly')).toLowerCase() })} 
+```
+
+**Cambio 15**
+
+ANTES:
+```
+                  Moneda
+```
+DESPUÉS:
+```
+                  {t('sm.currency')}
+```
+
+**Cambio 16**
+
+ANTES:
+```
+Huecos libres (plazas para otros)</label>
+```
+DESPUÉS:
+```
+{t('sm.slots')}</label>
+```
+
+**Cambio 17**
+
+ANTES:
+```
+El gestor ocupa 1 plaza. La capacidad total será 1 + huecos.</p>
+```
+DESPUÉS:
+```
+{t('sm.slotsHelp')}</p>
+```
+
+**Cambio 18**
+
+ANTES:
+```
+                  Frecuencia / Periodo de cobro
+```
+DESPUÉS:
+```
+                  {t('sm.frequency')}
+```
+
+**Cambio 19**
+
+ANTES:
+```
+MONTHLY: 'Mensual',
+```
+DESPUÉS:
+```
+MONTHLY: t('period.monthly'),
+```
+
+**Cambio 20**
+
+ANTES:
+```
+QUARTERLY: 'Trimestral',
+```
+DESPUÉS:
+```
+QUARTERLY: t('period.quarterly'),
+```
+
+**Cambio 21**
+
+ANTES:
+```
+SEMI_ANNUAL: 'Semestral',
+```
+DESPUÉS:
+```
+SEMI_ANNUAL: t('period.semi'),
+```
+
+**Cambio 22**
+
+ANTES:
+```
+YEARLY: 'Anual',
+```
+DESPUÉS:
+```
+YEARLY: t('period.yearly'),
+```
+
+**Cambio 23**
+
+ANTES:
+```
+                    Día de cobro (1 al 31)
+```
+DESPUÉS:
+```
+                    {t('sm.billingDay')}
+```
+
+**Cambio 24**
+
+ANTES:
+```
+                      Mes de cobro
+```
+DESPUÉS:
+```
+                      {t('sm.billingMonth')}
+```
+
+**Cambio 25**
+
+ANTES:
+```
+{m.label}
+```
+DESPUÉS:
+```
+{monthName(m.value)}
+```
+
+**Cambio 26**
+
+ANTES:
+```
+                    Fecha próximo cobro / renovación
+```
+DESPUÉS:
+```
+                    {t('sm.renewalDate')}
+```
+
+**Cambio 27**
+
+ANTES:
+```
+<span>Se calcula automáticamente en base a la frecuencia y día de cobro.</span>
+```
+DESPUÉS:
+```
+<span>{t('sm.renewalAuto')}</span>
+```
+
+**Cambio 28**
+
+ANTES:
+```
+                        Alarma de aviso para el cobro de la suscripción
+```
+DESPUÉS:
+```
+                        {t('sm.alarmTitle')}
+```
+
+**Cambio 29**
+
+ANTES:
+```
+                        Recibir recordatorio personalizado antes de que se cobre la suscripción
+```
+DESPUÉS:
+```
+                        {t('sm.alarmText')}
+```
+
+**Cambio 30**
+
+ANTES:
+```
+<span>Configurar antelación de la alarma:</span>
+```
+DESPUÉS:
+```
+<span>{t('sm.alarmConfig')}</span>
+```
+
+**Cambio 31**
+
+ANTES:
+```
+                          Cantidad
+```
+DESPUÉS:
+```
+                          {t('sm.amount')}
+```
+
+**Cambio 32**
+
+ANTES:
+```
+                          Unidad de antelación
+```
+DESPUÉS:
+```
+                          {t('sm.alarmUnit')}
+```
+
+**Cambio 33**
+
+ANTES:
+```
+                            El mismo día
+```
+DESPUÉS:
+```
+                            {t('detail.alarmSameDay')}
+```
+
+**Cambio 34**
+
+ANTES:
+```
+                            Horas antes
+```
+DESPUÉS:
+```
+                            {t('sm.hoursBefore')}
+```
+
+**Cambio 35**
+
+ANTES:
+```
+                            Días antes
+```
+DESPUÉS:
+```
+                            {t('sm.daysBefore')}
+```
+
+**Cambio 36**
+
+ANTES:
+```
+                            Semanas antes
+```
+DESPUÉS:
+```
+                            {t('sm.weeksBefore')}
+```
+
+**Cambio 37**
+
+ANTES:
+```
+                            Meses antes
+```
+DESPUÉS:
+```
+                            {t('sm.monthsBefore')}
+```
+
+**Cambio 38**
+
+ANTES:
+```
+<>Avisar <strong>el mismo día</strong> de la fecha de cobro de la suscripción.</>
+```
+DESPUÉS:
+```
+<>{tRich('sm.alarmSame')}</>
+```
+
+**Cambio 39**
+
+ANTES:
+```
+Avisar <strong>{alarmValue} {alarmUnit === 'hours' ? (alarmValue === 1 ? 'hora' : 'horas') : alarmUnit === 'days' ? (alarmValue === 1 ? 'día' : 'días') : alarmUnit === 'weeks' ? (alarmValue === 1 ? 'semana' : 'semanas') : (alarmValue === 1 ? 'mes' : 'meses')} antes</strong> de la fecha de cobro de la suscripción.
+```
+DESPUÉS:
+```
+{tRich('sm.alarmBefore', { n: alarmValue, unit: alarmUnit === 'hours' ? tp('unitw.hour', alarmValue) : alarmUnit === 'days' ? tp('unitw.day', alarmValue) : alarmUnit === 'weeks' ? tp('unitw.week', alarmValue) : tp('unitw.month', alarmValue) })}
+```
+
+**Cambio 40**
+
+ANTES:
+```
+                      Plataformas de compartición
+```
+DESPUÉS:
+```
+                      {t('sm.platforms')}
+```
+
+**Cambio 41**
+
+ANTES:
+```
+                      Configura hasta 3 plataformas con su precio, divisa y periodicidad
+```
+DESPUÉS:
+```
+                      {t('sm.platformsHelp')}
+```
+
+**Cambio 42**
+
+ANTES:
+```
+title="Gestionar catálogo de plataformas"
+```
+DESPUÉS:
+```
+title={t('sm.managePlatforms')}
+```
+
+**Cambio 43**
+
+ANTES:
+```
+<span>Añadir plataforma de compartición</span>
+```
+DESPUÉS:
+```
+<span>{t('sm.addPlatform')}</span>
+```
+
+**Cambio 44**
+
+ANTES:
+```
+                  No hay plataformas configuradas para esta suscripción.
+```
+DESPUÉS:
+```
+                  {t('sm.noPlatforms')}
+```
+
+**Cambio 45**
+
+ANTES:
+```
+title={`Editar ${item.platformName}`}
+```
+DESPUÉS:
+```
+title={t('sm.editItem', { name: item.platformName })}
+```
+
+**Cambio 46**
+
+ANTES:
+```
+title={`Eliminar ${item.platformName}`}
+```
+DESPUÉS:
+```
+title={t('sm.deleteItem', { name: item.platformName })}
+```
+
+**Cambio 47**
+
+ANTES:
+```
+                Notas adicionales
+```
+DESPUÉS:
+```
+                {t('sm.notes')}
+```
+
+**Cambio 48**
+
+ANTES:
+```
+placeholder="Detalles sobre contraseñas, perfiles, reglas del grupo, etc."
+```
+DESPUÉS:
+```
+placeholder={t('sm.notesPlaceholder')}
+```
+
+**Cambio 49**
+
+ANTES:
+```
+                        ¿Eliminar?
+```
+DESPUÉS:
+```
+                        {t('detail.confirmDelete')}
+```
+
+**Cambio 50**
+
+ANTES:
+```
+                        Sí
+```
+DESPUÉS:
+```
+                        {t('detail.yes')}
+```
+
+**Cambio 51**
+
+ANTES:
+```
+                        No
+```
+DESPUÉS:
+```
+                        {t('detail.no')}
+```
+
+**Cambio 52**
+
+ANTES:
+```
+title="Eliminar suscripción"
+```
+DESPUÉS:
+```
+title={t('sm.deleteTitle')}
+```
+
+**Cambio 53** (aparece 2 veces: reemplazar todas)
+
+ANTES:
+```
+                  Cancelar
+```
+DESPUÉS:
+```
+                  {t('common.cancel')}
+```
+
+**Cambio 54**
+
+ANTES:
+```
+<span>{activeSubToEdit ? 'Guardar cambios' : 'Crear suscripción'}</span>
+```
+DESPUÉS:
+```
+<span>{activeSubToEdit ? t('sm.save') : t('sm.create')}</span>
+```
+
+**Cambio 55**
+
+ANTES:
+```
+{platformModalState.mode === 'edit'
+                    ? 'Editar Plataforma de Compartición'
+                    : 'Añadir Plataforma de Compartición'}
+```
+DESPUÉS:
+```
+{platformModalState.mode === 'edit' ? t('sm.platEditTitle') : t('sm.platAddTitle')}
+```
+
+**Cambio 56**
+
+ANTES:
+```
+                  Plataforma de compartición *
+```
+DESPUÉS:
+```
+                  {t('sm.platLabel')}
+```
+
+**Cambio 57**
+
+ANTES:
+```
+{platformModalState.platformName || 'Seleccionar plataforma'}
+```
+DESPUÉS:
+```
+{platformModalState.platformName || t('sm.platSelect')}
+```
+
+**Cambio 58**
+
+ANTES:
+```
+                  Precio por usuario / slot *
+```
+DESPUÉS:
+```
+                  {t('sm.pricePerUser')}
+```
+
+**Cambio 59**
+
+ANTES:
+```
+                  Moneda con la que paga la plataforma *
+```
+DESPUÉS:
+```
+                  {t('sm.platCurrency')}
+```
+
+**Cambio 60**
+
+ANTES:
+```
+                  Frecuencia de pago de la plataforma *
+```
+DESPUÉS:
+```
+                  {t('sm.platFrequency')}
+```
+
+**Cambio 61**
+
+ANTES:
+```
+>Mensual</option>
+```
+DESPUÉS:
+```
+>{t('period.monthly')}</option>
+```
+
+**Cambio 62**
+
+ANTES:
+```
+>Trimestral</option>
+```
+DESPUÉS:
+```
+>{t('period.quarterly')}</option>
+```
+
+**Cambio 63**
+
+ANTES:
+```
+>Semestral</option>
+```
+DESPUÉS:
+```
+>{t('period.semi')}</option>
+```
+
+**Cambio 64**
+
+ANTES:
+```
+>Anual</option>
+```
+DESPUÉS:
+```
+>{t('period.yearly')}</option>
+```
+
+**Cambio 65**
+
+ANTES:
+```
+                  Método habitual por defecto (opcional)
+```
+DESPUÉS:
+```
+                  {t('sm.defaultMethod')}
+```
+
+**Cambio 66**
+
+ANTES:
+```
+placeholder="Ej. Bizum, Sharesub Wallet, Joiin..."
+```
+DESPUÉS:
+```
+placeholder={t('sm.methodPlaceholder')}
+```
+
+**Cambio 67**
+
+ANTES:
+```
+                  Se usará por defecto en el "Método habitual" de los miembros de esta suscripción.
+```
+DESPUÉS:
+```
+                  {t('sm.methodHelp')}
+```
+
+**Cambio 68**
+
+ANTES:
+```
+Tarifa: {platformModalState.platformName || 'Plataforma'} •{' '}
+```
+DESPUÉS:
+```
+{t('sm.tariff')} {platformModalState.platformName || t('sm.platFallback')} •{' '}
+```
+
+**Cambio 69**
+
+ANTES:
+```
+{platformModalState.mode === 'edit' ? 'Actualizar' : 'Añadir'}
+```
+DESPUÉS:
+```
+{platformModalState.mode === 'edit' ? t('sm.update') : t('list.add')}
+```
+
+### `src/components/IconSelectorModal.tsx`
+
+**Cambio 1**
+
+Añadir esta línea justo después del **último** `import` del archivo (sin cambiar los demás):
+```
+import { t, categoryName } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+platformName = 'Suscripción',
+```
+DESPUÉS:
+```
+platformName = t('sub.defaultName'),
+```
+
+**Cambio 3**
+
+ANTES:
+```
+setUploadError('Por favor, selecciona un archivo de imagen válido (JPG, PNG, WebP).');
+```
+DESPUÉS:
+```
+setUploadError(t('is.errType'));
+```
+
+**Cambio 4**
+
+ANTES:
+```
+setUploadError('La imagen no debe superar los 15 MB.');
+```
+DESPUÉS:
+```
+setUploadError(t('is.errSize'));
+```
+
+**Cambio 5**
+
+ANTES:
+```
+setUploadError('No se pudo procesar la imagen. Por favor, intenta de nuevo.');
+```
+DESPUÉS:
+```
+setUploadError(t('is.errProcess'));
+```
+
+**Cambio 6**
+
+ANTES:
+```
+platformName={platformName || 'Suscripción'}
+```
+DESPUÉS:
+```
+platformName={platformName || t('sub.defaultName')}
+```
+
+**Cambio 7**
+
+ANTES:
+```
+                Logo e icono de suscripción
+```
+DESPUÉS:
+```
+                {t('is.title')}
+```
+
+**Cambio 8**
+
+ANTES:
+```
+                Personaliza la apariencia del servicio
+```
+DESPUÉS:
+```
+                {t('is.subtitle')}
+```
+
+**Cambio 9**
+
+ANTES:
+```
+{platformName || 'Vista previa'}
+```
+DESPUÉS:
+```
+{platformName || t('is.preview')}
+```
+
+**Cambio 10**
+
+ANTES:
+```
+                      Imagen personalizada
+```
+DESPUÉS:
+```
+                      {t('is.customImage')}
+```
+
+**Cambio 11**
+
+ANTES:
+```
+              Catálogo
+```
+DESPUÉS:
+```
+              {t('is.tabCatalog')}
+```
+
+**Cambio 12**
+
+ANTES:
+```
+              Galería / Imagen
+```
+DESPUÉS:
+```
+              {t('is.tabGallery')}
+```
+
+**Cambio 13**
+
+ANTES:
+```
+              Color del icono / fondo
+```
+DESPUÉS:
+```
+              {t('is.colorLabel')}
+```
+
+**Cambio 14**
+
+ANTES:
+```
+title="Seleccionar color personalizado"
+```
+DESPUÉS:
+```
+title={t('is.pickColor')}
+```
+
+**Cambio 15**
+
+ANTES:
+```
+placeholder="Buscar servicio o icono (Netflix, Spotify, TV, Música...)"
+```
+DESPUÉS:
+```
+placeholder={t('is.searchPlaceholder')}
+```
+
+**Cambio 16**
+
+ANTES:
+```
+{cat === 'ALL' ? 'Todos' : cat}
+```
+DESPUÉS:
+```
+{cat === 'ALL' ? t('is.all') : categoryName(cat)}
+```
+
+**Cambio 17**
+
+ANTES:
+```
+                      Servicios populares ({filteredPresets.length})
+```
+DESPUÉS:
+```
+                      {t('is.popular', { n: filteredPresets.length })}
+```
+
+**Cambio 18**
+
+ANTES:
+```
+{preset.category}
+```
+DESPUÉS:
+```
+{categoryName(preset.category)}
+```
+
+**Cambio 19**
+
+ANTES:
+```
+                      Iconos generales ({filteredIcons.length})
+```
+DESPUÉS:
+```
+                      {t('is.generalIcons', { n: filteredIcons.length })}
+```
+
+**Cambio 20**
+
+ANTES:
+```
+                    No se encontraron servicios ni iconos para "{searchTerm}".
+```
+DESPUÉS:
+```
+                    {t('is.noResults', { term: searchTerm })}
+```
+
+**Cambio 21**
+
+ANTES:
+```
+                      Subiendo imagen a Firebase Storage...
+```
+DESPUÉS:
+```
+                      {t('is.uploading')}
+```
+
+**Cambio 22**
+
+ANTES:
+```
+                      Generando enlace seguro
+```
+DESPUÉS:
+```
+                      {t('is.secureLink')}
+```
+
+**Cambio 23**
+
+ANTES:
+```
+                        Imagen cargada correctamente
+```
+DESPUÉS:
+```
+                        {t('is.loaded')}
+```
+
+**Cambio 24**
+
+ANTES:
+```
+                        Haz clic aquí para seleccionar otra imagen de tu dispositivo
+```
+DESPUÉS:
+```
+                        {t('is.chooseAnother')}
+```
+
+**Cambio 25**
+
+ANTES:
+```
+                        Selecciona o arrastra una imagen aquí
+```
+DESPUÉS:
+```
+                        {t('is.dropHere')}
+```
+
+**Cambio 26**
+
+ANTES:
+```
+                        Soporta JPG, PNG y WebP. La imagen se almacenará en Firebase Storage y se sincronizará con tu app de Android.
+```
+DESPUÉS:
+```
+                        {t('is.supports')}
+```
+
+**Cambio 27**
+
+ANTES:
+```
+                      Examinar galería / archivos
+```
+DESPUÉS:
+```
+                      {t('is.browse')}
+```
+
+**Cambio 28**
+
+ANTES:
+```
+                      Restaurar icono predeterminado
+```
+DESPUÉS:
+```
+                      {t('is.restore')}
+```
+
+**Cambio 29**
+
+ANTES:
+```
+                      Elimina la imagen personalizada y vuelve al catálogo
+```
+DESPUÉS:
+```
+                      {t('is.restoreHelp')}
+```
+
+**Cambio 30**
+
+ANTES:
+```
+<span>Eliminar</span>
+```
+DESPUÉS:
+```
+<span>{t('is.remove')}</span>
+```
+
+**Cambio 31**
+
+ANTES:
+```
+            Cancelar
+```
+DESPUÉS:
+```
+            {t('common.cancel')}
+```
+
+**Cambio 32**
+
+ANTES:
+```
+<span>Subiendo imagen...</span>
+```
+DESPUÉS:
+```
+<span>{t('is.uploadingBtn')}</span>
+```
+
+**Cambio 33**
+
+ANTES:
+```
+<span>Aplicar icono</span>
+```
+DESPUÉS:
+```
+<span>{t('is.apply')}</span>
+```
+
+### `src/components/CurrencySelect.tsx`
+
+**Cambio 1**
+
+Añadir esta línea justo después del **último** `import` del archivo (sin cambiar los demás):
+```
+import { t, currencyName } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+placeholder="Buscar moneda o país..."
+```
+DESPUÉS:
+```
+placeholder={t('cur.search')}
+```
+
+**Cambio 3**
+
+ANTES:
+```
+                  No se encontraron monedas
+```
+DESPUÉS:
+```
+                  {t('cur.none')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+c.name.toLowerCase().includes(term) ||
+```
+DESPUÉS:
+```
+c.name.toLowerCase().includes(term) ||
+      currencyName(c.code, c.name).toLowerCase().includes(term) ||
+```
+
+### `src/components/JoinGroupModal.tsx`
+
+**Cambio 1**
+
+Añadir esta línea justo después del **último** `import` del archivo (sin cambiar los demás):
+```
+import { t } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+text: '¡Te has unido al grupo!'
+```
+DESPUÉS:
+```
+text: t('jg.success')
+```
+
+**Cambio 3**
+
+ANTES:
+```
+text: e?.message || 'No se pudo unir. Revisa el código.'
+```
+DESPUÉS:
+```
+text: e?.message || t('jg.failed')
+```
+
+**Cambio 4**
+
+ANTES:
+```
+>Unirse a un grupo</h2>
+```
+DESPUÉS:
+```
+>{t('common.joinGroup')}</h2>
+```
+
+**Cambio 5**
+
+ANTES:
+```
+          Introduce el código de invitación que te han compartido.
+```
+DESPUÉS:
+```
+          {t('jg.text')}
+```
+
+**Cambio 6**
+
+ANTES:
+```
+placeholder="Ej. 7K3-P9M"
+```
+DESPUÉS:
+```
+placeholder={t('jg.placeholder')}
+```
+
+**Cambio 7**
+
+ANTES:
+```
+            Cerrar
+```
+DESPUÉS:
+```
+            {t('common.close')}
+```
+
+**Cambio 8**
+
+ANTES:
+```
+{loading ? 'Uniéndote...' : 'Unirse'}
+```
+DESPUÉS:
+```
+{loading ? t('jg.joining') : t('nav.join')}
+```
+
+### `src/components/ManageSharingPlatformsModal.tsx`
+
+**Cambio 1**
+
+Añadir esta línea justo después del **último** `import` del archivo (sin cambiar los demás):
+```
+import { t } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+                Plataformas de compartición
+```
+DESPUÉS:
+```
+                {t('sm.platforms')}
+```
+
+**Cambio 3**
+
+ANTES:
+```
+                Añade o personaliza el nombre y color de tus plataformas
+```
+DESPUÉS:
+```
+                {t('msp.subtitle')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+              Añadir nueva plataforma
+```
+DESPUÉS:
+```
+              {t('msp.addNew')}
+```
+
+**Cambio 5**
+
+ANTES:
+```
+placeholder="Nombre (ej. Sharesub, Pulpo, GoSplit...)"
+```
+DESPUÉS:
+```
+placeholder={t('msp.namePlaceholder')}
+```
+
+**Cambio 6**
+
+ANTES:
+```
+title="Elegir color personalizado"
+```
+DESPUÉS:
+```
+title={t('msp.pickColor')}
+```
+
+**Cambio 7**
+
+ANTES:
+```
+<span>Añadir</span>
+```
+DESPUÉS:
+```
+<span>{t('list.add')}</span>
+```
+
+**Cambio 8**
+
+ANTES:
+```
+              Plataformas disponibles ({platforms.length})
+```
+DESPUÉS:
+```
+              {t('msp.available', { n: platforms.length })}
+```
+
+**Cambio 9**
+
+ANTES:
+```
+title="Guardar cambios"
+```
+DESPUÉS:
+```
+title={t('sm.save')}
+```
+
+**Cambio 10**
+
+ANTES:
+```
+title="Cancelar"
+```
+DESPUÉS:
+```
+title={t('common.cancel')}
+```
+
+**Cambio 11**
+
+ANTES:
+```
+title="Editar plataforma"
+```
+DESPUÉS:
+```
+title={t('msp.editTitle')}
+```
+
+**Cambio 12**
+
+ANTES:
+```
+title="Eliminar plataforma"
+```
+DESPUÉS:
+```
+title={t('msp.deleteTitle')}
+```
+
+**Cambio 13**
+
+ANTES:
+```
+window.confirm('¿Restaurar las plataformas de compartición a los valores predeterminados?')
+```
+DESPUÉS:
+```
+window.confirm(t('msp.restoreConfirm'))
+```
+
+**Cambio 14**
+
+ANTES:
+```
+<span>Restaurar por defecto</span>
+```
+DESPUÉS:
+```
+<span>{t('msp.restore')}</span>
+```
+
+**Cambio 15**
+
+ANTES:
+```
+            Hecho
+```
+DESPUÉS:
+```
+            {t('msp.done')}
+```
+
+## 5. Pruebas
+
+1. `npm run lint` y `npm run build` sin errores.
+2. En catalán, la fila de métricas dice «Et costa» y «T'aporten».
+3. Abrir «Nueva suscripción» y «Editar» en catalán e inglés: título, nombre, categoría (con los nombres traducidos), titular, precio con el periodo («Preu (EUR / mensual)»), moneda, llocs lliures, frecuencia, día y mes de cobro (los meses salen en el idioma), fecha de renovación, la alarma (activarla y comprobar la frase «Avisar … abans/before …»), plataformas de compartición, notas y botones.
+4. Pulsar «Añadir plataforma de compartición» y editar una existente: la ventana de plataforma (campos, ayudas, «Tarifa:», «Actualizar/Añadir») traducida. Abrir el desplegable de moneda: buscador y «No se encontraron monedas» traducidos; buscar «dolar» o «dollar» encuentra USD en cada idioma.
+5. Pulsar el icono para abrir el selector de logo: título, pestañas Catálogo / Galería, color, buscador, categorías, «Servicios populares», subida de imagen y botones traducidos.
+6. Engranaje del catálogo de plataformas: títulos, campos, «Restaurar por defecto» (con su confirmación) y «Hecho» traducidos.
+7. «Unirse a un grupo» (barra superior): textos y botones traducidos.
+8. En castellano todo se ve igual que antes. Guardar una suscripción nueva y una editada: sigue funcionando igual.
+9. Esperado en esta fase (sigue en castellano): nombres de iconos del catálogo («Películas», «Series / TV»…), modal de miembros, Configuración, notificaciones, chat y vista de cliente.

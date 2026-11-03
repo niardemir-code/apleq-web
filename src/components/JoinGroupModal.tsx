@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { claimInvite } from '../lib/firebase';
+import { t } from '../i18n';
 
 interface JoinGroupModalProps {
   isOpen: boolean;
@@ -20,7 +21,7 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
     setMessage(null);
     try {
       await claimInvite(clean);
-      setMessage({ type: 'success', text: '¡Te has unido al grupo!' });
+      setMessage({ type: 'success', text: t('jg.success') });
       setCode('');
       // Cierre automático: pequeña pausa para que se alcance a leer el mensaje de éxito.
       setTimeout(() => {
@@ -28,7 +29,7 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
         onClose();
       }, 900);
     } catch (e: any) {
-      setMessage({ type: 'error', text: e?.message || 'No se pudo unir. Revisa el código.' });
+      setMessage({ type: 'error', text: e?.message || t('jg.failed') });
     } finally {
       setLoading(false);
     }
@@ -43,15 +44,15 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
         className="w-full max-w-sm bg-card border border-border rounded-3xl p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-black text-foreground mb-1">Unirse a un grupo</h2>
+        <h2 className="text-lg font-black text-foreground mb-1">{t('common.joinGroup')}</h2>
         <p className="text-xs text-muted-foreground mb-4">
-          Introduce el código de invitación que te han compartido.
+          {t('jg.text')}
         </p>
         <input
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          placeholder="Ej. 7K3-P9M"
+          placeholder={t('jg.placeholder')}
           maxLength={8}
           className="w-full bg-muted/60 text-foreground px-4 py-3 rounded-2xl border border-border text-center text-lg font-black tracking-widest uppercase focus:outline-none focus:border-blue-500"
         />
@@ -72,7 +73,7 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
             onClick={onClose}
             className="flex-1 py-3 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-sm font-bold text-foreground transition-colors"
           >
-            Cerrar
+            {t('common.close')}
           </button>
           <button
             type="button"
@@ -80,7 +81,7 @@ export function JoinGroupModal({ isOpen, onClose }: JoinGroupModalProps) {
             disabled={loading || !code.trim()}
             className="flex-1 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-sm font-bold text-white transition-colors"
           >
-            {loading ? 'Uniéndote...' : 'Unirse'}
+            {loading ? t('jg.joining') : t('nav.join')}
           </button>
         </div>
       </div>

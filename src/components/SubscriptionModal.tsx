@@ -45,6 +45,7 @@ import {
   Clock,
   Save
 } from 'lucide-react';
+import { t, tp, tRich, categoryName, monthName } from '../i18n';
 
 function formatDisplayDate(dateStr?: string | number): string {
   if (!dateStr) return '';
@@ -482,10 +483,10 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 type="button"
                 onClick={() => setShowIconSelector(true)}
                 className="relative group cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-2xl shrink-0"
-                title="Haz clic para personalizar el icono o subir una imagen"
+                title={t('sm.iconTitle')}
               >
                 <PlatformIconBadge
-                  platformName={platformName || 'Suscripción'}
+                  platformName={platformName || t('sub.defaultName')}
                   iconType={iconType}
                   iconKey={iconKey}
                   customImageUri={customImageUri}
@@ -502,7 +503,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
               <div>
                 <h2 className="text-base font-extrabold text-foreground tracking-tight">
-                  {activeSubToEdit ? 'Editar suscripción' : 'Nueva suscripción'}
+                  {activeSubToEdit ? t('detail.editTitle') : t('sm.newTitle')}
                 </h2>
                 <button
                   type="button"
@@ -510,7 +511,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   className="inline-flex items-center gap-1 text-xs font-bold text-blue-500 hover:text-blue-400 cursor-pointer mt-0.5"
                 >
                   <Palette className="w-3.5 h-3.5" />
-                  <span>Personalizar logo o imagen</span>
+                  <span>{t('sm.customizeLogo')}</span>
                 </button>
               </div>
             </div>
@@ -531,7 +532,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Nombre del servicio / suscripción <span className="text-rose-500">*</span>
+                  {t('sm.nameLabel')} <span className="text-rose-500">*</span>
                 </label>
                 <button
                   type="button"
@@ -539,7 +540,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-500 hover:underline cursor-pointer"
                 >
                   <Palette className="w-3 h-3" />
-                  <span>Cambiar icono / logo</span>
+                  <span>{t('sm.changeIcon')}</span>
                 </button>
               </div>
               <input
@@ -547,7 +548,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 type="text"
                 value={platformName}
                 onChange={(e) => handlePlatformNameChange(e.target.value)}
-                placeholder="Ej. Netflix, Spotify, Crunchyroll, Nintendo Switch..."
+                placeholder={t('sm.namePlaceholder')}
                 className="w-full px-4 py-3 rounded-2xl bg-muted/50 border border-border text-foreground placeholder-muted-foreground text-sm font-semibold focus:outline-none focus:border-blue-500 transition-colors"
                 required
               />
@@ -556,7 +557,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             {/* 2. Categoría */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                Categoría
+                {t('sm.category')}
               </label>
               <div className="relative">
                 <select
@@ -567,7 +568,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 >
                   {SUBSCRIPTION_CATEGORIES.map((cat) => (
                     <option key={cat} value={cat} className="bg-card text-foreground">
-                      {cat}
+                      {categoryName(cat)}
                     </option>
                   ))}
                 </select>
@@ -578,7 +579,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             {/* 3. Titular / Usuario principal */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                Titular / Usuario principal
+                {t('sm.mainUser')}
               </label>
               <div className="relative">
                 <input
@@ -586,7 +587,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   type="text"
                   value={mainUserName}
                   onChange={(e) => setMainUserName(e.target.value)}
-                  placeholder="Tu nombre o el de la persona a cargo de la cuenta"
+                  placeholder={t('sm.mainUserPlaceholder')}
                   className="w-full pl-10 pr-4 py-3 rounded-2xl bg-muted/50 border border-border text-foreground placeholder-muted-foreground text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors"
                 />
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -599,7 +600,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   className="w-4 h-4 rounded accent-blue-600 cursor-pointer"
                 />
                 <span className="text-[11px] font-semibold text-muted-foreground">
-                  Visible para los clientes de esta suscripción
+                  {t('sm.mainUserVisible')}
                 </span>
               </label>
             </div>
@@ -608,11 +609,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4">
               <div className="sm:col-span-7">
                 <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                  Precio ({currency || 'EUR'} / {
-                    billingPeriod === 'MONTHLY' ? 'mensual' :
-                    billingPeriod === 'QUARTERLY' ? 'trimestral' :
-                    billingPeriod === 'SEMI_ANNUAL' ? 'semestral' : 'anual'
-                  }) <span className="text-rose-500">*</span>
+                  {t('sm.price', { cur: currency || 'EUR', period: (billingPeriod === 'MONTHLY' ? t('period.monthly') : billingPeriod === 'QUARTERLY' ? t('period.quarterly') : billingPeriod === 'SEMI_ANNUAL' ? t('period.semi') : t('period.yearly')).toLowerCase() })} <span className="text-rose-500">*</span>
                 </label>
                 <div>
                   <input
@@ -631,7 +628,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
               <div className="sm:col-span-5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                  Moneda
+                  {t('sm.currency')}
                 </label>
                 <CurrencySelect
                   id="select-subscription-currency"
@@ -643,7 +640,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
             {/* Huecos libres (plazas para otros) */}
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">Huecos libres (plazas para otros)</label>
+              <label className="block text-xs font-bold text-slate-300 mb-1.5">{t('sm.slots')}</label>
               <input
                 type="number"
                 min={0}
@@ -651,23 +648,23 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 onChange={(e) => setFreeSlots(Math.max(0, Number(e.target.value) || 0))}
                 className="w-full bg-[#202234] text-slate-100 px-4 py-3 rounded-2xl border border-border/80 text-sm font-medium focus:outline-none focus:border-blue-500"
               />
-              <p className="text-[11px] text-slate-500 mt-1">El gestor ocupa 1 plaza. La capacidad total será 1 + huecos.</p>
+              <p className="text-[11px] text-slate-500 mt-1">{t('sm.slotsHelp')}</p>
             </div>
 
             {/* 5. Periodo de facturación, Fecha de renovación y Sistema de alarmas */}
             <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                  Frecuencia / Periodo de cobro
+                  {t('sm.frequency')}
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {(['MONTHLY', 'QUARTERLY', 'SEMI_ANNUAL', 'YEARLY'] as const).map((p) => {
                     const isSelected = normalizeBillingPeriod(billingPeriod) === p;
                     const labels: Record<'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'YEARLY', string> = {
-                      MONTHLY: 'Mensual',
-                      QUARTERLY: 'Trimestral',
-                      SEMI_ANNUAL: 'Semestral',
-                      YEARLY: 'Anual',
+                      MONTHLY: t('period.monthly'),
+                      QUARTERLY: t('period.quarterly'),
+                      SEMI_ANNUAL: t('period.semi'),
+                      YEARLY: t('period.yearly'),
                     };
 
                     return (
@@ -700,7 +697,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 {/* Día del mes */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                    Día de cobro (1 al 31)
+                    {t('sm.billingDay')}
                   </label>
                   <input
                     type="number"
@@ -725,7 +722,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 {isNonMonthly && (
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                      Mes de cobro
+                      {t('sm.billingMonth')}
                     </label>
                     <div className="relative">
                       <select
@@ -744,7 +741,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                       >
                         {MONTHS_OF_YEAR.map((m) => (
                           <option key={m.value} value={m.value} className="bg-card text-foreground">
-                            {m.label}
+                            {monthName(m.value)}
                           </option>
                         ))}
                       </select>
@@ -758,7 +755,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               <div className="pt-2 border-t border-border/60">
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Fecha próximo cobro / renovación
+                    {t('sm.renewalDate')}
                   </label>
                   {renewalDate && (
                     <span className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[11px] font-mono font-bold tracking-tight">
@@ -777,7 +774,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 </div>
                 <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 pt-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                  <span>Se calcula automáticamente en base a la frecuencia y día de cobro.</span>
+                  <span>{t('sm.renewalAuto')}</span>
                 </p>
               </div>
 
@@ -797,10 +794,10 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground">
-                        Alarma de aviso para el cobro de la suscripción
+                        {t('sm.alarmTitle')}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
-                        Recibir recordatorio personalizado antes de que se cobre la suscripción
+                        {t('sm.alarmText')}
                       </p>
                     </div>
                   </div>
@@ -818,13 +815,13 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   <div className="p-3.5 rounded-xl bg-card border border-border space-y-2.5">
                     <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
                       <Clock className="w-3.5 h-3.5 text-blue-500" />
-                      <span>Configurar antelación de la alarma:</span>
+                      <span>{t('sm.alarmConfig')}</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2.5">
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                          Cantidad
+                          {t('sm.amount')}
                         </label>
                         <input
                           id="input-sub-alarm-val"
@@ -844,7 +841,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
                       <div>
                         <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                          Unidad de antelación
+                          {t('sm.alarmUnit')}
                         </label>
                         <select
                           id="select-sub-alarm-unit"
@@ -861,19 +858,19 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                           className="w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-foreground text-xs font-bold outline-none cursor-pointer focus:border-blue-500 transition-colors"
                         >
                           <option value="same_day" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                            El mismo día
+                            {t('detail.alarmSameDay')}
                           </option>
                           <option value="hours" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                            Horas antes
+                            {t('sm.hoursBefore')}
                           </option>
                           <option value="days" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                            Días antes
+                            {t('sm.daysBefore')}
                           </option>
                           <option value="weeks" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                            Semanas antes
+                            {t('sm.weeksBefore')}
                           </option>
                           <option value="months" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                            Meses antes
+                            {t('sm.monthsBefore')}
                           </option>
                         </select>
                       </div>
@@ -883,10 +880,10 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                       <Bell className="w-3 h-3" />
                       <span>
                         {alarmUnit === 'same_day' || alarmValue === 0 ? (
-                          <>Avisar <strong>el mismo día</strong> de la fecha de cobro de la suscripción.</>
+                          <>{tRich('sm.alarmSame')}</>
                         ) : (
                           <>
-                            Avisar <strong>{alarmValue} {alarmUnit === 'hours' ? (alarmValue === 1 ? 'hora' : 'horas') : alarmUnit === 'days' ? (alarmValue === 1 ? 'día' : 'días') : alarmUnit === 'weeks' ? (alarmValue === 1 ? 'semana' : 'semanas') : (alarmValue === 1 ? 'mes' : 'meses')} antes</strong> de la fecha de cobro de la suscripción.
+                            {tRich('sm.alarmBefore', { n: alarmValue, unit: alarmUnit === 'hours' ? tp('unitw.hour', alarmValue) : alarmUnit === 'days' ? tp('unitw.day', alarmValue) : alarmUnit === 'weeks' ? tp('unitw.week', alarmValue) : tp('unitw.month', alarmValue) })}
                           </>
                         )}
                       </span>
@@ -905,10 +902,10 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-foreground">
-                      Plataformas de compartición
+                      {t('sm.platforms')}
                     </h4>
                     <p className="text-[11px] text-muted-foreground">
-                      Configura hasta 3 plataformas con su precio, divisa y periodicidad
+                      {t('sm.platformsHelp')}
                     </p>
                   </div>
                 </div>
@@ -921,7 +918,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     type="button"
                     onClick={() => setShowManagePlatforms(true)}
                     className="p-1.5 rounded-lg bg-card hover:bg-muted text-muted-foreground hover:text-foreground border border-border transition-colors cursor-pointer"
-                    title="Gestionar catálogo de plataformas"
+                    title={t('sm.managePlatforms')}
                   >
                     <Settings2 className="w-3.5 h-3.5 text-blue-400" />
                   </button>
@@ -935,13 +932,13 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                 className="w-full py-3 px-4 rounded-2xl border border-dashed border-blue-500/40 hover:border-blue-500/70 bg-blue-500/5 hover:bg-blue-500/10 text-blue-400 hover:text-blue-300 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99]"
               >
                 <Plus className="w-4 h-4" />
-                <span>Añadir plataforma de compartición</span>
+                <span>{t('sm.addPlatform')}</span>
               </button>
 
               {/* Configured Platforms List (Matching Screenshot 1) */}
               {configuredPlatforms.length === 0 ? (
                 <div className="p-3 text-center rounded-xl bg-card border border-border text-muted-foreground text-xs">
-                  No hay plataformas configuradas para esta suscripción.
+                  {t('sm.noPlatforms')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -982,7 +979,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                             type="button"
                             onClick={() => handleOpenEditPlatform(index)}
                             className="p-2 rounded-xl text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors cursor-pointer"
-                            title={`Editar ${item.platformName}`}
+                            title={t('sm.editItem', { name: item.platformName })}
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
@@ -990,7 +987,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                             type="button"
                             onClick={() => handleRemovePlatformFromSub(index)}
                             className="p-2 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                            title={`Eliminar ${item.platformName}`}
+                            title={t('sm.deleteItem', { name: item.platformName })}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -1005,7 +1002,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
             {/* 7. Notas */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                Notas adicionales
+                {t('sm.notes')}
               </label>
               <div className="relative">
                 <textarea
@@ -1013,7 +1010,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   rows={2}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Detalles sobre contraseñas, perfiles, reglas del grupo, etc."
+                  placeholder={t('sm.notesPlaceholder')}
                   className="w-full px-4 py-3 rounded-2xl bg-muted/50 border border-border text-foreground placeholder-muted-foreground text-xs font-medium focus:outline-none focus:border-blue-500 transition-colors resize-none"
                 />
               </div>
@@ -1028,7 +1025,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   confirmDelete ? (
                     <div className="flex items-center gap-1.5 p-1 rounded-xl bg-rose-500/10 border border-rose-500/30">
                       <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 px-1.5">
-                        ¿Eliminar?
+                        {t('detail.confirmDelete')}
                       </span>
                       <button
                         type="button"
@@ -1040,14 +1037,14 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                         }}
                         className="py-1 px-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition-colors shadow-xs cursor-pointer active:scale-95"
                       >
-                        Sí
+                        {t('detail.yes')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfirmDelete(false)}
                         className="py-1 px-2 rounded-lg bg-muted text-muted-foreground text-[11px] font-medium hover:bg-muted/80 cursor-pointer"
                       >
-                        No
+                        {t('detail.no')}
                       </button>
                     </div>
                   ) : (
@@ -1056,7 +1053,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                       type="button"
                       onClick={() => setConfirmDelete(true)}
                       className="p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 hover:border-rose-500/40 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 transition-colors cursor-pointer active:scale-95"
-                      title="Eliminar suscripción"
+                      title={t('sm.deleteTitle')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1071,7 +1068,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   onClick={onClose}
                   className="px-5 py-2.5 rounded-xl bg-muted hover:bg-muted/80 border border-border text-foreground text-xs font-bold transition-colors cursor-pointer active:scale-95"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </button>
                 <button
                   id="btn-submit-subscription"
@@ -1079,7 +1076,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md shadow-blue-600/25 active:scale-95 cursor-pointer"
                 >
                   <Save className="w-4 h-4" />
-                  <span>{activeSubToEdit ? 'Guardar cambios' : 'Crear suscripción'}</span>
+                  <span>{activeSubToEdit ? t('sm.save') : t('sm.create')}</span>
                 </button>
               </div>
             </div>
@@ -1098,9 +1095,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               <div className="flex items-center gap-2.5">
                 <Pencil className="w-5 h-5 text-blue-400" />
                 <h3 className="text-base font-bold text-slate-100">
-                  {platformModalState.mode === 'edit'
-                    ? 'Editar Plataforma de Compartición'
-                    : 'Añadir Plataforma de Compartición'}
+                  {platformModalState.mode === 'edit' ? t('sm.platEditTitle') : t('sm.platAddTitle')}
                 </h3>
               </div>
               <button
@@ -1116,7 +1111,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               {/* Field 1: Plataforma de compartición */}
               <div className="relative" ref={platformSelectRef}>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Plataforma de compartición *
+                  {t('sm.platLabel')}
                 </label>
                 {(() => {
                   const currentPlat = platforms.find(
@@ -1135,7 +1130,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                             className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs ring-1 ring-white/10"
                             style={{ backgroundColor: currentPlatColor }}
                           />
-                          <span className="truncate">{platformModalState.platformName || 'Seleccionar plataforma'}</span>
+                          <span className="truncate">{platformModalState.platformName || t('sm.platSelect')}</span>
                         </div>
                         <ChevronDown
                           className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-1.5 ${
@@ -1183,7 +1178,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               {/* Field 2: Precio por usuario / slot */}
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Precio por usuario / slot *
+                  {t('sm.pricePerUser')}
                 </label>
                 <div className="relative flex items-center bg-[#202234] border border-border/80 rounded-2xl px-4 py-2.5 focus-within:border-blue-500 transition-colors">
                   <span className="text-base font-bold text-blue-400 mr-2.5 shrink-0">
@@ -1213,7 +1208,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               {/* Field 3: Moneda con la que paga la plataforma */}
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Moneda con la que paga la plataforma *
+                  {t('sm.platCurrency')}
                 </label>
                 <CurrencySelect
                   value={platformModalState.currency}
@@ -1229,7 +1224,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               {/* Field 4: Frecuencia de pago de la plataforma */}
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Frecuencia de pago de la plataforma *
+                  {t('sm.platFrequency')}
                 </label>
                 <div className="relative">
                   <select
@@ -1241,10 +1236,10 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                     }
                     className="w-full bg-[#202234] text-slate-100 px-4 py-3 pr-10 rounded-2xl border border-border/80 text-sm font-medium focus:outline-none focus:border-blue-500 appearance-none cursor-pointer"
                   >
-                    <option value="MONTHLY" className="bg-[#202234] text-slate-100">Mensual</option>
-                    <option value="QUARTERLY" className="bg-[#202234] text-slate-100">Trimestral</option>
-                    <option value="SEMI_ANNUAL" className="bg-[#202234] text-slate-100">Semestral</option>
-                    <option value="YEARLY" className="bg-[#202234] text-slate-100">Anual</option>
+                    <option value="MONTHLY" className="bg-[#202234] text-slate-100">{t('period.monthly')}</option>
+                    <option value="QUARTERLY" className="bg-[#202234] text-slate-100">{t('period.quarterly')}</option>
+                    <option value="SEMI_ANNUAL" className="bg-[#202234] text-slate-100">{t('period.semi')}</option>
+                    <option value="YEARLY" className="bg-[#202234] text-slate-100">{t('period.yearly')}</option>
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
@@ -1253,7 +1248,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               {/* Field 5: Método habitual por defecto (opcional) */}
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                  Método habitual por defecto (opcional)
+                  {t('sm.defaultMethod')}
                 </label>
                 <input
                   type="text"
@@ -1263,11 +1258,11 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                       prev ? { ...prev, defaultPaymentMethod: e.target.value } : null
                     )
                   }
-                  placeholder="Ej. Bizum, Sharesub Wallet, Joiin..."
+                  placeholder={t('sm.methodPlaceholder')}
                   className="w-full bg-[#202234] text-slate-100 px-4 py-3 rounded-2xl border border-border/80 text-sm font-medium focus:outline-none focus:border-blue-500"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Se usará por defecto en el "Método habitual" de los miembros de esta suscripción.
+                  {t('sm.methodHelp')}
                 </p>
               </div>
 
@@ -1275,7 +1270,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
               <div className="p-3.5 rounded-2xl bg-blue-950/60 border border-blue-500/20 text-blue-200 flex items-center gap-2.5 text-xs font-semibold">
                 <Info className="w-4 h-4 text-blue-400 shrink-0" />
                 <span>
-                  Tarifa: {platformModalState.platformName || 'Plataforma'} •{' '}
+                  {t('sm.tariff')} {platformModalState.platformName || t('sm.platFallback')} •{' '}
                   {(typeof platformModalState.pricePerUser === 'number'
                     ? platformModalState.pricePerUser
                     : 0
@@ -1294,13 +1289,13 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
                   onClick={() => setPlatformModalState(null)}
                   className="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-300 hover:text-white transition-colors cursor-pointer"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-2.5 rounded-xl font-bold text-xs bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/25 active:scale-95 transition-all cursor-pointer"
                 >
-                  {platformModalState.mode === 'edit' ? 'Actualizar' : 'Añadir'}
+                  {platformModalState.mode === 'edit' ? t('sm.update') : t('list.add')}
                 </button>
               </div>
             </form>

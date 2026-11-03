@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSharingPlatforms } from '../context/SharingPlatformsContext';
 import { SharingPlatformEntity } from '../types';
 import { X, Plus, Trash2, Edit2, Check, RotateCcw, Palette } from 'lucide-react';
+import { t } from '../i18n';
 
 interface ManageSharingPlatformsModalProps {
   isOpen: boolean;
@@ -89,7 +90,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
   };
 
   const handleRestore = async () => {
-    if (window.confirm('¿Restaurar las plataformas de compartición a los valores predeterminados?')) {
+    if (window.confirm(t('msp.restoreConfirm'))) {
       await restoreDefaultPlatforms();
     }
   };
@@ -108,10 +109,10 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
             </div>
             <div>
               <h2 className="text-base font-extrabold text-white tracking-tight">
-                Plataformas de compartición
+                {t('sm.platforms')}
               </h2>
               <p className="text-xs text-slate-400">
-                Añade o personaliza el nombre y color de tus plataformas
+                {t('msp.subtitle')}
               </p>
             </div>
           </div>
@@ -132,7 +133,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
             className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3"
           >
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 block">
-              Añadir nueva plataforma
+              {t('msp.addNew')}
             </span>
 
             <div className="flex items-center gap-2">
@@ -142,7 +143,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Nombre (ej. Sharesub, Pulpo, GoSplit...)"
+                  placeholder={t('msp.namePlaceholder')}
                   className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-xs font-medium focus:outline-none focus:border-blue-500 transition-colors"
                   required
                 />
@@ -155,7 +156,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                   value={newColor}
                   onChange={(e) => setNewColor(e.target.value)}
                   className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0 p-0"
-                  title="Elegir color personalizado"
+                  title={t('msp.pickColor')}
                 />
                 <button
                   type="submit"
@@ -163,7 +164,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-blue-600/20"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Añadir</span>
+                  <span>{t('list.add')}</span>
                 </button>
               </div>
             </div>
@@ -190,7 +191,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
           {/* List of existing platforms */}
           <div className="space-y-2">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 block">
-              Plataformas disponibles ({platforms.length})
+              {t('msp.available', { n: platforms.length })}
             </span>
 
             {platforms.map((platform) => {
@@ -220,7 +221,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                         onClick={handleSaveEdit}
                         type="button"
                         className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
-                        title="Guardar cambios"
+                        title={t('sm.save')}
                       >
                         <Check className="w-4 h-4" />
                       </button>
@@ -228,7 +229,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                         onClick={() => setEditingId(null)}
                         type="button"
                         className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
-                        title="Cancelar"
+                        title={t('common.cancel')}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -273,7 +274,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                       onClick={() => handleStartEdit(platform)}
                       type="button"
                       className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                      title="Editar plataforma"
+                      title={t('msp.editTitle')}
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
@@ -281,7 +282,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
                       onClick={() => handleDelete(platform.id)}
                       type="button"
                       className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-500/10 transition-colors"
-                      title="Eliminar plataforma"
+                      title={t('msp.deleteTitle')}
                     >
                       <Trash2 className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
                     </button>
@@ -300,7 +301,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-semibold hover:bg-slate-800 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restaurar por defecto</span>
+            <span>{t('msp.restore')}</span>
           </button>
 
           <button
@@ -308,7 +309,7 @@ export const ManageSharingPlatformsModal: React.FC<ManageSharingPlatformsModalPr
             type="button"
             className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-colors"
           >
-            Hecho
+            {t('msp.done')}
           </button>
         </div>
       </div>

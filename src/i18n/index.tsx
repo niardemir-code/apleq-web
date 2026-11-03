@@ -160,3 +160,25 @@ export function categoryName(value?: string): string {
   const key = CATEGORY_KEYS[value];
   return key ? t(key) : value;
 }
+
+function capitalize(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
+/** Nombre del mes (1-12) en el idioma actual, con inicial mayúscula. */
+export function monthName(month: number): string {
+  const m = Math.min(12, Math.max(1, month)) - 1;
+  return capitalize(new Date(2024, m, 1).toLocaleDateString(dateLocale(), { month: 'long' }));
+}
+
+/** Nombre de una moneda (EUR, USD...) en el idioma actual; si no se puede, el texto de respaldo. */
+export function currencyName(code: string, fallback?: string): string {
+  try {
+    const name = new Intl.DisplayNames([dateLocale()], { type: 'currency' }).of(code);
+    if (name) return capitalize(name);
+  } catch {
+    /* el navegador no lo soporta */
+  }
+  return fallback || code;
+}
+
