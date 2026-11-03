@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Subscription, getMemberPlatformInfo } from '../types';
 import { PlatformIconBadge } from '../utils/icons';
 import { ChevronRight, Search, Mail } from 'lucide-react';
+import { t } from '../i18n';
 
 interface ParticipatingListProps {
   groups: Subscription[];
@@ -22,7 +23,7 @@ export function ParticipatingList({ groups, currentUid, selectedId, onSelect, un
   return (
     <div className="mt-4 bg-card border border-border rounded-3xl p-3">
       <div className="flex items-center gap-2 px-2 py-2">
-        <h2 className="text-sm font-black text-foreground">Participo en</h2>
+        <h2 className="text-sm font-black text-foreground">{t('pl.title')}</h2>
         <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
           {groups.length}
         </span>
@@ -34,18 +35,18 @@ export function ParticipatingList({ groups, currentUid, selectedId, onSelect, un
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Filtrar por nombre..."
+          placeholder={t('list.search')}
           className="w-full bg-muted/40 border border-border rounded-2xl pl-10 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500/50"
         />
       </div>
 
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <p className="text-[11px] text-muted-foreground text-center py-4">No se encontraron grupos</p>
+          <p className="text-[11px] text-muted-foreground text-center py-4">{t('pl.empty')}</p>
         ) : (
           filtered.map((group) => {
             const isSelected = selectedId != null && String(group.id) === String(selectedId);
-            const displayName = group.platformName || group.name || 'Grupo';
+            const displayName = group.platformName || group.name || t('pl.defaultName');
             const iconColor = group.iconColorHex || group.color || '#10B981';
             const myMember = (group.members || []).find((m) => m.linkedUid === currentUid);
             const platform = myMember ? (getMemberPlatformInfo(group, myMember)?.name || '') : '';
@@ -78,7 +79,7 @@ export function ParticipatingList({ groups, currentUid, selectedId, onSelect, un
                   />
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-foreground truncate">{displayName}</p>
-                    <p className="text-[11px] text-muted-foreground font-medium truncate">{platform || 'Cliente'}</p>
+                    <p className="text-[11px] text-muted-foreground font-medium truncate">{platform || t('pl.client')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
@@ -88,7 +89,7 @@ export function ParticipatingList({ groups, currentUid, selectedId, onSelect, un
                       <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-600" />
                     </div>
                   )}
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">Cliente</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">{t('pl.client')}</span>
                   <ChevronRight className={`w-4 h-4 ${isSelected ? 'text-emerald-500' : 'text-muted-foreground'}`} />
                 </div>
               </button>

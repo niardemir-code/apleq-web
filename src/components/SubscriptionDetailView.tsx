@@ -10,6 +10,7 @@ import {
   getCurrencyFlag
 } from '../types';
 import { PlatformIconBadge } from '../utils/icons';
+import { t, tp, categoryName, dateLocale } from '../i18n';
 import { PlatformBadge } from './PlatformBadge';
 import { CurrencyFlag } from './CurrencyFlag';
 import { useSharingPlatforms } from '../context/SharingPlatformsContext';
@@ -32,7 +33,6 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { createInvite, deleteInvite, formatInviteCode } from '../services/subscriptionService';
-import { dateLocale } from '../i18n';
 
 interface SubscriptionDetailViewProps {
   subscription: Subscription | null;
@@ -75,10 +75,10 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           <CreditCard className="w-8 h-8" />
         </div>
         <h3 className="text-lg font-bold text-foreground mb-1">
-          Selecciona una suscripción
+          {t('detail.selectTitle')}
         </h3>
         <p className="text-xs text-muted-foreground max-w-sm">
-          Haz clic en cualquier suscripción de la lista para ver todos sus detalles, co-suscriptores y balance financiero.
+          {t('detail.selectText')}
         </p>
       </div>
     );
@@ -112,7 +112,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
   const handleGenerateInvite = async () => {
     if (!subscription || !onUpdateSubscription) return;
     try {
-      setInvMsg('Generando...');
+      setInvMsg(t('detail.generating'));
       const newMemberId = String(Date.now() * 1000 + Math.floor(Math.random() * 1000));
       const code = await createInvite(subscription, newMemberId);
       const reservedMember = {
@@ -132,18 +132,18 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
       setInvMsg('');
     } catch (e) {
       console.warn('Error al crear invitación:', e);
-      setInvMsg('No se pudo generar el código. Revisa los permisos de Firestore.');
+      setInvMsg(t('detail.inviteError'));
     }
   };
 
   const handleShareInvite = async (code: string) => {
-    const text = `Te han invitado a compartir gastos en Apleq. Únete con este código: ${formatInviteCode(code)}`;
+    const text = t('detail.inviteShareText', { code: formatInviteCode(code) });
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Invitación a Apleq', text });
+        await navigator.share({ title: t('detail.inviteShareTitle'), text });
       } else {
         await navigator.clipboard.writeText(text);
-        setInvMsg('Invitación copiada al portapapeles');
+        setInvMsg(t('detail.inviteCopied'));
       }
     } catch {
       // el usuario canceló el compartir
@@ -155,7 +155,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
   const totalCostOriginal = subscription.cost;
   const period = subscription.billingPeriod || (subscription.billingCycle === 'yearly' ? 'YEARLY' : 'MONTHLY');
   const periodMonths = period === 'YEARLY' ? 12 : period === 'SEMI_ANNUAL' ? 6 : period === 'QUARTERLY' ? 3 : 1;
-  const periodLabel = period === 'YEARLY' ? 'Anual' : period === 'SEMI_ANNUAL' ? 'Semestral' : period === 'QUARTERLY' ? 'Trimestral' : 'Mensual';
+  const periodLabel = period === 'YEARLY' ? t('period.yearly') : period === 'SEMI_ANNUAL' ? t('period.semi') : period === 'QUARTERLY' ? t('period.quarterly') : t('period.monthly');
 
   const totalCostInEur = convertToEur(totalCostOriginal, originalCurrency);
   const monthlyGrossInEur = totalCostInEur / periodMonths;
@@ -200,26 +200,13 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
 
   const rawMonth = subscription.billingMonth || (subscription.renewalDate ? new Date(subscription.renewalDate).getMonth() + 1 : 1);
   const monthIndex = Math.min(12, Math.max(1, rawMonth)) - 1;
-  const MONTH_NAMES_ES = [
-    'enero',
-    'febrero',
-    'marzo',
-    'abril',
-    'mayo',
-    'junio',
-    'julio',
-    'agosto',
-    'septiembre',
-    'octubre',
-    'noviembre',
-    'diciembre',
-  ];
-  const monthName = MONTH_NAMES_ES[monthIndex];
-  const renewalDisplayText = period === 'MONTHLY' 
-    ? `Día ${subscription.billingDay || 1}` 
-    : `${subscription.billingDay || 1} de ${monthName}`;
+  const renewalDay = subscription.billingDay || 1;
+  const renewalDisplayText = period === 'MONTHLY'
+    ? t('detail.renewalDay', { n: renewalDay })
+    : new Date(2024, monthIndex, Math.min(renewalDay, new Date(2024, monthIndex + 1, 0).getDate()))
+        .toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long' });
 
-  const displayName = subscription.platformName || subscription.name || 'Suscripción';
+  const displayName = subscription.platformName || subscription.name || t('sub.defaultName');
   const iconColor = subscription.iconColorHex || subscription.color || '#1285FA';
 
   // Configured sharing platforms for this subscription
@@ -235,6 +222,33 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
         (m) => !!m.linkedUid && unreadChatIdsForOwner.has(`${currentUid}_${subscription.id}_${m.linkedUid}`)
       )
     : false;
+
+  const unitLabel = (unit?: string): string => {
+    switch (unit) {
+      case 'days': return t('unit.days');
+      case 'weeks': return t('unit.weeks');
+      case 'months': return t('unit.months');
+      case 'years': return t('unit.years');
+      case 'hours': return t('unit.hours');
+      default: return unit || '';
+    }
+  };
+
+  // Texto emergente de la fecha de próximo pago (frecuencia y alarma incluidas)
+  const paymentTitle = (member: Member): string => {
+    let text = t('detail.nextPayment', { date: member.nextPaymentDate || '' });
+    if (member.paymentFrequencyValue) {
+      text += t('detail.every', { n: member.paymentFrequencyValue, unit: unitLabel(member.paymentFrequencyUnit || 'months') });
+    }
+    if (member.enableAlarm) {
+      const sameDay = member.alarmUnit === 'same_day' || member.alarmValue === 0 || member.alarmDaysBefore === 0;
+      const alarmText = sameDay
+        ? t('detail.alarmSameDay')
+        : t('detail.alarmBefore', { n: member.alarmValue ?? member.alarmDaysBefore ?? 3, unit: unitLabel(member.alarmUnit || 'days') });
+      text += t('detail.alarm', { text: alarmText });
+    }
+    return text;
+  };
 
   return (
     <div className="bg-card border border-border rounded-3xl shadow-lg flex flex-col transition-colors relative">
@@ -254,7 +268,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
               className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-600 mb-4 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Volver a la lista</span>
+              <span>{t('detail.back')}</span>
             </button>
           )}
 
@@ -265,7 +279,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                 type="button"
                 onClick={() => onEdit(subscription)}
                 className="relative group cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-2xl shrink-0"
-                title="Editar suscripción y cambiar icono"
+                title={t('detail.editIconTitle')}
               >
                 <PlatformIconBadge
                   key={`detail-icon-${subscription.id}-${subscription.customImageUri || ''}-${subscription.iconType || ''}`}
@@ -295,13 +309,13 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                   </span>
 
                   <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-muted/60 text-muted-foreground">
-                    {subscription.category || 'Streaming'}
+                    {categoryName(subscription.category)}
                   </span>
                 </div>
 
                 {subscription.mainUserName && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    Titular / Usuario principal:{' '}
+                    {t('detail.mainUser')}{' '}
                     <span className="text-foreground font-semibold">{subscription.mainUserName}</span>
                     {subscription.mainUserContact && (
                       <span className="text-muted-foreground ml-1">({subscription.mainUserContact})</span>
@@ -323,10 +337,10 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                       ? 'bg-blue-500/15 border-blue-500/50 text-blue-600 dark:text-blue-400'
                       : 'bg-muted/60 hover:bg-muted border-border text-foreground'
                   }`}
-                  title="Chats con miembros"
+                  title={t('detail.chatsTitle')}
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  <span>Chats</span>
+                  <span>{t('detail.chats')}</span>
                   {hasAnyUnreadChat && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-600 border-2 border-card" />
                   )}
@@ -337,10 +351,10 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                 onClick={() => onEdit(subscription)}
                 type="button"
                 className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-muted/60 hover:bg-muted border border-border text-foreground text-xs font-bold transition-colors cursor-pointer"
-                title="Editar suscripción"
+                title={t('detail.editTitle')}
               >
                 <Edit2 className="w-3.5 h-3.5" />
-                <span>Editar</span>
+                <span>{t('common.edit')}</span>
               </button>
             </div>
           </div>
@@ -351,7 +365,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           {/* Coste Suscripción */}
           <div className="p-4 rounded-2xl bg-muted/40 border border-border">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              Coste total
+              {t('detail.totalCost')}
             </span>
             <p className="text-lg sm:text-xl font-extrabold text-foreground mt-1 flex items-center gap-1.5">
               <CurrencyFlag currency={originalCurrency} size="sm" />
@@ -361,16 +375,16 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
             {isForeign ? (
               <p 
                 className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1.5"
-                title={`Tipo de cambio: 1 EUR ≈ ${getRateFor(originalCurrency).toFixed(2)} ${originalCurrency}`}
+                title={t('detail.exchangeRate', { rate: getRateFor(originalCurrency).toFixed(2), cur: originalCurrency })}
               >
                 <CurrencyFlag currency="EUR" size="xs" />
                 <span>≈ {totalCostInEur.toFixed(2)} €/{periodLabel.toLowerCase()}
-                {period !== 'MONTHLY' && ` (${monthlyGrossInEur.toFixed(2)} €/mes)`}</span>
+                {period !== 'MONTHLY' && ` (${monthlyGrossInEur.toFixed(2)} ${t('unit.eurPerMonth')})`}</span>
               </p>
             ) : (
               period !== 'MONTHLY' && (
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  ≈ {monthlyGrossInEur.toFixed(2)} €/mes
+                  ≈ {monthlyGrossInEur.toFixed(2)} {t('unit.eurPerMonth')}
                 </p>
               )
             )}
@@ -379,39 +393,39 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           {/* Aportan */}
           <div className="p-4 rounded-2xl bg-muted/40 border border-border">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              Aportan ({members.length} usuario{members.length !== 1 ? 's' : ''})
+              {tp('detail.contribute', members.length)}
             </span>
             <p className="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
-              +{totalMemberIncomeInEur.toFixed(2)} €/mes
+              +{totalMemberIncomeInEur.toFixed(2)} {t('unit.eurPerMonth')}
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {members.length} co-suscriptores activos
+              {tp('detail.activeCosubs', members.length)}
             </p>
           </div>
 
           {/* Ganancia neta */}
           <div className="p-4 rounded-2xl bg-muted/40 border border-border">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              Ganancia neta
+              {t('metrics.netProfit')}
             </span>
             <p className={`text-lg sm:text-xl font-extrabold mt-1 ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
-              {netProfitInEur > 0.001 ? `+${netProfitInEur.toFixed(2)}` : netProfitInEur.toFixed(2)} €/mes
+              {netProfitInEur > 0.001 ? `+${netProfitInEur.toFixed(2)}` : netProfitInEur.toFixed(2)} {t('unit.eurPerMonth')}
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {isProfit ? 'Superávit mensual' : 'Coste neto mensual'}
+              {isProfit ? t('detail.surplus') : t('detail.netCost')}
             </p>
           </div>
 
           {/* Renovación */}
           <div className="p-4 rounded-2xl bg-muted/40 border border-border">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-              Renovación
+              {t('detail.renewal')}
             </span>
             <p className="text-lg sm:text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1">
               {renewalDisplayText}
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {period === 'MONTHLY' ? 'Mensual' : `Renovación ${periodLabel.toLowerCase()}`}
+              {period === 'MONTHLY' ? t('period.monthly') : t('detail.renewalPeriod', { period: periodLabel, periodLower: periodLabel.toLowerCase() })}
             </p>
           </div>
         </div>
@@ -421,7 +435,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-2.5">
             <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
               <Share2 className="w-3.5 h-3.5 text-blue-500" />
-              <span>Plataformas de compartición configuradas ({configuredPlatforms.length})</span>
+              <span>{t('detail.platforms', { n: configuredPlatforms.length })}</span>
             </div>
 
             <div className="flex flex-wrap gap-2.5">
@@ -457,7 +471,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-extrabold uppercase tracking-wider text-foreground">
-                Co-suscriptores ({members.length})
+                {t('detail.cosubs', { n: members.length })}
               </h3>
             </div>
 
@@ -469,7 +483,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1.5 cursor-pointer"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Marcar todos pagados</span>
+                <span>{t('detail.markAllPaid')}</span>
               </button>
             )}
           </div>
@@ -477,7 +491,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           {members.length === 0 ? (
             <div className="p-6 rounded-2xl bg-muted/30 border border-border text-center">
               <p className="text-xs text-muted-foreground font-medium">
-                No hay ningún co-suscriptor añadido en esta suscripción.
+                {t('detail.noMembers')}
               </p>
               <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                 <button
@@ -486,7 +500,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-600 dark:text-blue-400 text-xs font-bold transition-colors cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
-                  <span>Añadir miembros</span>
+                  <span>{t('detail.addMembers')}</span>
                 </button>
                 {capacity > 0 && (
                   <button
@@ -495,7 +509,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-colors cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>Invitar a un hueco</span>
+                    <span>{t('detail.inviteSlot')}</span>
                   </button>
                 )}
               </div>
@@ -504,14 +518,14 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
               )}
               {capacity === 0 && (
                 <p className="text-[11px] text-muted-foreground mt-3">
-                  Para invitar a alguien, primero configura cuántos huecos libres tiene esta suscripción desde "Editar".
+                  {t('detail.needSlots')}
                 </p>
               )}
             </div>
           ) : (
             <div className="space-y-2">
               {sortedMembers.map((member, index) => {
-                const memberDisplayName = member.memberName || member.name || 'Miembro';
+                const memberDisplayName = member.memberName || member.name || t('detail.defaultMember');
                 const memberPlatform = member.sharingPlatform || member.platform || '';
                 const memberCost = getMemberContributionAmount(subscription, member);
                 const memberPlatformInfo = getMemberPlatformInfo(subscription, member);
@@ -535,7 +549,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                     key={member.id}
                     onClick={() => onManageMembers(subscription, member.id)}
                     className={`w-full text-left p-3 sm:p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-all duration-150 group cursor-pointer shadow-xs hover:shadow-sm active:scale-[0.99] ${memberCardClasses}`}
-                    title={`Haz clic para editar los datos de ${memberDisplayName}`}
+                    title={t('detail.clickEditMember', { name: memberDisplayName })}
                   >
                     {/* Left: Avatar + Member Name + Platform Badge + Status Alert Tag */}
                     <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -550,7 +564,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                         {member.notes && member.notes.trim() && (
                           <span 
                             className="text-xs font-medium text-muted-foreground truncate max-w-[150px] sm:max-w-[200px]" 
-                            title={`Notas o perfil asignado: ${member.notes.trim()}`}
+                            title={t('detail.notesTitle', { notes: member.notes.trim() })}
                           >
                             ({member.notes.trim()})
                           </span>
@@ -560,30 +574,30 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                         {member.isPendingRemoval && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-rose-500 text-white shadow-2xs">
                             <Trash2 className="w-2.5 h-2.5" />
-                            <span>Pendiente baja</span>
+                            <span>{t('detail.pendingRemoval')}</span>
                           </span>
                         )}
                         {member.isPendingPayment && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 shadow-2xs">
                             <Hourglass className="w-2.5 h-2.5" />
-                            <span>Pendiente pago</span>
+                            <span>{t('detail.pendingPayment')}</span>
                           </span>
                         )}
                         {(member.unpaidCycles || 0) >= 1 && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-rose-600 text-white shadow-2xs">
-                            <span>{member.unpaidCycles === 1 ? '1 cuota pendiente' : `${member.unpaidCycles} cuotas pendientes`}</span>
+                            <span>{tp('detail.unpaid', member.unpaidCycles || 0)}</span>
                           </span>
                         )}
                         {member.isPendingRegistration && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-500 text-white shadow-2xs">
                             <UserPlus className="w-2.5 h-2.5" />
-                            <span>Pendiente alta</span>
+                            <span>{t('detail.pendingSignup')}</span>
                           </span>
                         )}
                         {member.inviteCode && (
                           <span
                             className="inline-flex items-center gap-1 text-[10px] font-black tracking-widest px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 cursor-pointer"
-                            title="Copiar código de invitación"
+                            title={t('detail.copyCode')}
                             onClick={(e) => { e.stopPropagation(); navigator.clipboard?.writeText(formatInviteCode(member.inviteCode!)); }}
                           >
                             {formatInviteCode(member.inviteCode)}
@@ -593,11 +607,11 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                           <button
                             type="button"
                             className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 cursor-pointer"
-                            title="Compartir invitación (WhatsApp, email...)"
+                            title={t('detail.shareTitle')}
                             onClick={(e) => { e.stopPropagation(); handleShareInvite(member.inviteCode!); }}
                           >
                             <Share2 className="w-3 h-3" />
-                            <span>Compartir</span>
+                            <span>{t('detail.share')}</span>
                           </button>
                         )}
                       </div>
@@ -606,7 +620,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                     {/* Center: Next payment date & alarm if configured */}
                     {member.nextPaymentDate && (
                       <div 
-                        title={`Próximo pago: ${member.nextPaymentDate}${member.paymentFrequencyValue ? ` (cada ${member.paymentFrequencyValue} ${member.paymentFrequencyUnit || 'meses'})` : ''}${member.enableAlarm ? ` | Alarma: ${member.alarmUnit === 'same_day' || member.alarmValue === 0 || member.alarmDaysBefore === 0 ? 'El mismo día' : `${member.alarmValue ?? member.alarmDaysBefore ?? 3} ${member.alarmUnit || 'días'} antes`}` : ''}`}
+                        title={paymentTitle(member)}
                         className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-xl bg-muted/80 text-muted-foreground border border-border shrink-0 self-start sm:self-center"
                       >
                         <Calendar className="w-3.5 h-3.5 text-blue-500 shrink-0" />
@@ -635,14 +649,14 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                             onManageMembers(subscription, member.id);
                           }}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                          title="Editar usuario"
+                          title={t('detail.editUser')}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
 
                         {confirmDeleteMemberId === member.id ? (
                           <div className="flex items-center gap-1 p-0.5 rounded-lg bg-rose-500/10 border border-rose-500/30 ml-1">
-                            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 px-1">¿Eliminar?</span>
+                            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 px-1">{t('detail.confirmDelete')}</span>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -651,7 +665,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                               }}
                               className="py-0.5 px-2 rounded-md bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold transition-colors shadow-xs cursor-pointer active:scale-95"
                             >
-                              Sí
+                              {t('detail.yes')}
                             </button>
                             <button
                               type="button"
@@ -661,7 +675,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                               }}
                               className="py-0.5 px-1.5 rounded-md bg-muted text-muted-foreground text-[10px] font-medium hover:bg-muted/80 cursor-pointer"
                             >
-                              No
+                              {t('detail.no')}
                             </button>
                           </div>
                         ) : (
@@ -673,7 +687,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                               setConfirmDeleteMemberId(member.id);
                             }}
                             className="p-1.5 rounded-lg text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-500/10 active:scale-95 transition-all cursor-pointer"
-                            title="Eliminar usuario"
+                            title={t('detail.deleteUser')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -691,14 +705,14 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                 type="button"
                 disabled={isFull}
                 className={`w-full mt-2 py-3 px-4 rounded-2xl border-2 border-dashed border-blue-500/30 hover:border-blue-500 bg-blue-500/5 hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99] ${isFull ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}`}
-                title={isFull ? `Has alcanzado los ${capacity} huecos` : "Añadir un nuevo co-suscriptor"}
+                title={isFull ? t('detail.addUserTitleFull', { n: capacity }) : t('detail.addUserTitle')}
               >
                 <UserPlus className="w-4 h-4 text-blue-500" />
-                <span>Añadir usuario</span>
+                <span>{t('detail.addUser')}</span>
               </button>
               {isFull && (
                 <p className="text-[11px] text-muted-foreground text-center mt-2">
-                  Has alcanzado el número de huecos ({capacity}). Aumenta los huecos en la suscripción para añadir más.
+                  {t('detail.full', { n: capacity })}
                 </p>
               )}
 
@@ -711,7 +725,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                     className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
-                    <span>Invitar a un hueco</span>
+                    <span>{t('detail.inviteSlot')}</span>
                   </button>
 
                   {invMsg && (
@@ -728,7 +742,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           <div className="p-4 rounded-2xl bg-muted/30 border border-border">
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground mb-1.5">
               <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>Notas de la suscripción</span>
+              <span>{t('detail.notes')}</span>
             </div>
             <p className="text-xs text-foreground whitespace-pre-wrap">
               {subscription.notes.trim()}

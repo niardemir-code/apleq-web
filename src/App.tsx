@@ -43,7 +43,7 @@ import { ChatWindow } from './components/ChatWindow';
 import { ChatListModal } from './components/ChatListModal';
 import { EmptyState } from './components/EmptyState';
 import { SharingPlatformsProvider } from './context/SharingPlatformsContext';
-import { LanguageProvider, LanguageKeyed } from './i18n';
+import { LanguageProvider, LanguageKeyed, t } from './i18n';
 import { 
   generateNotificationsFromSubscriptions, 
   generateClientReminders,
@@ -202,7 +202,7 @@ function SplitzyApp() {
       },
       (err) => {
         console.error('Error fetching subscriptions:', err);
-        setSyncError('Error al sincronizar con Firestore. Comprueba los permisos o la conexión.');
+        setSyncError(t('app.syncError'));
         setLoadingData(false);
       }
     );

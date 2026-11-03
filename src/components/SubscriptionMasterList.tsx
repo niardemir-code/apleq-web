@@ -1,6 +1,7 @@
 import React from 'react';
 import { Subscription, FilterOptions, Category } from '../types';
 import { PlatformIconBadge } from '../utils/icons';
+import { t, tp, categoryName } from '../i18n';
 import { 
   Plus, 
   Search, 
@@ -22,18 +23,18 @@ interface SubscriptionMasterListProps {
   totalCount: number;
 }
 
-const CATEGORIES: { id: Category | 'ALL'; label: string }[] = [
-  { id: 'ALL', label: 'Todas las categorías' },
-  { id: 'STREAMING', label: 'Streaming' },
-  { id: 'MUSIC', label: 'Música' },
-  { id: 'GAMING', label: 'Gaming' },
-  { id: 'AI_TOOLS', label: 'IA y Productividad' },
-  { id: 'CLOUD', label: 'Almacenamiento' },
-  { id: 'SOFTWARE', label: 'Software' },
-  { id: 'FITNESS', label: 'Salud y Fitness' },
-  { id: 'EDUCATION', label: 'Educación' },
-  { id: 'NEWS', label: 'Prensa y Noticias' },
-  { id: 'OTHER', label: 'Otros' },
+const getCategories = (): { id: Category | 'ALL'; label: string }[] => [
+  { id: 'ALL', label: t('cat.all') },
+  { id: 'STREAMING', label: t('cat.streaming') },
+  { id: 'MUSIC', label: t('cat.music') },
+  { id: 'GAMING', label: t('cat.gaming') },
+  { id: 'AI_TOOLS', label: t('cat.ai') },
+  { id: 'CLOUD', label: t('cat.cloud') },
+  { id: 'SOFTWARE', label: t('cat.software') },
+  { id: 'FITNESS', label: t('cat.fitness') },
+  { id: 'EDUCATION', label: t('cat.education') },
+  { id: 'NEWS', label: t('cat.news') },
+  { id: 'OTHER', label: t('cat.other') },
 ];
 
 export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
@@ -68,7 +69,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-foreground tracking-tight">
-              Mis suscripciones
+              {t('list.title')}
             </h2>
             <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-blue-500/10 text-blue-500 border border-blue-500/20">
               {subscriptions.length}
@@ -82,7 +83,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-md shadow-blue-600/20 active:scale-95 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Añadir</span>
+            <span>{t('list.add')}</span>
           </button>
         </div>
 
@@ -94,7 +95,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
             type="text"
             value={filters.search}
             onChange={handleSearchChange}
-            placeholder="Filtrar por nombre..."
+            placeholder={t('list.search')}
             className="w-full pl-10 pr-8 py-2 rounded-xl bg-background border border-border text-foreground placeholder-muted-foreground text-xs font-medium focus:outline-none focus:border-blue-500 transition-colors"
           />
           {filters.search && (
@@ -119,7 +120,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
-            title="Ordenar alfabéticamente (A-Z)"
+            title={t('list.sortNameTitle')}
           >
             <ArrowDownAZ className="w-3.5 h-3.5" />
             <span>A-Z</span>
@@ -134,10 +135,10 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
-            title="Ordenar por más recientes"
+            title={t('list.sortRecentTitle')}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>Recientes</span>
+            <span>{t('list.sortRecent')}</span>
           </button>
 
           <button
@@ -149,10 +150,10 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
-            title="Ordenar por día de cobro"
+            title={t('list.sortRenewalTitle')}
           >
             <Calendar className="w-3.5 h-3.5" />
-            <span>Día cobro</span>
+            <span>{t('list.sortRenewal')}</span>
           </button>
         </div>
 
@@ -164,7 +165,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
             onChange={handleCategoryChange}
             className="w-full appearance-none pl-3 pr-7 py-1.5 rounded-lg bg-background border border-border text-foreground text-[11px] font-semibold focus:outline-none focus:border-blue-500 cursor-pointer"
           >
-            {CATEGORIES.map((c) => (
+            {getCategories().map((c) => (
               <option key={c.id} value={c.id} className="bg-card text-foreground">
                 {c.label}
               </option>
@@ -179,7 +180,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
         {subscriptions.length === 0 ? (
           <div className="py-12 px-4 text-center">
             <p className="text-xs font-semibold text-muted-foreground">
-              No se encontraron suscripciones
+              {t('list.empty')}
             </p>
             {filters.search && (
               <button
@@ -187,14 +188,14 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
                 type="button"
                 className="mt-2 text-xs font-bold text-blue-500 hover:underline cursor-pointer"
               >
-                Limpiar búsqueda
+                {t('list.clearSearch')}
               </button>
             )}
           </div>
         ) : (
           subscriptions.map((sub) => {
             const isSelected = selectedSubscriptionId != null && String(sub.id) === String(selectedSubscriptionId);
-            const displayName = sub.platformName || sub.name || 'Suscripción';
+            const displayName = sub.platformName || sub.name || t('sub.defaultName');
             const iconColor = sub.iconColorHex || sub.color || '#1285FA';
             const membersCount = (sub.members || []).length;
 
@@ -239,7 +240,7 @@ export const SubscriptionMasterList: React.FC<SubscriptionMasterListProps> = ({
                       {displayName}
                     </p>
                     <p className="text-[11px] text-muted-foreground font-medium truncate">
-                      {sub.category || 'Streaming'} · {membersCount} miembro{membersCount !== 1 ? 's' : ''}
+                      {tp('list.members', membersCount, { cat: categoryName(sub.category) })}
                     </p>
                   </div>
                 </div>

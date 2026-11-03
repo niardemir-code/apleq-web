@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, Filter, LogIn } from 'lucide-react';
 import { SplitzyLogo } from './SplitzyLogo';
+import { t, tRich } from '../i18n';
 
 interface EmptyStateProps {
   hasFilters: boolean;
@@ -22,17 +23,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <Filter className="w-7 h-7" />
         </div>
         <h3 className="text-base font-bold text-foreground">
-          No hay suscripciones que coincidan
+          {t('empty.noMatchTitle')}
         </h3>
         <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-          Prueba a cambiar los términos de búsqueda o limpiar los filtros activos.
+          {t('empty.noMatchText')}
         </p>
         <button
           onClick={onClearFilters}
           type="button"
           className="mt-5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors shadow-lg shadow-blue-600/25 cursor-pointer"
         >
-          Limpiar todos los filtros
+          {t('empty.clearFilters')}
         </button>
       </div>
     );
@@ -45,10 +46,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       </div>
 
       <h2 className="text-xl font-bold text-foreground tracking-tight">
-        Empieza a optimizar tus suscripciones compartidas
+        {t('empty.title')}
       </h2>
       <p className="text-xs sm:text-sm text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
-        Añade los servicios que compartes en <span className="font-semibold text-foreground">Together Price, Sharesub, Sharingful, Spliiit, Gamsgo</span> o con familia y amigos para sincronizar costes y cobros mensuales.
+        {tRich('empty.text', undefined, 'font-semibold text-foreground')}
       </p>
 
       {/* Quick Add CTA */}
@@ -60,7 +61,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/25 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Crear Primera Suscripción</span>
+          <span>{t('empty.first')}</span>
         </button>
         <button
           id="btn-empty-join-group"
@@ -69,7 +70,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
         >
           <LogIn className="w-4 h-4 stroke-[2.5]" />
-          <span>Unirse a un grupo</span>
+          <span>{t('common.joinGroup')}</span>
         </button>
       </div>
     </div>

@@ -1,0 +1,1789 @@
+# Prompt para AI Studio (Web): idioma, fases W2 + W4 (métricas, lista, «Participo en» y detalle de suscripción)
+
+Continúa la traducción de la web (es / ca / en) que empezó con W0+W1. Esta entrega traduce: el resumen de métricas de arriba, la lista lateral «Mis suscripciones», la lista «Participo en», la pantalla vacía y todo el **detalle de suscripción** (costes, renovación, plataformas, co-suscriptores, estados, invitaciones, notas). También se traducen las unidades de periodo (mes/año/trim…), los nombres de categoría al mostrarlos y las fechas de renovación según el idioma.
+
+Reglas:
+- Hacer **exactamente** lo que se indica, sin tocar nada más. No cambiar lógica ni datos guardados: las categorías siguen guardándose en castellano en la base de datos, y solo se traducen al mostrarlas.
+- No tocar `FilterBar.tsx`, `SubscriptionCard.tsx` ni `ParticipatingGroups.tsx` (no se usan en la app).
+- Las ventanas de crear/editar suscripción, el modal de miembros, Configuración, notificaciones, chat y la vista de cliente seguirán en castellano hasta las fases siguientes.
+- Al terminar: `npm run lint` y `npm run build` sin errores.
+
+## 1. Textos nuevos en `src/i18n/translations.ts`
+
+Añadir cada bloque **al final** del objeto correspondiente (justo antes de su cierre), sin tocar lo que ya hay.
+
+### 1a. En `es`: justo antes de la línea `} as const;`
+```ts
+  // --- W2 + W4: métricas, lista, estado vacío y detalle ---
+  'per.year': 'año',
+  'per.semi': 'sem',
+  'per.quarter': 'trim',
+  'per.month': 'mes',
+  'per.day': 'día',
+  'per.week': 'sem',
+  'per.dayN': '{n}d',
+  'per.weekN': '{n}sem',
+  'per.monthN': '{n}m',
+  'per.yearN': '{n}a',
+  'period.yearly': 'Anual',
+  'period.semi': 'Semestral',
+  'period.quarterly': 'Trimestral',
+  'period.monthly': 'Mensual',
+  'unit.eurPerMonth': '€/mes',
+  'unit.days': 'días',
+  'unit.weeks': 'semanas',
+  'unit.months': 'meses',
+  'unit.years': 'años',
+  'unit.hours': 'horas',
+  'catv.streaming': 'Streaming',
+  'catv.music': 'Música',
+  'catv.productivity': 'Productividad',
+  'catv.gaming': 'Gaming',
+  'catv.education': 'Educación',
+  'catv.health': 'Salud',
+  'catv.lifestyle': 'Estilo de vida',
+  'catv.security': 'Seguridad',
+  'catv.finance': 'Finanzas',
+  'catv.general': 'General',
+  'common.joinGroup': 'Unirse a un grupo',
+  'common.edit': 'Editar',
+  'sub.defaultName': 'Suscripción',
+  'app.syncError': 'Error al sincronizar con Firestore. Comprueba los permisos o la conexión.',
+  'metrics.pending.one': 'Hay **1 pago pendiente** por cobrar ({amount} €)',
+  'metrics.pending.other': 'Hay **{n} pagos pendientes** por cobrar ({amount} €)',
+  'metrics.viewPending': 'Ver pendientes',
+  'metrics.netProfit': 'Ganancia neta',
+  'metrics.netBalance': 'Balance neto',
+  'metrics.youPay': 'Te cuesta a ti',
+  'metrics.youReceive': 'Te aportan',
+  'metrics.haveSubs.one': 'Tengo {n} suscripción',
+  'metrics.haveSubs.other': 'Tengo {n} suscripciones',
+  'metrics.members.one': '{n} Miembro activo',
+  'metrics.members.other': '{n} Miembros activos',
+  'metrics.participate.one': 'Participo en {n} suscripción',
+  'metrics.participate.other': 'Participo en {n} suscripciones',
+  'empty.noMatchTitle': 'No hay suscripciones que coincidan',
+  'empty.noMatchText': 'Prueba a cambiar los términos de búsqueda o limpiar los filtros activos.',
+  'empty.clearFilters': 'Limpiar todos los filtros',
+  'empty.title': 'Empieza a optimizar tus suscripciones compartidas',
+  'empty.text': 'Añade los servicios que compartes en **Together Price, Sharesub, Sharingful, Spliiit, Gamsgo** o con familia y amigos para sincronizar costes y cobros mensuales.',
+  'empty.first': 'Crear primera suscripción',
+  'list.title': 'Mis suscripciones',
+  'list.add': 'Añadir',
+  'list.search': 'Filtrar por nombre...',
+  'list.sortNameTitle': 'Ordenar alfabéticamente (A-Z)',
+  'list.sortRecentTitle': 'Ordenar por más recientes',
+  'list.sortRecent': 'Recientes',
+  'list.sortRenewalTitle': 'Ordenar por día de cobro',
+  'list.sortRenewal': 'Día cobro',
+  'list.empty': 'No se encontraron suscripciones',
+  'list.clearSearch': 'Limpiar búsqueda',
+  'list.members.one': '{cat} · {n} miembro',
+  'list.members.other': '{cat} · {n} miembros',
+  'cat.all': 'Todas las categorías',
+  'cat.streaming': 'Streaming',
+  'cat.music': 'Música',
+  'cat.gaming': 'Gaming',
+  'cat.ai': 'IA y Productividad',
+  'cat.cloud': 'Almacenamiento',
+  'cat.software': 'Software',
+  'cat.fitness': 'Salud y Fitness',
+  'cat.education': 'Educación',
+  'cat.news': 'Prensa y Noticias',
+  'cat.other': 'Otros',
+  'pl.title': 'Participo en',
+  'pl.empty': 'No se encontraron grupos',
+  'pl.defaultName': 'Grupo',
+  'pl.client': 'Cliente',
+  'detail.selectTitle': 'Selecciona una suscripción',
+  'detail.selectText': 'Haz clic en cualquier suscripción de la lista para ver todos sus detalles, co-suscriptores y balance financiero.',
+  'detail.generating': 'Generando...',
+  'detail.inviteError': 'No se pudo generar el código. Revisa los permisos de Firestore.',
+  'detail.inviteShareText': 'Te han invitado a compartir gastos en Apleq. Únete con este código: {code}',
+  'detail.inviteShareTitle': 'Invitación a Apleq',
+  'detail.inviteCopied': 'Invitación copiada al portapapeles',
+  'detail.renewalDay': 'Día {n}',
+  'detail.back': 'Volver a la lista',
+  'detail.editIconTitle': 'Editar suscripción y cambiar icono',
+  'detail.mainUser': 'Titular / Usuario principal:',
+  'detail.chatsTitle': 'Chats con miembros',
+  'detail.chats': 'Chats',
+  'detail.editTitle': 'Editar suscripción',
+  'detail.totalCost': 'Coste total',
+  'detail.exchangeRate': 'Tipo de cambio: 1 EUR ≈ {rate} {cur}',
+  'detail.contribute.one': 'Aportan ({n} usuario)',
+  'detail.contribute.other': 'Aportan ({n} usuarios)',
+  'detail.activeCosubs.one': '{n} co-suscriptor activo',
+  'detail.activeCosubs.other': '{n} co-suscriptores activos',
+  'detail.surplus': 'Superávit mensual',
+  'detail.netCost': 'Coste neto mensual',
+  'detail.renewal': 'Renovación',
+  'detail.renewalPeriod': 'Renovación {periodLower}',
+  'detail.platforms': 'Plataformas de compartición configuradas ({n})',
+  'detail.cosubs': 'Co-suscriptores ({n})',
+  'detail.markAllPaid': 'Marcar todos pagados',
+  'detail.noMembers': 'No hay ningún co-suscriptor añadido en esta suscripción.',
+  'detail.addMembers': 'Añadir miembros',
+  'detail.inviteSlot': 'Invitar a un hueco',
+  'detail.needSlots': 'Para invitar a alguien, primero configura cuántos huecos libres tiene esta suscripción desde "Editar".',
+  'detail.defaultMember': 'Miembro',
+  'detail.clickEditMember': 'Haz clic para editar los datos de {name}',
+  'detail.notesTitle': 'Notas o perfil asignado: {notes}',
+  'detail.pendingRemoval': 'Pendiente baja',
+  'detail.pendingPayment': 'Pendiente pago',
+  'detail.pendingSignup': 'Pendiente alta',
+  'detail.unpaid.one': '1 cuota pendiente',
+  'detail.unpaid.other': '{n} cuotas pendientes',
+  'detail.copyCode': 'Copiar código de invitación',
+  'detail.shareTitle': 'Compartir invitación (WhatsApp, email...)',
+  'detail.share': 'Compartir',
+  'detail.nextPayment': 'Próximo pago: {date}',
+  'detail.every': ' (cada {n} {unit})',
+  'detail.alarm': ' | Alarma: {text}',
+  'detail.alarmSameDay': 'El mismo día',
+  'detail.alarmBefore': '{n} {unit} antes',
+  'detail.editUser': 'Editar usuario',
+  'detail.deleteUser': 'Eliminar usuario',
+  'detail.confirmDelete': '¿Eliminar?',
+  'detail.yes': 'Sí',
+  'detail.no': 'No',
+  'detail.addUserTitleFull': 'Has alcanzado los {n} huecos',
+  'detail.addUserTitle': 'Añadir un nuevo co-suscriptor',
+  'detail.addUser': 'Añadir usuario',
+  'detail.full': 'Has alcanzado el número de huecos ({n}). Aumenta los huecos en la suscripción para añadir más.',
+  'detail.notes': 'Notas de la suscripción',
+```
+
+### 1b. En `ca`: justo antes del `};` que cierra `export const ca: Dictionary = {`
+```ts
+  // --- W2 + W4: métricas, lista, estado vacío y detalle ---
+  'per.year': 'any',
+  'per.semi': 'sem',
+  'per.quarter': 'trim',
+  'per.month': 'mes',
+  'per.day': 'dia',
+  'per.week': 'set',
+  'per.dayN': '{n}d',
+  'per.weekN': '{n}set',
+  'per.monthN': '{n}m',
+  'per.yearN': '{n}a',
+  'period.yearly': 'Anual',
+  'period.semi': 'Semestral',
+  'period.quarterly': 'Trimestral',
+  'period.monthly': 'Mensual',
+  'unit.eurPerMonth': '€/mes',
+  'unit.days': 'dies',
+  'unit.weeks': 'setmanes',
+  'unit.months': 'mesos',
+  'unit.years': 'anys',
+  'unit.hours': 'hores',
+  'catv.streaming': 'Streaming',
+  'catv.music': 'Música',
+  'catv.productivity': 'Productivitat',
+  'catv.gaming': 'Gaming',
+  'catv.education': 'Educació',
+  'catv.health': 'Salut',
+  'catv.lifestyle': 'Estil de vida',
+  'catv.security': 'Seguretat',
+  'catv.finance': 'Finances',
+  'catv.general': 'General',
+  'common.joinGroup': 'Unir-se a un grup',
+  'common.edit': 'Edita',
+  'sub.defaultName': 'Subscripció',
+  'app.syncError': 'Error en sincronitzar amb Firestore. Comprova els permisos o la connexió.',
+  'metrics.pending.one': 'Hi ha **1 pagament pendent** per cobrar ({amount} €)',
+  'metrics.pending.other': 'Hi ha **{n} pagaments pendents** per cobrar ({amount} €)',
+  'metrics.viewPending': 'Veure pendents',
+  'metrics.netProfit': 'Guany net',
+  'metrics.netBalance': 'Balanç net',
+  'metrics.youPay': 'Et costa a tu',
+  'metrics.youReceive': 'Et aporten',
+  'metrics.haveSubs.one': 'Tinc {n} subscripció',
+  'metrics.haveSubs.other': 'Tinc {n} subscripcions',
+  'metrics.members.one': '{n} Membre actiu',
+  'metrics.members.other': '{n} Membres actius',
+  'metrics.participate.one': 'Participo en {n} subscripció',
+  'metrics.participate.other': 'Participo en {n} subscripcions',
+  'empty.noMatchTitle': 'No hi ha cap subscripció que coincideixi',
+  'empty.noMatchText': 'Prova de canviar els termes de cerca o de netejar els filtres actius.',
+  'empty.clearFilters': 'Neteja tots els filtres',
+  'empty.title': 'Comença a optimitzar les teves subscripcions compartides',
+  'empty.text': 'Afegeix els serveis que comparteixes a **Together Price, Sharesub, Sharingful, Spliiit, Gamsgo** o amb família i amics per sincronitzar costos i cobraments mensuals.',
+  'empty.first': 'Crea la primera subscripció',
+  'list.title': 'Les meves subscripcions',
+  'list.add': 'Afegeix',
+  'list.search': 'Filtra per nom...',
+  'list.sortNameTitle': 'Ordena alfabèticament (A-Z)',
+  'list.sortRecentTitle': 'Ordena per més recents',
+  'list.sortRecent': 'Recents',
+  'list.sortRenewalTitle': 'Ordena per dia de cobrament',
+  'list.sortRenewal': 'Dia cobrament',
+  'list.empty': 'No s\'han trobat subscripcions',
+  'list.clearSearch': 'Neteja la cerca',
+  'list.members.one': '{cat} · {n} membre',
+  'list.members.other': '{cat} · {n} membres',
+  'cat.all': 'Totes les categories',
+  'cat.streaming': 'Streaming',
+  'cat.music': 'Música',
+  'cat.gaming': 'Gaming',
+  'cat.ai': 'IA i productivitat',
+  'cat.cloud': 'Emmagatzematge',
+  'cat.software': 'Programari',
+  'cat.fitness': 'Salut i fitnes',
+  'cat.education': 'Educació',
+  'cat.news': 'Premsa i notícies',
+  'cat.other': 'Altres',
+  'pl.title': 'Participo en',
+  'pl.empty': 'No s\'han trobat grups',
+  'pl.defaultName': 'Grup',
+  'pl.client': 'Client',
+  'detail.selectTitle': 'Selecciona una subscripció',
+  'detail.selectText': 'Fes clic en qualsevol subscripció de la llista per veure\'n tots els detalls, els cosubscriptors i el balanç financer.',
+  'detail.generating': 'Generant...',
+  'detail.inviteError': 'No s\'ha pogut generar el codi. Revisa els permisos de Firestore.',
+  'detail.inviteShareText': 'T\'han convidat a compartir despeses a Apleq. Uneix-te amb aquest codi: {code}',
+  'detail.inviteShareTitle': 'Invitació a Apleq',
+  'detail.inviteCopied': 'Invitació copiada al porta-retalls',
+  'detail.renewalDay': 'Dia {n}',
+  'detail.back': 'Torna a la llista',
+  'detail.editIconTitle': 'Edita la subscripció i canvia la icona',
+  'detail.mainUser': 'Titular / Usuari principal:',
+  'detail.chatsTitle': 'Xats amb membres',
+  'detail.chats': 'Xats',
+  'detail.editTitle': 'Edita la subscripció',
+  'detail.totalCost': 'Cost total',
+  'detail.exchangeRate': 'Tipus de canvi: 1 EUR ≈ {rate} {cur}',
+  'detail.contribute.one': 'Aporten ({n} usuari)',
+  'detail.contribute.other': 'Aporten ({n} usuaris)',
+  'detail.activeCosubs.one': '{n} cosubscriptor actiu',
+  'detail.activeCosubs.other': '{n} cosubscriptors actius',
+  'detail.surplus': 'Superàvit mensual',
+  'detail.netCost': 'Cost net mensual',
+  'detail.renewal': 'Renovació',
+  'detail.renewalPeriod': 'Renovació {periodLower}',
+  'detail.platforms': 'Plataformes de compartició configurades ({n})',
+  'detail.cosubs': 'Cosubscriptors ({n})',
+  'detail.markAllPaid': 'Marca tots pagats',
+  'detail.noMembers': 'No hi ha cap cosubscriptor afegit en aquesta subscripció.',
+  'detail.addMembers': 'Afegeix membres',
+  'detail.inviteSlot': 'Convida a un lloc',
+  'detail.needSlots': 'Per convidar algú, primer configura quants llocs lliures té aquesta subscripció des d\'«Edita».',
+  'detail.defaultMember': 'Membre',
+  'detail.clickEditMember': 'Fes clic per editar les dades de {name}',
+  'detail.notesTitle': 'Notes o perfil assignat: {notes}',
+  'detail.pendingRemoval': 'Pendent de baixa',
+  'detail.pendingPayment': 'Pendent de pagament',
+  'detail.pendingSignup': 'Pendent d\'alta',
+  'detail.unpaid.one': '1 quota pendent',
+  'detail.unpaid.other': '{n} quotes pendents',
+  'detail.copyCode': 'Copia el codi d\'invitació',
+  'detail.shareTitle': 'Comparteix la invitació (WhatsApp, correu...)',
+  'detail.share': 'Comparteix',
+  'detail.nextPayment': 'Pròxim pagament: {date}',
+  'detail.every': ' (cada {n} {unit})',
+  'detail.alarm': ' | Alarma: {text}',
+  'detail.alarmSameDay': 'El mateix dia',
+  'detail.alarmBefore': '{n} {unit} abans',
+  'detail.editUser': 'Edita l\'usuari',
+  'detail.deleteUser': 'Elimina l\'usuari',
+  'detail.confirmDelete': 'Eliminar?',
+  'detail.yes': 'Sí',
+  'detail.no': 'No',
+  'detail.addUserTitleFull': 'Has arribat als {n} llocs',
+  'detail.addUserTitle': 'Afegeix un nou cosubscriptor',
+  'detail.addUser': 'Afegeix un usuari',
+  'detail.full': 'Has arribat al nombre de llocs ({n}). Augmenta els llocs de la subscripció per afegir-ne més.',
+  'detail.notes': 'Notes de la subscripció',
+```
+
+### 1c. En `en`: justo antes del `};` final del archivo (cierra `export const en: Dictionary = {`)
+```ts
+  // --- W2 + W4: métricas, lista, estado vacío y detalle ---
+  'per.year': 'yr',
+  'per.semi': '6mo',
+  'per.quarter': 'qtr',
+  'per.month': 'mo',
+  'per.day': 'day',
+  'per.week': 'wk',
+  'per.dayN': '{n}d',
+  'per.weekN': '{n}w',
+  'per.monthN': '{n}mo',
+  'per.yearN': '{n}y',
+  'period.yearly': 'Annual',
+  'period.semi': 'Semi-annual',
+  'period.quarterly': 'Quarterly',
+  'period.monthly': 'Monthly',
+  'unit.eurPerMonth': '€/mo',
+  'unit.days': 'days',
+  'unit.weeks': 'weeks',
+  'unit.months': 'months',
+  'unit.years': 'years',
+  'unit.hours': 'hours',
+  'catv.streaming': 'Streaming',
+  'catv.music': 'Music',
+  'catv.productivity': 'Productivity',
+  'catv.gaming': 'Gaming',
+  'catv.education': 'Education',
+  'catv.health': 'Health',
+  'catv.lifestyle': 'Lifestyle',
+  'catv.security': 'Security',
+  'catv.finance': 'Finance',
+  'catv.general': 'General',
+  'common.joinGroup': 'Join a group',
+  'common.edit': 'Edit',
+  'sub.defaultName': 'Subscription',
+  'app.syncError': 'Error syncing with Firestore. Check the permissions or your connection.',
+  'metrics.pending.one': 'There is **1 pending payment** to collect ({amount} €)',
+  'metrics.pending.other': 'There are **{n} pending payments** to collect ({amount} €)',
+  'metrics.viewPending': 'View pending',
+  'metrics.netProfit': 'Net profit',
+  'metrics.netBalance': 'Net balance',
+  'metrics.youPay': 'Costs you',
+  'metrics.youReceive': 'You receive',
+  'metrics.haveSubs.one': 'I have {n} subscription',
+  'metrics.haveSubs.other': 'I have {n} subscriptions',
+  'metrics.members.one': '{n} Active member',
+  'metrics.members.other': '{n} Active members',
+  'metrics.participate.one': 'I take part in {n} subscription',
+  'metrics.participate.other': 'I take part in {n} subscriptions',
+  'empty.noMatchTitle': 'No subscriptions match',
+  'empty.noMatchText': 'Try changing your search terms or clearing the active filters.',
+  'empty.clearFilters': 'Clear all filters',
+  'empty.title': 'Start optimizing your shared subscriptions',
+  'empty.text': 'Add the services you share on **Together Price, Sharesub, Sharingful, Spliiit, Gamsgo** or with family and friends to sync costs and monthly payments.',
+  'empty.first': 'Create first subscription',
+  'list.title': 'My subscriptions',
+  'list.add': 'Add',
+  'list.search': 'Filter by name...',
+  'list.sortNameTitle': 'Sort alphabetically (A-Z)',
+  'list.sortRecentTitle': 'Sort by most recent',
+  'list.sortRecent': 'Recent',
+  'list.sortRenewalTitle': 'Sort by billing day',
+  'list.sortRenewal': 'Billing day',
+  'list.empty': 'No subscriptions found',
+  'list.clearSearch': 'Clear search',
+  'list.members.one': '{cat} · {n} member',
+  'list.members.other': '{cat} · {n} members',
+  'cat.all': 'All categories',
+  'cat.streaming': 'Streaming',
+  'cat.music': 'Music',
+  'cat.gaming': 'Gaming',
+  'cat.ai': 'AI & Productivity',
+  'cat.cloud': 'Storage',
+  'cat.software': 'Software',
+  'cat.fitness': 'Health & Fitness',
+  'cat.education': 'Education',
+  'cat.news': 'Press & News',
+  'cat.other': 'Other',
+  'pl.title': 'I take part in',
+  'pl.empty': 'No groups found',
+  'pl.defaultName': 'Group',
+  'pl.client': 'Client',
+  'detail.selectTitle': 'Select a subscription',
+  'detail.selectText': 'Click any subscription in the list to see all its details, co-subscribers and financial balance.',
+  'detail.generating': 'Generating...',
+  'detail.inviteError': 'The code could not be generated. Check the Firestore permissions.',
+  'detail.inviteShareText': 'You\'ve been invited to share expenses on Apleq. Join with this code: {code}',
+  'detail.inviteShareTitle': 'Invitation to Apleq',
+  'detail.inviteCopied': 'Invitation copied to clipboard',
+  'detail.renewalDay': 'Day {n}',
+  'detail.back': 'Back to list',
+  'detail.editIconTitle': 'Edit subscription and change icon',
+  'detail.mainUser': 'Account holder / Main user:',
+  'detail.chatsTitle': 'Chats with members',
+  'detail.chats': 'Chats',
+  'detail.editTitle': 'Edit subscription',
+  'detail.totalCost': 'Total cost',
+  'detail.exchangeRate': 'Exchange rate: 1 EUR ≈ {rate} {cur}',
+  'detail.contribute.one': 'Contribute ({n} user)',
+  'detail.contribute.other': 'Contribute ({n} users)',
+  'detail.activeCosubs.one': '{n} active co-subscriber',
+  'detail.activeCosubs.other': '{n} active co-subscribers',
+  'detail.surplus': 'Monthly surplus',
+  'detail.netCost': 'Net monthly cost',
+  'detail.renewal': 'Renewal',
+  'detail.renewalPeriod': '{period} renewal',
+  'detail.platforms': 'Sharing platforms configured ({n})',
+  'detail.cosubs': 'Co-subscribers ({n})',
+  'detail.markAllPaid': 'Mark all as paid',
+  'detail.noMembers': 'There are no co-subscribers added to this subscription.',
+  'detail.addMembers': 'Add members',
+  'detail.inviteSlot': 'Invite to a slot',
+  'detail.needSlots': 'To invite someone, first set how many free slots this subscription has from "Edit".',
+  'detail.defaultMember': 'Member',
+  'detail.clickEditMember': 'Click to edit {name}\'s details',
+  'detail.notesTitle': 'Notes or assigned profile: {notes}',
+  'detail.pendingRemoval': 'Pending removal',
+  'detail.pendingPayment': 'Payment pending',
+  'detail.pendingSignup': 'Pending sign-up',
+  'detail.unpaid.one': '1 unpaid installment',
+  'detail.unpaid.other': '{n} unpaid installments',
+  'detail.copyCode': 'Copy invitation code',
+  'detail.shareTitle': 'Share invitation (WhatsApp, email...)',
+  'detail.share': 'Share',
+  'detail.nextPayment': 'Next payment: {date}',
+  'detail.every': ' (every {n} {unit})',
+  'detail.alarm': ' | Alarm: {text}',
+  'detail.alarmSameDay': 'Same day',
+  'detail.alarmBefore': '{n} {unit} before',
+  'detail.editUser': 'Edit user',
+  'detail.deleteUser': 'Delete user',
+  'detail.confirmDelete': 'Delete?',
+  'detail.yes': 'Yes',
+  'detail.no': 'No',
+  'detail.addUserTitleFull': 'You have reached the {n} slots',
+  'detail.addUserTitle': 'Add a new co-subscriber',
+  'detail.addUser': 'Add user',
+  'detail.full': 'You have reached the number of slots ({n}). Increase the slots in the subscription to add more.',
+  'detail.notes': 'Subscription notes',
+```
+
+## 2. `src/i18n/index.tsx`: añadir al FINAL del archivo (después de `LanguageKeyed`)
+
+```tsx
+type PluralBase = Extract<TranslationKey, `${string}.one`> extends infer K
+  ? K extends `${infer B}.one`
+    ? B
+    : never
+  : never;
+
+/** Traduce con singular/plural: usa la clave «base.one» si n es 1 y «base.other» en caso contrario. */
+export function tp(base: PluralBase, n: number, params?: Record<string, string | number>): string {
+  const key = `${base}.${n === 1 ? 'one' : 'other'}` as TranslationKey;
+  return t(key, { n, ...params });
+}
+
+/** Como t(), pero los fragmentos entre **dobles asteriscos** salen en negrita. */
+export function tRich(
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+  strongClassName?: string
+): ReactNode {
+  return richParts(t(key, params), strongClassName);
+}
+
+/** Como tp(), con negritas entre **dobles asteriscos**. */
+export function tpRich(
+  base: PluralBase,
+  n: number,
+  params?: Record<string, string | number>,
+  strongClassName?: string
+): ReactNode {
+  return richParts(tp(base, n, params), strongClassName);
+}
+
+function richParts(text: string, strongClassName?: string): ReactNode {
+  return text.split('**').map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} className={strongClassName}>
+        {part}
+      </strong>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  );
+}
+
+// Las categorías se guardan en castellano en la base de datos; solo se traducen al mostrarlas.
+const CATEGORY_KEYS: Record<string, TranslationKey> = {
+  'Streaming': 'catv.streaming',
+  'Música': 'catv.music',
+  'Productividad': 'catv.productivity',
+  'Gaming': 'catv.gaming',
+  'Educación': 'catv.education',
+  'Salud': 'catv.health',
+  'Estilo de vida': 'catv.lifestyle',
+  'Seguridad': 'catv.security',
+  'Finanzas': 'catv.finance',
+  'General': 'catv.general',
+};
+
+export function categoryName(value?: string): string {
+  if (!value) return t('catv.streaming');
+  const key = CATEGORY_KEYS[value];
+  return key ? t(key) : value;
+}
+```
+
+No hace falta cambiar los `import` de ese archivo (`Fragment` y `ReactNode` ya están importados).
+
+## 3. Modificaciones en archivos existentes
+
+Cada bloque indica el texto actual (ANTES) y el nuevo (DESPUÉS). Salvo que se indique otra cosa, el ANTES aparece una sola vez en su archivo; si aparece varias veces, se indica «reemplazar todas».
+
+### `src/types.ts`
+
+**Cambio 1**
+
+ANTES:
+```
+export type BillingPeriod = 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL' | 'YEARLY';
+```
+DESPUÉS:
+```
+import { t } from './i18n';
+
+export type BillingPeriod = 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL' | 'YEARLY';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+  if (p === 'YEARLY') return 'año';
+  if (p === 'SEMI_ANNUAL') return 'sem';
+  if (p === 'QUARTERLY') return 'trim';
+  return 'mes';
+```
+DESPUÉS:
+```
+  if (p === 'YEARLY') return t('per.year');
+  if (p === 'SEMI_ANNUAL') return t('per.semi');
+  if (p === 'QUARTERLY') return t('per.quarter');
+  return t('per.month');
+```
+
+**Cambio 3**
+
+ANTES:
+```
+    if (unit === 'days') periodShort = val === 1 ? 'día' : `${val}d`;
+    else if (unit === 'weeks') periodShort = val === 1 ? 'sem' : `${val}sem`;
+    else if (unit === 'months') periodShort = val === 1 ? 'mes' : `${val}m`;
+    else if (unit === 'years') periodShort = val === 1 ? 'año' : `${val}a`;
+```
+DESPUÉS:
+```
+    if (unit === 'days') periodShort = val === 1 ? t('per.day') : t('per.dayN', { n: val });
+    else if (unit === 'weeks') periodShort = val === 1 ? t('per.week') : t('per.weekN', { n: val });
+    else if (unit === 'months') periodShort = val === 1 ? t('per.month') : t('per.monthN', { n: val });
+    else if (unit === 'years') periodShort = val === 1 ? t('per.year') : t('per.yearN', { n: val });
+```
+
+### `src/App.tsx`
+
+**Cambio 1**
+
+ANTES:
+```
+import { LanguageProvider, LanguageKeyed } from './i18n';
+```
+DESPUÉS:
+```
+import { LanguageProvider, LanguageKeyed, t } from './i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+setSyncError('Error al sincronizar con Firestore. Comprueba los permisos o la conexión.');
+```
+DESPUÉS:
+```
+setSyncError(t('app.syncError'));
+```
+
+### `src/components/MetricsHeader.tsx`
+
+**Cambio 1**
+
+ANTES:
+```
+import { useCurrency } from '../context/CurrencyContext';
+```
+DESPUÉS:
+```
+import { useCurrency } from '../context/CurrencyContext';
+import { t, tp, tpRich } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+Hay <strong>{pendingPaymentsCount} pago(s) pendiente(s)</strong> por cobrar ({pendingAmount.toFixed(2)} €)
+```
+DESPUÉS:
+```
+{tpRich('metrics.pending', pendingPaymentsCount, { amount: pendingAmount.toFixed(2) })}
+```
+
+**Cambio 3**
+
+ANTES:
+```
+            Ver pendientes
+```
+DESPUÉS:
+```
+            {t('metrics.viewPending')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+{isProfit ? 'Ganancia Neta' : 'Balance Neto'}
+```
+DESPUÉS:
+```
+{isProfit ? t('metrics.netProfit') : t('metrics.netBalance')}
+```
+
+**Cambio 5**
+
+ANTES:
+```
+<span className="text-xs font-semibold opacity-75">€/mes</span>
+```
+DESPUÉS:
+```
+<span className="text-xs font-semibold opacity-75">{t('unit.eurPerMonth')}</span>
+```
+
+**Cambio 6** (aparece 2 veces: reemplazar todas)
+
+ANTES:
+```
+<span className="text-xs font-normal text-muted-foreground">€/mes</span>
+```
+DESPUÉS:
+```
+<span className="text-xs font-normal text-muted-foreground">{t('unit.eurPerMonth')}</span>
+```
+
+**Cambio 7**
+
+ANTES:
+```
+                Te cuesta a ti
+```
+DESPUÉS:
+```
+                {t('metrics.youPay')}
+```
+
+**Cambio 8**
+
+ANTES:
+```
+                Te aportan
+```
+DESPUÉS:
+```
+                {t('metrics.youReceive')}
+```
+
+**Cambio 9**
+
+ANTES:
+```
+Tengo {subscriptions.length} {subscriptions.length === 1 ? 'suscripción' : 'suscripciones'}
+```
+DESPUÉS:
+```
+{tp('metrics.haveSubs', subscriptions.length)}
+```
+
+**Cambio 10**
+
+ANTES:
+```
+{totalMembersCount} {totalMembersCount === 1 ? 'Miembro activo' : 'Miembros activos'}
+```
+DESPUÉS:
+```
+{tp('metrics.members', totalMembersCount)}
+```
+
+**Cambio 11**
+
+ANTES:
+```
+Participo en {participatingCount} {participatingCount === 1 ? 'suscripción' : 'suscripciones'}
+```
+DESPUÉS:
+```
+{tp('metrics.participate', participatingCount)}
+```
+
+### `src/components/EmptyState.tsx`
+
+**Cambio 1**
+
+ANTES:
+```
+import { SplitzyLogo } from './SplitzyLogo';
+```
+DESPUÉS:
+```
+import { SplitzyLogo } from './SplitzyLogo';
+import { t, tRich } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+          No hay suscripciones que coincidan
+```
+DESPUÉS:
+```
+          {t('empty.noMatchTitle')}
+```
+
+**Cambio 3**
+
+ANTES:
+```
+          Prueba a cambiar los términos de búsqueda o limpiar los filtros activos.
+```
+DESPUÉS:
+```
+          {t('empty.noMatchText')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+          Limpiar todos los filtros
+```
+DESPUÉS:
+```
+          {t('empty.clearFilters')}
+```
+
+**Cambio 5**
+
+ANTES:
+```
+        Empieza a optimizar tus suscripciones compartidas
+```
+DESPUÉS:
+```
+        {t('empty.title')}
+```
+
+**Cambio 6**
+
+ANTES:
+```
+Añade los servicios que compartes en <span className="font-semibold text-foreground">Together Price, Sharesub, Sharingful, Spliiit, Gamsgo</span> o con familia y amigos para sincronizar costes y cobros mensuales.
+```
+DESPUÉS:
+```
+{tRich('empty.text', undefined, 'font-semibold text-foreground')}
+```
+
+**Cambio 7**
+
+ANTES:
+```
+<span>Crear Primera Suscripción</span>
+```
+DESPUÉS:
+```
+<span>{t('empty.first')}</span>
+```
+
+**Cambio 8**
+
+ANTES:
+```
+<span>Unirse a un grupo</span>
+```
+DESPUÉS:
+```
+<span>{t('common.joinGroup')}</span>
+```
+
+### `src/components/SubscriptionMasterList.tsx`
+
+**Cambio 1**
+
+ANTES:
+```
+import { PlatformIconBadge } from '../utils/icons';
+```
+DESPUÉS:
+```
+import { PlatformIconBadge } from '../utils/icons';
+import { t, tp, categoryName } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+const CATEGORIES: { id: Category | 'ALL'; label: string }[] = [
+  { id: 'ALL', label: 'Todas las categorías' },
+  { id: 'STREAMING', label: 'Streaming' },
+  { id: 'MUSIC', label: 'Música' },
+  { id: 'GAMING', label: 'Gaming' },
+  { id: 'AI_TOOLS', label: 'IA y Productividad' },
+  { id: 'CLOUD', label: 'Almacenamiento' },
+  { id: 'SOFTWARE', label: 'Software' },
+  { id: 'FITNESS', label: 'Salud y Fitness' },
+  { id: 'EDUCATION', label: 'Educación' },
+  { id: 'NEWS', label: 'Prensa y Noticias' },
+  { id: 'OTHER', label: 'Otros' },
+];
+```
+DESPUÉS:
+```
+const getCategories = (): { id: Category | 'ALL'; label: string }[] => [
+  { id: 'ALL', label: t('cat.all') },
+  { id: 'STREAMING', label: t('cat.streaming') },
+  { id: 'MUSIC', label: t('cat.music') },
+  { id: 'GAMING', label: t('cat.gaming') },
+  { id: 'AI_TOOLS', label: t('cat.ai') },
+  { id: 'CLOUD', label: t('cat.cloud') },
+  { id: 'SOFTWARE', label: t('cat.software') },
+  { id: 'FITNESS', label: t('cat.fitness') },
+  { id: 'EDUCATION', label: t('cat.education') },
+  { id: 'NEWS', label: t('cat.news') },
+  { id: 'OTHER', label: t('cat.other') },
+];
+```
+
+**Cambio 3**
+
+ANTES:
+```
+{CATEGORIES.map((c) => (
+```
+DESPUÉS:
+```
+{getCategories().map((c) => (
+```
+
+**Cambio 4**
+
+ANTES:
+```
+              Mis suscripciones
+```
+DESPUÉS:
+```
+              {t('list.title')}
+```
+
+**Cambio 5**
+
+ANTES:
+```
+<span>Añadir</span>
+```
+DESPUÉS:
+```
+<span>{t('list.add')}</span>
+```
+
+**Cambio 6**
+
+ANTES:
+```
+placeholder="Filtrar por nombre..."
+```
+DESPUÉS:
+```
+placeholder={t('list.search')}
+```
+
+**Cambio 7**
+
+ANTES:
+```
+title="Ordenar alfabéticamente (A-Z)"
+```
+DESPUÉS:
+```
+title={t('list.sortNameTitle')}
+```
+
+**Cambio 8**
+
+ANTES:
+```
+title="Ordenar por más recientes"
+```
+DESPUÉS:
+```
+title={t('list.sortRecentTitle')}
+```
+
+**Cambio 9**
+
+ANTES:
+```
+<span>Recientes</span>
+```
+DESPUÉS:
+```
+<span>{t('list.sortRecent')}</span>
+```
+
+**Cambio 10**
+
+ANTES:
+```
+title="Ordenar por día de cobro"
+```
+DESPUÉS:
+```
+title={t('list.sortRenewalTitle')}
+```
+
+**Cambio 11**
+
+ANTES:
+```
+<span>Día cobro</span>
+```
+DESPUÉS:
+```
+<span>{t('list.sortRenewal')}</span>
+```
+
+**Cambio 12**
+
+ANTES:
+```
+              No se encontraron suscripciones
+```
+DESPUÉS:
+```
+              {t('list.empty')}
+```
+
+**Cambio 13**
+
+ANTES:
+```
+                Limpiar búsqueda
+```
+DESPUÉS:
+```
+                {t('list.clearSearch')}
+```
+
+**Cambio 14**
+
+ANTES:
+```
+const displayName = sub.platformName || sub.name || 'Suscripción';
+```
+DESPUÉS:
+```
+const displayName = sub.platformName || sub.name || t('sub.defaultName');
+```
+
+**Cambio 15**
+
+ANTES:
+```
+{sub.category || 'Streaming'} · {membersCount} miembro{membersCount !== 1 ? 's' : ''}
+```
+DESPUÉS:
+```
+{tp('list.members', membersCount, { cat: categoryName(sub.category) })}
+```
+
+### `src/components/ParticipatingList.tsx`
+
+**Cambio 1**
+
+ANTES:
+```
+import { ChevronRight, Search, Mail } from 'lucide-react';
+```
+DESPUÉS:
+```
+import { ChevronRight, Search, Mail } from 'lucide-react';
+import { t } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+<h2 className="text-sm font-black text-foreground">Participo en</h2>
+```
+DESPUÉS:
+```
+<h2 className="text-sm font-black text-foreground">{t('pl.title')}</h2>
+```
+
+**Cambio 3**
+
+ANTES:
+```
+placeholder="Filtrar por nombre..."
+```
+DESPUÉS:
+```
+placeholder={t('list.search')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+>No se encontraron grupos</p>
+```
+DESPUÉS:
+```
+>{t('pl.empty')}</p>
+```
+
+**Cambio 5**
+
+ANTES:
+```
+const displayName = group.platformName || group.name || 'Grupo';
+```
+DESPUÉS:
+```
+const displayName = group.platformName || group.name || t('pl.defaultName');
+```
+
+**Cambio 6**
+
+ANTES:
+```
+{platform || 'Cliente'}
+```
+DESPUÉS:
+```
+{platform || t('pl.client')}
+```
+
+**Cambio 7**
+
+ANTES:
+```
+dark:text-emerald-400">Cliente</span>
+```
+DESPUÉS:
+```
+dark:text-emerald-400">{t('pl.client')}</span>
+```
+
+### `src/components/SubscriptionDetailView.tsx`
+
+**Cambio 1**
+
+ANTES:
+```
+import { PlatformIconBadge } from '../utils/icons';
+```
+DESPUÉS:
+```
+import { PlatformIconBadge } from '../utils/icons';
+import { t, tp, categoryName } from '../i18n';
+```
+
+**Cambio 2**
+
+ANTES:
+```
+          Selecciona una suscripción
+```
+DESPUÉS:
+```
+          {t('detail.selectTitle')}
+```
+
+**Cambio 3**
+
+ANTES:
+```
+          Haz clic en cualquier suscripción de la lista para ver todos sus detalles, co-suscriptores y balance financiero.
+```
+DESPUÉS:
+```
+          {t('detail.selectText')}
+```
+
+**Cambio 4**
+
+ANTES:
+```
+setInvMsg('Generando...');
+```
+DESPUÉS:
+```
+setInvMsg(t('detail.generating'));
+```
+
+**Cambio 5**
+
+ANTES:
+```
+setInvMsg('No se pudo generar el código. Revisa los permisos de Firestore.');
+```
+DESPUÉS:
+```
+setInvMsg(t('detail.inviteError'));
+```
+
+**Cambio 6**
+
+ANTES:
+```
+const text = `Te han invitado a compartir gastos en Apleq. Únete con este código: ${formatInviteCode(code)}`;
+```
+DESPUÉS:
+```
+const text = t('detail.inviteShareText', { code: formatInviteCode(code) });
+```
+
+**Cambio 7**
+
+ANTES:
+```
+title: 'Invitación a Apleq'
+```
+DESPUÉS:
+```
+title: t('detail.inviteShareTitle')
+```
+
+**Cambio 8**
+
+ANTES:
+```
+setInvMsg('Invitación copiada al portapapeles');
+```
+DESPUÉS:
+```
+setInvMsg(t('detail.inviteCopied'));
+```
+
+**Cambio 9**
+
+ANTES:
+```
+const periodLabel = period === 'YEARLY' ? 'Anual' : period === 'SEMI_ANNUAL' ? 'Semestral' : period === 'QUARTERLY' ? 'Trimestral' : 'Mensual';
+```
+DESPUÉS:
+```
+const periodLabel = period === 'YEARLY' ? t('period.yearly') : period === 'SEMI_ANNUAL' ? t('period.semi') : period === 'QUARTERLY' ? t('period.quarterly') : t('period.monthly');
+```
+
+**Cambio 10**
+
+ANTES:
+```
+  const MONTH_NAMES_ES = [
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
+  ];
+  const monthName = MONTH_NAMES_ES[monthIndex];
+  const renewalDisplayText = period === 'MONTHLY' 
+    ? `Día ${subscription.billingDay || 1}` 
+    : `${subscription.billingDay || 1} de ${monthName}`;
+```
+DESPUÉS:
+```
+  const renewalDay = subscription.billingDay || 1;
+  const renewalDisplayText = period === 'MONTHLY'
+    ? t('detail.renewalDay', { n: renewalDay })
+    : new Date(2024, monthIndex, Math.min(renewalDay, new Date(2024, monthIndex + 1, 0).getDate()))
+        .toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long' });
+```
+
+**Cambio 11**
+
+ANTES:
+```
+const displayName = subscription.platformName || subscription.name || 'Suscripción';
+```
+DESPUÉS:
+```
+const displayName = subscription.platformName || subscription.name || t('sub.defaultName');
+```
+
+**Cambio 12**
+
+ANTES:
+```
+    : false;
+
+  return (
+    <div className="bg-card border border-border rounded-3xl shadow-lg flex flex-col transition-colors relative">
+```
+DESPUÉS:
+```
+    : false;
+
+  const unitLabel = (unit?: string): string => {
+    switch (unit) {
+      case 'days': return t('unit.days');
+      case 'weeks': return t('unit.weeks');
+      case 'months': return t('unit.months');
+      case 'years': return t('unit.years');
+      case 'hours': return t('unit.hours');
+      default: return unit || '';
+    }
+  };
+
+  // Texto emergente de la fecha de próximo pago (frecuencia y alarma incluidas)
+  const paymentTitle = (member: Member): string => {
+    let text = t('detail.nextPayment', { date: member.nextPaymentDate || '' });
+    if (member.paymentFrequencyValue) {
+      text += t('detail.every', { n: member.paymentFrequencyValue, unit: unitLabel(member.paymentFrequencyUnit || 'months') });
+    }
+    if (member.enableAlarm) {
+      const sameDay = member.alarmUnit === 'same_day' || member.alarmValue === 0 || member.alarmDaysBefore === 0;
+      const alarmText = sameDay
+        ? t('detail.alarmSameDay')
+        : t('detail.alarmBefore', { n: member.alarmValue ?? member.alarmDaysBefore ?? 3, unit: unitLabel(member.alarmUnit || 'days') });
+      text += t('detail.alarm', { text: alarmText });
+    }
+    return text;
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-3xl shadow-lg flex flex-col transition-colors relative">
+```
+
+**Cambio 13**
+
+ANTES:
+```
+<span>Volver a la lista</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.back')}</span>
+```
+
+**Cambio 14**
+
+ANTES:
+```
+title="Editar suscripción y cambiar icono"
+```
+DESPUÉS:
+```
+title={t('detail.editIconTitle')}
+```
+
+**Cambio 15**
+
+ANTES:
+```
+{subscription.category || 'Streaming'}
+```
+DESPUÉS:
+```
+{categoryName(subscription.category)}
+```
+
+**Cambio 16**
+
+ANTES:
+```
+Titular / Usuario principal:{' '}
+```
+DESPUÉS:
+```
+{t('detail.mainUser')}{' '}
+```
+
+**Cambio 17**
+
+ANTES:
+```
+title="Chats con miembros"
+```
+DESPUÉS:
+```
+title={t('detail.chatsTitle')}
+```
+
+**Cambio 18**
+
+ANTES:
+```
+<span>Chats</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.chats')}</span>
+```
+
+**Cambio 19**
+
+ANTES:
+```
+title="Editar suscripción"
+```
+DESPUÉS:
+```
+title={t('detail.editTitle')}
+```
+
+**Cambio 20**
+
+ANTES:
+```
+<span>Editar</span>
+```
+DESPUÉS:
+```
+<span>{t('common.edit')}</span>
+```
+
+**Cambio 21**
+
+ANTES:
+```
+              Coste total
+```
+DESPUÉS:
+```
+              {t('detail.totalCost')}
+```
+
+**Cambio 22**
+
+ANTES:
+```
+title={`Tipo de cambio: 1 EUR ≈ ${getRateFor(originalCurrency).toFixed(2)} ${originalCurrency}`}
+```
+DESPUÉS:
+```
+title={t('detail.exchangeRate', { rate: getRateFor(originalCurrency).toFixed(2), cur: originalCurrency })}
+```
+
+**Cambio 23**
+
+ANTES:
+```
+{period !== 'MONTHLY' && ` (${monthlyGrossInEur.toFixed(2)} €/mes)`}
+```
+DESPUÉS:
+```
+{period !== 'MONTHLY' && ` (${monthlyGrossInEur.toFixed(2)} ${t('unit.eurPerMonth')})`}
+```
+
+**Cambio 24**
+
+ANTES:
+```
+≈ {monthlyGrossInEur.toFixed(2)} €/mes
+```
+DESPUÉS:
+```
+≈ {monthlyGrossInEur.toFixed(2)} {t('unit.eurPerMonth')}
+```
+
+**Cambio 25**
+
+ANTES:
+```
+              Aportan ({members.length} usuario{members.length !== 1 ? 's' : ''})
+```
+DESPUÉS:
+```
+              {tp('detail.contribute', members.length)}
+```
+
+**Cambio 26**
+
+ANTES:
+```
++{totalMemberIncomeInEur.toFixed(2)} €/mes
+```
+DESPUÉS:
+```
++{totalMemberIncomeInEur.toFixed(2)} {t('unit.eurPerMonth')}
+```
+
+**Cambio 27**
+
+ANTES:
+```
+              {members.length} co-suscriptores activos
+```
+DESPUÉS:
+```
+              {tp('detail.activeCosubs', members.length)}
+```
+
+**Cambio 28**
+
+ANTES:
+```
+              Ganancia neta
+```
+DESPUÉS:
+```
+              {t('metrics.netProfit')}
+```
+
+**Cambio 29**
+
+ANTES:
+```
+{netProfitInEur > 0.001 ? `+${netProfitInEur.toFixed(2)}` : netProfitInEur.toFixed(2)} €/mes
+```
+DESPUÉS:
+```
+{netProfitInEur > 0.001 ? `+${netProfitInEur.toFixed(2)}` : netProfitInEur.toFixed(2)} {t('unit.eurPerMonth')}
+```
+
+**Cambio 30**
+
+ANTES:
+```
+{isProfit ? 'Superávit mensual' : 'Coste neto mensual'}
+```
+DESPUÉS:
+```
+{isProfit ? t('detail.surplus') : t('detail.netCost')}
+```
+
+**Cambio 31**
+
+ANTES:
+```
+              Renovación
+```
+DESPUÉS:
+```
+              {t('detail.renewal')}
+```
+
+**Cambio 32**
+
+ANTES:
+```
+{period === 'MONTHLY' ? 'Mensual' : `Renovación ${periodLabel.toLowerCase()}`}
+```
+DESPUÉS:
+```
+{period === 'MONTHLY' ? t('period.monthly') : t('detail.renewalPeriod', { period: periodLabel, periodLower: periodLabel.toLowerCase() })}
+```
+
+**Cambio 33**
+
+ANTES:
+```
+<span>Plataformas de compartición configuradas ({configuredPlatforms.length})</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.platforms', { n: configuredPlatforms.length })}</span>
+```
+
+**Cambio 34**
+
+ANTES:
+```
+                Co-suscriptores ({members.length})
+```
+DESPUÉS:
+```
+                {t('detail.cosubs', { n: members.length })}
+```
+
+**Cambio 35**
+
+ANTES:
+```
+<span>Marcar todos pagados</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.markAllPaid')}</span>
+```
+
+**Cambio 36**
+
+ANTES:
+```
+                No hay ningún co-suscriptor añadido en esta suscripción.
+```
+DESPUÉS:
+```
+                {t('detail.noMembers')}
+```
+
+**Cambio 37**
+
+ANTES:
+```
+<span>Añadir miembros</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.addMembers')}</span>
+```
+
+**Cambio 38** (aparece 2 veces: reemplazar todas)
+
+ANTES:
+```
+<span>Invitar a un hueco</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.inviteSlot')}</span>
+```
+
+**Cambio 39**
+
+ANTES:
+```
+                  Para invitar a alguien, primero configura cuántos huecos libres tiene esta suscripción desde "Editar".
+```
+DESPUÉS:
+```
+                  {t('detail.needSlots')}
+```
+
+**Cambio 40**
+
+ANTES:
+```
+const memberDisplayName = member.memberName || member.name || 'Miembro';
+```
+DESPUÉS:
+```
+const memberDisplayName = member.memberName || member.name || t('detail.defaultMember');
+```
+
+**Cambio 41**
+
+ANTES:
+```
+title={`Haz clic para editar los datos de ${memberDisplayName}`}
+```
+DESPUÉS:
+```
+title={t('detail.clickEditMember', { name: memberDisplayName })}
+```
+
+**Cambio 42**
+
+ANTES:
+```
+title={`Notas o perfil asignado: ${member.notes.trim()}`}
+```
+DESPUÉS:
+```
+title={t('detail.notesTitle', { notes: member.notes.trim() })}
+```
+
+**Cambio 43**
+
+ANTES:
+```
+<span>Pendiente baja</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.pendingRemoval')}</span>
+```
+
+**Cambio 44**
+
+ANTES:
+```
+<span>Pendiente pago</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.pendingPayment')}</span>
+```
+
+**Cambio 45**
+
+ANTES:
+```
+<span>{member.unpaidCycles === 1 ? '1 cuota pendiente' : `${member.unpaidCycles} cuotas pendientes`}</span>
+```
+DESPUÉS:
+```
+<span>{tp('detail.unpaid', member.unpaidCycles || 0)}</span>
+```
+
+**Cambio 46**
+
+ANTES:
+```
+<span>Pendiente alta</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.pendingSignup')}</span>
+```
+
+**Cambio 47**
+
+ANTES:
+```
+title="Copiar código de invitación"
+```
+DESPUÉS:
+```
+title={t('detail.copyCode')}
+```
+
+**Cambio 48**
+
+ANTES:
+```
+title="Compartir invitación (WhatsApp, email...)"
+```
+DESPUÉS:
+```
+title={t('detail.shareTitle')}
+```
+
+**Cambio 49**
+
+ANTES:
+```
+<span>Compartir</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.share')}</span>
+```
+
+**Cambio 50**
+
+ANTES:
+```
+title={`Próximo pago: ${member.nextPaymentDate}${member.paymentFrequencyValue ? ` (cada ${member.paymentFrequencyValue} ${member.paymentFrequencyUnit || 'meses'})` : ''}${member.enableAlarm ? ` | Alarma: ${member.alarmUnit === 'same_day' || member.alarmValue === 0 || member.alarmDaysBefore === 0 ? 'El mismo día' : `${member.alarmValue ?? member.alarmDaysBefore ?? 3} ${member.alarmUnit || 'días'} antes`}` : ''}`}
+```
+DESPUÉS:
+```
+title={paymentTitle(member)}
+```
+
+**Cambio 51**
+
+ANTES:
+```
+title="Editar usuario"
+```
+DESPUÉS:
+```
+title={t('detail.editUser')}
+```
+
+**Cambio 52**
+
+ANTES:
+```
+px-1">¿Eliminar?</span>
+```
+DESPUÉS:
+```
+px-1">{t('detail.confirmDelete')}</span>
+```
+
+**Cambio 53**
+
+ANTES:
+```
+                              Sí
+```
+DESPUÉS:
+```
+                              {t('detail.yes')}
+```
+
+**Cambio 54**
+
+ANTES:
+```
+                              No
+```
+DESPUÉS:
+```
+                              {t('detail.no')}
+```
+
+**Cambio 55**
+
+ANTES:
+```
+title="Eliminar usuario"
+```
+DESPUÉS:
+```
+title={t('detail.deleteUser')}
+```
+
+**Cambio 56**
+
+ANTES:
+```
+title={isFull ? `Has alcanzado los ${capacity} huecos` : "Añadir un nuevo co-suscriptor"}
+```
+DESPUÉS:
+```
+title={isFull ? t('detail.addUserTitleFull', { n: capacity }) : t('detail.addUserTitle')}
+```
+
+**Cambio 57**
+
+ANTES:
+```
+<span>Añadir usuario</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.addUser')}</span>
+```
+
+**Cambio 58**
+
+ANTES:
+```
+                  Has alcanzado el número de huecos ({capacity}). Aumenta los huecos en la suscripción para añadir más.
+```
+DESPUÉS:
+```
+                  {t('detail.full', { n: capacity })}
+```
+
+**Cambio 59**
+
+ANTES:
+```
+<span>Notas de la suscripción</span>
+```
+DESPUÉS:
+```
+<span>{t('detail.notes')}</span>
+```
+
+## 4. Pruebas
+
+1. `npm run lint` y `npm run build` sin errores.
+2. Con la sesión iniciada y el idioma en catalán: la fila de métricas («Guany net / Balanç net», «Et costa a tu», «Et aporten», «Tinc N subscripcions», «Participo en…»), la lista lateral («Les meves subscripcions», «Filtra per nom…», «A-Z / Recents / Dia cobrament», categorías) y el aviso de pagos pendientes salen en catalán.
+3. Abrir una suscripción: etiqueta del periodo («Mensual / Anual…»), categoría, «Titular / Usuari principal», «Cost total», «Aporten», «Renovació» (fecha tipo «24 d'abril» en un periodo anual), «Plataformes de compartició», «Cosubscriptors», insignias («Pendent de pagament», «Pendent d'alta», «N quotes pendents»), botones y mensajes de invitación.
+4. Pasar el ratón por la fecha de pago de un miembro: el texto emergente sale en el idioma (con la frecuencia y la alarma).
+5. Repetir en inglés y en castellano. En castellano todo debe verse igual que antes.
+6. Con la lista vacía (cuenta nueva): pantalla de bienvenida de la lista traducida y botones «Crear primera suscripción / Unirse a un grupo».
+7. Cambiar de idioma con una suscripción abierta: no se pierde la sesión.
+8. Lo que sigue en castellano en esta fase (esperado): ventana de crear/editar suscripción, modal de miembros, Configuración, notificaciones, chat y vista de cliente. Los miembros reservados creados por una invitación se siguen llamando «Invitado (pendiente)», porque es un dato guardado.

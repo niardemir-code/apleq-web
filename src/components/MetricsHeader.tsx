@@ -1,6 +1,7 @@
 import React from 'react';
 import { Subscription, getMemberPlatformInfo, getMemberContributionAmount } from '../types';
 import { useCurrency } from '../context/CurrencyContext';
+import { t, tp, tpRich } from '../i18n';
 import { 
   TrendingUp, 
   PiggyBank, 
@@ -63,7 +64,7 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 animate-pulse" />
             <span className="text-xs font-medium">
-              Hay <strong>{pendingPaymentsCount} pago(s) pendiente(s)</strong> por cobrar ({pendingAmount.toFixed(2)} €)
+              {tpRich('metrics.pending', pendingPaymentsCount, { amount: pendingAmount.toFixed(2) })}
             </span>
           </div>
           <button
@@ -71,7 +72,7 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
             type="button"
             className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-800 dark:text-amber-200 transition-colors cursor-pointer"
           >
-            Ver pendientes
+            {t('metrics.viewPending')}
           </button>
         </div>
       )}
@@ -95,13 +96,13 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
             </div>
             <div className="min-w-0">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground block leading-tight truncate">
-                {isProfit ? 'Ganancia Neta' : 'Balance Neto'}
+                {isProfit ? t('metrics.netProfit') : t('metrics.netBalance')}
               </span>
               <div className={`text-base sm:text-lg font-black tracking-tight leading-tight mt-0.5 truncate ${
                 isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'
               }`}>
                 {netBalance > 0.001 ? `+${netBalance.toFixed(2)}` : netBalance.toFixed(2)}{' '}
-                <span className="text-xs font-semibold opacity-75">€/mes</span>
+                <span className="text-xs font-semibold opacity-75">{t('unit.eurPerMonth')}</span>
               </div>
             </div>
           </div>
@@ -113,11 +114,11 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
             </div>
             <div className="min-w-0">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground block leading-tight truncate">
-                Te cuesta a ti
+                {t('metrics.youPay')}
               </span>
               <div className="text-base sm:text-lg font-bold text-foreground mt-0.5 leading-tight truncate">
                 {totalMonthlyCost.toFixed(2)}{' '}
-                <span className="text-xs font-normal text-muted-foreground">€/mes</span>
+                <span className="text-xs font-normal text-muted-foreground">{t('unit.eurPerMonth')}</span>
               </div>
             </div>
           </div>
@@ -129,11 +130,11 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
             </div>
             <div className="min-w-0">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground block leading-tight truncate">
-                Te aportan
+                {t('metrics.youReceive')}
               </span>
               <div className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 leading-tight truncate">
                 +{totalContributed.toFixed(2)}{' '}
-                <span className="text-xs font-normal text-muted-foreground">€/mes</span>
+                <span className="text-xs font-normal text-muted-foreground">{t('unit.eurPerMonth')}</span>
               </div>
             </div>
           </div>
@@ -144,21 +145,21 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
           <div className="px-3.5 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center sm:justify-start gap-2">
             <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
             <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
-              Tengo {subscriptions.length} {subscriptions.length === 1 ? 'suscripción' : 'suscripciones'}
+              {tp('metrics.haveSubs', subscriptions.length)}
             </span>
           </div>
 
           <div className="px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center sm:justify-start gap-2">
             <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-              {totalMembersCount} {totalMembersCount === 1 ? 'Miembro activo' : 'Miembros activos'}
+              {tp('metrics.members', totalMembersCount)}
             </span>
           </div>
 
           <div className="px-3.5 py-2 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center sm:justify-start gap-2">
             <Layers className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0" />
             <span className="text-xs font-bold text-violet-600 dark:text-violet-400">
-              Participo en {participatingCount} {participatingCount === 1 ? 'suscripción' : 'suscripciones'}
+              {tp('metrics.participate', participatingCount)}
             </span>
           </div>
         </div>

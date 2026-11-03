@@ -97,3 +97,66 @@ export function LanguageKeyed({ children }: { children: ReactNode }) {
   const { lang } = useLanguage();
   return <Fragment key={lang}>{children}</Fragment>;
 }
+
+type PluralBase = Extract<TranslationKey, `${string}.one`> extends infer K
+  ? K extends `${infer B}.one`
+    ? B
+    : never
+  : never;
+
+/** Traduce con singular/plural: usa la clave «base.one» si n es 1 y «base.other» en caso contrario. */
+export function tp(base: PluralBase, n: number, params?: Record<string, string | number>): string {
+  const key = `${base}.${n === 1 ? 'one' : 'other'}` as TranslationKey;
+  return t(key, { n, ...params });
+}
+
+/** Como t(), pero los fragmentos entre **dobles asteriscos** salen en negrita. */
+export function tRich(
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+  strongClassName?: string
+): ReactNode {
+  return richParts(t(key, params), strongClassName);
+}
+
+/** Como tp(), con negritas entre **dobles asteriscos**. */
+export function tpRich(
+  base: PluralBase,
+  n: number,
+  params?: Record<string, string | number>,
+  strongClassName?: string
+): ReactNode {
+  return richParts(tp(base, n, params), strongClassName);
+}
+
+function richParts(text: string, strongClassName?: string): ReactNode {
+  return text.split('**').map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} className={strongClassName}>
+        {part}
+      </strong>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  );
+}
+
+// Las categorías se guardan en castellano en la base de datos; solo se traducen al mostrarlas.
+const CATEGORY_KEYS: Record<string, TranslationKey> = {
+  'Streaming': 'catv.streaming',
+  'Música': 'catv.music',
+  'Productividad': 'catv.productivity',
+  'Gaming': 'catv.gaming',
+  'Educación': 'catv.education',
+  'Salud': 'catv.health',
+  'Estilo de vida': 'catv.lifestyle',
+  'Seguridad': 'catv.security',
+  'Finanzas': 'catv.finance',
+  'General': 'catv.general',
+};
+
+export function categoryName(value?: string): string {
+  if (!value) return t('catv.streaming');
+  const key = CATEGORY_KEYS[value];
+  return key ? t(key) : value;
+}

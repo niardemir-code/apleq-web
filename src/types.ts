@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 export type BillingPeriod = 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL' | 'YEARLY';
 export type BillingCycle = 'monthly' | 'yearly' | 'quarterly' | 'semi_annual';
 
@@ -169,10 +171,10 @@ export function serializePlatformPricing(items: PlatformPriceItem[]): string {
 
 export function formatPeriodShort(period?: BillingPeriod | string): string {
   const p = normalizeBillingPeriod(period);
-  if (p === 'YEARLY') return 'año';
-  if (p === 'SEMI_ANNUAL') return 'sem';
-  if (p === 'QUARTERLY') return 'trim';
-  return 'mes';
+  if (p === 'YEARLY') return t('per.year');
+  if (p === 'SEMI_ANNUAL') return t('per.semi');
+  if (p === 'QUARTERLY') return t('per.quarter');
+  return t('per.month');
 }
 
 export function getMemberPlatformInfo(subscription: Subscription, memberOrPlatformName?: Member | string): {
@@ -202,10 +204,10 @@ export function getMemberPlatformInfo(subscription: Subscription, memberOrPlatfo
   if (member?.paymentFrequencyUnit) {
     const val = member.paymentFrequencyValue || 1;
     const unit = member.paymentFrequencyUnit;
-    if (unit === 'days') periodShort = val === 1 ? 'día' : `${val}d`;
-    else if (unit === 'weeks') periodShort = val === 1 ? 'sem' : `${val}sem`;
-    else if (unit === 'months') periodShort = val === 1 ? 'mes' : `${val}m`;
-    else if (unit === 'years') periodShort = val === 1 ? 'año' : `${val}a`;
+    if (unit === 'days') periodShort = val === 1 ? t('per.day') : t('per.dayN', { n: val });
+    else if (unit === 'weeks') periodShort = val === 1 ? t('per.week') : t('per.weekN', { n: val });
+    else if (unit === 'months') periodShort = val === 1 ? t('per.month') : t('per.monthN', { n: val });
+    else if (unit === 'years') periodShort = val === 1 ? t('per.year') : t('per.yearN', { n: val });
   }
 
   const period = matched?.period || subPeriod;
