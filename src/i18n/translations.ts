@@ -1562,7 +1562,7 @@ export const en: Dictionary = {
   'md.joined': 'Join date',
   'md.nextPay': 'Next payment date',
   'md.notSet': 'Not set',
-  'md.autoCalc': 'Calculada automatically from the join date and frequency, or editable by hand.',
+  'md.autoCalc': 'Calculated automatically from the join date and frequency, or editable by hand.',
   'md.freq': 'Payment frequency',
   'md.autoRepeat': 'Automatic repeat',
   'md.unit': 'Unit',
