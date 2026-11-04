@@ -29,6 +29,7 @@ import {
   Smartphone,
   Database
 } from 'lucide-react';
+import { t, tp } from '../i18n';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -114,7 +115,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       });
       setNewPlatformName('');
       setShowAddForm(false);
-      showFeedback('Plataforma personalizada añadida');
+      showFeedback(t('st.platformAdded'));
     } catch (err) {
       console.error('Error al añadir plataforma:', err);
     } finally {
@@ -139,7 +140,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         colorHex: editPlatformColor,
       });
       setEditingPlatformId(null);
-      showFeedback('Plataforma actualizada');
+      showFeedback(t('st.platformUpdated'));
     } catch (err) {
       console.error('Error al actualizar plataforma:', err);
     } finally {
@@ -150,16 +151,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const handleDelete = async (id: string | number, name: string) => {
     try {
       await deletePlatform(id);
-      showFeedback(`"${name}" eliminada`);
+      showFeedback(t('st.platformDeleted', { name }));
     } catch (err) {
       console.error('Error al eliminar plataforma:', err);
     }
   };
 
   const handleRestore = async () => {
-    if (window.confirm('¿Restaurar las 6 plataformas iniciales (Price together, sharingful, Spliiit, Gamsgo, Sharesub, Directo/Familia)?')) {
+    if (window.confirm(t('st.restoreConfirm'))) {
       await restoreDefaultPlatforms();
-      showFeedback('Plataformas iniciales restauradas');
+      showFeedback(t('st.restored'));
     }
   };
 
@@ -177,14 +178,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showFeedback('Archivo JSON descargado');
+    showFeedback(t('st.downloaded'));
   };
 
   const handleCopyJson = async () => {
     try {
       await navigator.clipboard.writeText(jsonString);
       setCopied(true);
-      showFeedback('Copia JSON copiada al portapapeles');
+      showFeedback(t('st.copiedMsg'));
       setTimeout(() => setCopied(false), 2500);
     } catch (err) {
       console.error('Failed to copy JSON:', err);
@@ -218,14 +219,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           const count = result.subscriptionsRestored;
           setImportStatus({
             type: 'success',
-            message: `¡${count} suscripciones y ${result.membersRestored} miembros sincronizados con Firestore con éxito!`,
+            message: t('st.syncedOk', { count, members: result.membersRestored }),
             count,
           });
-          showFeedback(`¡${count} suscripciones restauradas!`);
+          showFeedback(t('st.restoredCount', { count }));
         } else {
           setImportStatus({
             type: 'error',
-            message: result.errorMessage || 'Error al procesar el archivo de copia de seguridad.',
+            message: result.errorMessage || t('st.backupFileErr'),
           });
         }
       } else {
@@ -234,16 +235,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         const count = await onImport(Array.isArray(subsToImport) ? subsToImport : []);
         setImportStatus({
           type: 'success',
-          message: `¡${count} suscripciones importadas en modo local/invitado!`,
+          message: t('st.localImported', { count }),
           count,
         });
-        showFeedback(`¡${count} suscripciones restauradas!`);
+        showFeedback(t('st.restoredCount', { count }));
       }
       setJsonInput('');
     } catch (err: any) {
       setImportStatus({
         type: 'error',
-        message: err.message || 'Error al procesar el archivo JSON. Verifica el formato.',
+        message: err.message || t('st.jsonErr'),
       });
     }
   };
@@ -251,21 +252,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const themeOptions: { mode: AppThemeMode; label: string; icon: React.ReactNode; desc: string }[] = [
     {
       mode: 'LIGHT',
-      label: 'Claro',
+      label: t('st.light'),
       icon: <Sun className="w-5 h-5 text-amber-500" />,
-      desc: 'Tema luminoso de alto contraste',
+      desc: t('st.lightDesc'),
     },
     {
       mode: 'DARK',
-      label: 'Oscuro',
+      label: t('st.dark'),
       icon: <Moon className="w-5 h-5 text-blue-400" />,
-      desc: 'Tema oscuro con tonos relajantes',
+      desc: t('st.darkDesc'),
     },
     {
       mode: 'SYSTEM',
-      label: 'Sistema',
+      label: t('st.system'),
       icon: <Laptop className="w-5 h-5 text-slate-400" />,
-      desc: 'Se adapta a tu dispositivo',
+      desc: t('st.systemDesc'),
     },
   ];
 
@@ -283,10 +284,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-extrabold text-foreground tracking-tight">
-                Configuración
+                {t('st.title')}
               </h2>
               <p className="text-xs text-muted-foreground">
-                Apariencia, plataformas de compartición y copia de seguridad JSON
+                {t('st.subtitle')}
               </p>
             </div>
           </div>
@@ -312,7 +313,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Sun className="w-4 h-4" />
-            <span>Apariencia (Tema)</span>
+            <span>{t('st.tabAppearance')}</span>
           </button>
 
           <button
@@ -325,7 +326,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>Plataformas ({platforms.length})</span>
+            <span>{t('st.tabPlatforms', { n: platforms.length })}</span>
           </button>
 
           <button
@@ -338,7 +339,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }`}
           >
             <FileJson className="w-4 h-4" />
-            <span>Copia de seguridad JSON</span>
+            <span>{t('st.tabBackup')}</span>
           </button>
         </div>
 
@@ -359,10 +360,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div>
                 <h3 className="text-sm font-bold text-foreground tracking-tight flex items-center gap-2">
                   <Sun className="w-4 h-4 text-amber-500" />
-                  Tema y Modo de Visualización
+                  {t('st.themeTitle')}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Cambia entre modo claro y oscuro o sincroniza con tu sistema operativo.
+                  {t('st.themeText')}
                 </p>
               </div>
 
@@ -376,7 +377,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       type="button"
                       onClick={() => {
                         setThemeMode(option.mode);
-                        showFeedback(`Tema cambiado a ${option.label}`);
+                        showFeedback(t('st.themeChanged', { label: option.label }));
                       }}
                       className={`flex flex-col items-start p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
                         isSelected
@@ -412,7 +413,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div>
                   <h3 className="text-sm font-bold text-foreground tracking-tight flex items-center gap-2">
                     <Layers className="w-4 h-4 text-blue-500" />
-                    Plataformas de compartición
+                    {t('st.platformsTitle')}
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     Gestiona las plataformas disponibles para tus suscripciones y miembros ({platforms.length})
@@ -437,7 +438,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             value={editPlatformName}
                             onChange={(e) => setEditPlatformName(e.target.value)}
                             className="flex-1 px-3 py-2 rounded-xl bg-card border border-border text-foreground text-xs font-semibold focus:outline-none focus:border-blue-500"
-                            placeholder="Nombre de la plataforma"
+                            placeholder={t('st.platformNamePh')}
                             autoFocus
                           />
                           <div className="relative">
@@ -446,7 +447,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               value={editPlatformColor}
                               onChange={(e) => setEditPlatformColor(e.target.value)}
                               className="w-8 h-8 rounded-xl cursor-pointer bg-transparent border-0 p-0"
-                              title="Elegir color personalizado"
+                              title={t('st.pickColor')}
                             />
                           </div>
                           <button
@@ -454,7 +455,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             disabled={isSubmittingEdit || !editPlatformName.trim()}
                             type="button"
                             className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold transition-colors cursor-pointer"
-                            title="Guardar cambios"
+                            title={t('st.saveChanges')}
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -462,7 +463,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             onClick={() => setEditingPlatformId(null)}
                             type="button"
                             className="p-2 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                            title="Cancelar"
+                            title={t('st.cancel')}
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -508,7 +509,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onClick={() => handleStartEdit(platform)}
                           type="button"
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                          title="Editar plataforma"
+                          title={t('st.editPlatform')}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -516,7 +517,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onClick={() => handleDelete(platform.id, platform.name)}
                           type="button"
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                          title="Eliminar plataforma"
+                          title={t('st.deletePlatform')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -535,14 +536,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                       <Plus className="w-3.5 h-3.5 text-blue-500" />
-                      Nueva plataforma personalizada
+                      {t('st.newPlatform')}
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowAddForm(false)}
                       className="text-muted-foreground hover:text-foreground text-xs cursor-pointer"
                     >
-                      Cancelar
+                      {t('st.cancel')}
                     </button>
                   </div>
 
@@ -552,7 +553,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       type="text"
                       value={newPlatformName}
                       onChange={(e) => setNewPlatformName(e.target.value)}
-                      placeholder="Nombre (ej. Pulpo, Spliiit Pro, etc.)"
+                      placeholder={t('st.newPlatformPh')}
                       className="flex-1 px-3.5 py-2 rounded-xl bg-muted/50 border border-border text-foreground placeholder-muted-foreground text-xs font-semibold focus:outline-none focus:border-blue-500"
                       autoFocus
                       required
@@ -562,7 +563,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       value={newPlatformColor}
                       onChange={(e) => setNewPlatformColor(e.target.value)}
                       className="w-8 h-8 rounded-xl cursor-pointer bg-transparent border-0 p-0 shrink-0"
-                      title="Elegir color personalizado"
+                      title={t('st.pickColor')}
                     />
                     <button
                       type="submit"
@@ -570,7 +571,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-blue-600/20 transition-all cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Guardar</span>
+                      <span>{t('st.save')}</span>
                     </button>
                   </div>
 
@@ -603,7 +604,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-98"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Añadir plataforma personalizada</span>
+                    <span>{t('st.addPlatform')}</span>
                   </button>
                 )}
 
@@ -612,10 +613,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   type="button"
                   onClick={handleRestore}
                   className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-2xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground border border-border text-xs font-semibold transition-all cursor-pointer active:scale-98"
-                  title="Restaurar: Price together, sharingful, Spliiit, Gamsgo, Sharesub, Directo/Familia"
+                  title={t('st.restoreTitle')}
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Restaurar 6 iniciales</span>
+                  <span>{t('st.restore6')}</span>
                 </button>
               </div>
             </section>
@@ -628,10 +629,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div>
                   <h3 className="text-sm font-bold text-foreground tracking-tight flex items-center gap-2">
                     <FileJson className="w-4 h-4 text-blue-500" />
-                    Copia de Seguridad JSON
+                    {t('st.backupTitle')}
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Exporta o importa tus datos en formato JSON 100% compatible
+                    {t('st.backupText')}
                   </p>
                 </div>
               </div>
@@ -647,7 +648,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Exportar / Copiar JSON
+                  {t('st.exportTab')}
                 </button>
                 <button
                   type="button"
@@ -658,7 +659,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Importar / Restaurar JSON
+                  {t('st.importTab')}
                 </button>
               </div>
 
@@ -672,10 +673,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </div>
                       <div>
                         <div className="text-xs font-bold text-foreground">
-                          {subscriptions.length} suscripciones listas para exportar
+                          {tp('st.readyExport', subscriptions.length)}
                         </div>
                         <div className="text-[11px] text-muted-foreground">
-                          Incluye miembros, cobros, plataformas y notas
+                          {t('st.includes')}
                         </div>
                       </div>
                     </div>
@@ -687,17 +688,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
                       >
                         {copied ? <Check className="w-3.5 h-3.5 text-emerald-200" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copied ? '¡Copiado!' : 'Copiar JSON'}</span>
+                        <span>{copied ? t('st.copied') : t('st.copyJson')}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={handleDownloadJson}
                         className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold transition-all cursor-pointer"
-                        title="Descargar archivo .json"
+                        title={t('st.downloadTitle')}
                       >
                         <Download className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="hidden sm:inline">Descargar</span>
+                        <span className="hidden sm:inline">{t('st.download')}</span>
                       </button>
                     </div>
                   </div>
@@ -719,14 +720,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                      Al importar un archivo o texto JSON, se añadirán las suscripciones y co-suscriptores a tu cuenta.
+                      {t('st.importWarn')}
                     </span>
                   </div>
 
                   {/* File selector & textarea */}
                   <div>
                     <label className="block text-xs font-bold text-foreground mb-2">
-                      Pega el JSON o sube un archivo:
+                      {t('st.pasteOrUpload')}
                     </label>
                     <textarea
                       value={jsonInput}
@@ -734,7 +735,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         setJsonInput(e.target.value);
                         setImportStatus({ type: 'idle' });
                       }}
-                      placeholder="Pega aquí el contenido JSON de tu copia de seguridad..."
+                      placeholder={t('st.pastePh')}
                       rows={5}
                       className="w-full p-3 font-mono text-[11px] bg-card border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-blue-500"
                     />
@@ -743,7 +744,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <label className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-border hover:bg-muted text-foreground text-xs font-bold transition-all cursor-pointer shadow-xs">
                       <Upload className="w-3.5 h-3.5 text-blue-500" />
-                      <span>Cargar archivo .json</span>
+                      <span>{t('st.loadFile')}</span>
                       <input
                         type="file"
                         accept=".json,application/json"
@@ -759,7 +760,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         onChange={(e) => setReplaceExisting(e.target.checked)}
                         className="rounded border-border text-blue-600 focus:ring-blue-500"
                       />
-                      <span>Reemplazar datos existentes</span>
+                      <span>{t('st.replace')}</span>
                     </label>
 
                     <button
@@ -769,7 +770,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-blue-600/20 cursor-pointer"
                     >
                       <Database className="w-3.5 h-3.5" />
-                      <span>{importStatus.type === 'loading' ? 'Importando...' : 'Restaurar ahora'}</span>
+                      <span>{importStatus.type === 'loading' ? t('st.importing') : t('st.restoreNow')}</span>
                     </button>
                   </div>
 
@@ -802,7 +803,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             type="button"
             className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer"
           >
-            Cerrar
+            {t('st.close')}
           </button>
         </div>
       </div>

@@ -6,6 +6,12 @@ import {
   getCurrencySymbol,
   resolveSubscriptionNextRenewalDate 
 } from '../types';
+import { t, tp } from '../i18n';
+
+function alarmUnitWord(unit: string, n: number): string {
+  const base = unit === 'hours' ? 'unitw.hour' : unit === 'weeks' ? 'unitw.week' : unit === 'months' ? 'unitw.month' : 'unitw.day';
+  return tp(base, n);
+}
 
 export interface AppNotification {
   id: string;
@@ -86,7 +92,7 @@ export function generateNotificationsFromSubscriptions(
   today.setHours(0, 0, 0, 0);
 
   subscriptions.forEach((sub) => {
-    const subName = sub.platformName || sub.name || 'Suscripción';
+    const subName = sub.platformName || sub.name || t('nf.subscription');
     const subColor = sub.iconColorHex || sub.color || '#1285FA';
     const members = sub.members || [];
 
@@ -146,28 +152,28 @@ export function generateNotificationsFromSubscriptions(
 
         if (hasDebt) {
           status = 'overdue';
-          dueDateText = m.unpaidCycles === 1 ? 'Pago pendiente' : `${m.unpaidCycles} pagos pendientes`;
+          dueDateText = m.unpaidCycles === 1 ? t('nf.pendingOne') : t('nf.pendingMany', { n: m.unpaidCycles });
         } else if (daysRemaining < 0) {
           status = 'overdue';
           const overdueDays = Math.abs(daysRemaining);
-          dueDateText = overdueDays === 1 ? 'Vencido ayer' : `Vencido hace ${overdueDays} días`;
+          dueDateText = overdueDays === 1 ? t('nf.overdueYesterday') : t('nf.overdueDays', { n: overdueDays });
         } else if (daysRemaining === 0) {
           status = 'today';
-          dueDateText = '¡Vence hoy!';
+          dueDateText = t('nf.dueToday');
         } else if (daysRemaining === 1) {
           status = 'upcoming';
-          dueDateText = 'Vence mañana';
+          dueDateText = t('nf.dueTomorrow');
         } else {
           status = 'upcoming';
-          dueDateText = `Vence en ${daysRemaining} días`;
+          dueDateText = t('nf.dueIn', { n: daysRemaining });
         }
 
         const alarmVal = m.alarmValue ?? m.alarmDaysBefore ?? 3;
         const alarmUnit = m.alarmUnit || 'days';
         const isSameDay = alarmUnit === 'same_day' || alarmVal === 0 || m.alarmDaysBefore === 0;
-        const unitLabel = alarmUnit === 'hours' ? (alarmVal === 1 ? 'hora' : 'horas') : alarmUnit === 'weeks' ? (alarmVal === 1 ? 'semana' : 'semanas') : alarmUnit === 'months' ? (alarmVal === 1 ? 'mes' : 'meses') : (alarmVal === 1 ? 'día' : 'días');
+        const unitLabel = alarmUnitWord(alarmUnit, alarmVal);
         const alarmConfigText = hasAlarm 
-          ? (isSameDay ? 'Alarma configurada: El mismo día' : `Alarma configurada: ${alarmVal} ${unitLabel} antes`) 
+          ? (isSameDay ? t('nf.alarmSameDay') : t('nf.alarmBefore', { n: alarmVal, unit: unitLabel })) 
           : undefined;
 
         let notifType: 'alarm' | 'overdue' | 'pending' = 'alarm';
@@ -176,7 +182,7 @@ export function generateNotificationsFromSubscriptions(
         else notifType = 'pending';
 
         const debtText = hasDebt && m.debtSinceDate
-          ? `Debe ${m.unpaidCycles === 1 ? '1 cuota' : m.unpaidCycles + ' cuotas'} desde el ${m.debtSinceDate.split('-').reverse().join('/')}`
+          ? (m.unpaidCycles === 1 ? t('nf.owesOne', { date: m.debtSinceDate.split('-').reverse().join('/') }) : t('nf.owesMany', { n: m.unpaidCycles, date: m.debtSinceDate.split('-').reverse().join('/') }))
           : undefined;
 
         // Para deudas, el id incluye el número de cuotas: si la deuda empeora,
@@ -231,23 +237,23 @@ export function generateNotificationsFromSubscriptions(
             if (daysRemaining < 0) {
               status = 'overdue';
               const overdueDays = Math.abs(daysRemaining);
-              dueDateText = overdueDays === 1 ? 'Renovación vencida ayer' : `Renovación vencida hace ${overdueDays} días`;
+              dueDateText = overdueDays === 1 ? t('nf.renewOverdueYesterday') : t('nf.renewOverdueDays', { n: overdueDays });
             } else if (daysRemaining === 0) {
               status = 'today';
-              dueDateText = '¡Renovación de suscripción hoy!';
+              dueDateText = t('nf.renewToday');
             } else if (daysRemaining === 1) {
               status = 'upcoming';
-              dueDateText = 'Renovación de suscripción mañana';
+              dueDateText = t('nf.renewTomorrow');
             } else {
               status = 'upcoming';
-              dueDateText = `Renovación en ${daysRemaining} días`;
+              dueDateText = t('nf.renewIn', { n: daysRemaining });
             }
 
             const alarmVal = sub.alarmValue ?? sub.alarmDaysBefore ?? 3;
             const alarmUnit = sub.alarmUnit || 'days';
             const isSameDay = alarmUnit === 'same_day' || alarmVal === 0 || sub.alarmDaysBefore === 0;
-            const unitLabel = alarmUnit === 'hours' ? (alarmVal === 1 ? 'hora' : 'horas') : alarmUnit === 'weeks' ? (alarmVal === 1 ? 'semana' : 'semanas') : alarmUnit === 'months' ? (alarmVal === 1 ? 'mes' : 'meses') : (alarmVal === 1 ? 'día' : 'días');
-            const alarmConfigText = isSameDay ? 'Alarma de suscripción: El mismo día' : `Alarma de suscripción: ${alarmVal} ${unitLabel} antes`;
+            const unitLabel = alarmUnitWord(alarmUnit, alarmVal);
+            const alarmConfigText = isSameDay ? t('nf.subAlarmSameDay') : t('nf.subAlarmBefore', { n: alarmVal, unit: unitLabel });
 
             const notifId = `notif_sub_renewal_${sub.id}_${renewalDateStr}`;
             const isRead = readIds.includes(notifId);
@@ -259,9 +265,9 @@ export function generateNotificationsFromSubscriptions(
               subscriptionName: subName,
               subscriptionColor: subColor,
               memberId: 'owner_renewal',
-              memberName: sub.mainUserName || 'Cobro de suscripción',
+              memberName: sub.mainUserName || t('nf.subCharge'),
               memberContact: sub.notes || '',
-              sharingPlatform: 'Renovación general',
+              sharingPlatform: t('nf.generalRenewal'),
               amount: typeof sub.cost === 'number' ? sub.cost : 0,
               currency: sub.currency || 'EUR',
               currencySymbol: getCurrencySymbol(sub.currency),
@@ -331,22 +337,22 @@ export function generateClientReminders(
     if (!hasDebt && daysRemaining > pref.leadDays) return;
     if (daysRemaining < -60) return;
 
-    const groupName = group.platformName || 'Suscripción';
+    const groupName = group.platformName || t('nf.subscription');
     const groupColor = group.iconColorHex || '#1285FA';
     const amount = getMemberContributionAmount(group, myMember);
     const currencySymbol = getCurrencySymbol(group.currency || 'EUR');
 
     let dueDateText: string;
     if (hasDebt) {
-      dueDateText = unpaidCycles === 1 ? 'Tienes un pago pendiente' : `Tienes ${unpaidCycles} pagos pendientes`;
+      dueDateText = unpaidCycles === 1 ? t('nf.youPendingOne') : t('nf.youPendingMany', { n: unpaidCycles });
     } else if (daysRemaining < 0) {
-      dueDateText = `Tu pago venció hace ${-daysRemaining} días`;
+      dueDateText = t('nf.youOverdueDays', { n: -daysRemaining });
     } else if (daysRemaining === 0) {
-      dueDateText = '¡Tu pago vence hoy!';
+      dueDateText = t('nf.youDueToday');
     } else if (daysRemaining === 1) {
-      dueDateText = 'Tu pago vence mañana';
+      dueDateText = t('nf.youDueTomorrow');
     } else {
-      dueDateText = `Tu pago vence en ${daysRemaining} días`;
+      dueDateText = t('nf.youDueIn', { n: daysRemaining });
     }
 
     const status: 'upcoming' | 'today' | 'overdue' =
@@ -363,7 +369,7 @@ export function generateClientReminders(
       subscriptionName: groupName,
       subscriptionColor: groupColor,
       memberId: '',
-      memberName: 'Tu pago',
+      memberName: t('nf.yourPayment'),
       sharingPlatform: '',
       amount,
       currency: group.currency || 'EUR',
@@ -374,7 +380,7 @@ export function generateClientReminders(
       status,
       isRead: readIds.includes(notifId),
       timestamp: new Date().toISOString(),
-      alarmConfigText: !hasDebt ? `Alarma configurada: ${pref.leadDays} días antes` : undefined,
+      alarmConfigText: !hasDebt ? t('nf.alarmDaysBefore', { n: pref.leadDays }) : undefined,
     });
   });
 

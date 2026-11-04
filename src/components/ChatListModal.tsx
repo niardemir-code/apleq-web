@@ -1,5 +1,6 @@
 import { Mail, ChevronRight, MessageCircle } from 'lucide-react';
 import { Member } from '../types';
+import { t } from '../i18n';
 
 interface ChatListModalProps {
   subscriptionName: string;
@@ -30,12 +31,12 @@ export function ChatListModal({
       >
         <div className="flex items-center gap-2 mb-4">
           <MessageCircle className="w-5 h-5 text-blue-500 shrink-0" />
-          <h2 className="text-sm font-black text-foreground truncate">Chats · {subscriptionName}</h2>
+          <h2 className="text-sm font-black text-foreground truncate">{t('ch.listTitle', { name: subscriptionName })}</h2>
         </div>
 
         {linkedMembers.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-6">
-            Ningún miembro tiene cuenta enlazada todavía.
+            {t('ch.noLinked')}
           </p>
         ) : (
           <div className="space-y-2 overflow-y-auto">
@@ -43,7 +44,7 @@ export function ChatListModal({
               const clientUid = member.linkedUid as string;
               const chatId = `${currentUid}_${groupId}_${clientUid}`;
               const hasUnread = unreadChatIdsForOwner.has(chatId);
-              const displayName = member.memberName || 'Cliente';
+              const displayName = member.memberName || t('ch.client');
               const initial = displayName.trim().charAt(0).toUpperCase() || '?';
 
               return (
@@ -85,7 +86,7 @@ export function ChatListModal({
           onClick={onClose}
           className="mt-4 w-full py-2.5 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-sm font-bold text-foreground transition-colors cursor-pointer"
         >
-          Cerrar
+          {t('ch.close')}
         </button>
       </div>
     </div>

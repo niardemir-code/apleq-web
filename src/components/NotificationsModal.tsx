@@ -18,6 +18,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { generateMemberReminderText, getWhatsAppShareUrl } from '../utils/reminder';
+import { t } from '../i18n';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -107,16 +108,16 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-extrabold text-foreground tracking-tight">
-                  Centro de Notificaciones y Alarmas
+                  {t('nt.title')}
                 </h2>
                 {unreadCount > 0 && (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-xs">
-                    {unreadCount} sin leer
+                    {t('nt.unread', { n: unreadCount })}
                   </span>
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Avisos de próximos cobros, alarmas configuradas y cuotas pendientes.
+                {t('nt.subtitle')}
               </p>
             </div>
           </div>
@@ -126,7 +127,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             onClick={onClose}
             type="button"
             className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-            aria-label="Cerrar ventana"
+            aria-label={t('nt.closeWindow')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -145,7 +146,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Todas ({notifications.length})
+              {t('nt.all', { n: notifications.length })}
             </button>
             <button
               id="btn-filter-notifs-unread"
@@ -157,7 +158,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <span>Pendientes de leer</span>
+              <span>{t('nt.pending')}</span>
               {unreadCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
                   {unreadCount}
@@ -174,7 +175,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-800/60 transition-colors cursor-pointer"
             >
               <CheckCheck className="w-3.5 h-3.5" />
-              <span>Marcar todas como leídas</span>
+              <span>{t('nt.markAll')}</span>
             </button>
           )}
         </div>
@@ -188,13 +189,13 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
               </div>
               <h3 className="text-sm font-bold text-foreground">
                 {filterMode === 'unread' 
-                  ? '¡No tienes notificaciones pendientes de leer!' 
-                  : 'Sin alarmas ni pagos pendientes'}
+                  ? t('nt.emptyUnreadTitle') 
+                  : t('nt.emptyAllTitle')}
               </h3>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto">
                 {filterMode === 'unread'
-                  ? 'Has revisado todas las alertas de cobro. Puedes ver el historial completo pulsando en "Todas".'
-                  : 'Todas las cuotas de tus co-suscriptores están al día o fuera de su periodo de antelación.'}
+                  ? t('nt.emptyUnread')
+                  : t('nt.emptyAll')}
               </p>
             </div>
           ) : (
@@ -217,7 +218,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   {isUnread && (
                     <div className="absolute -top-2.5 left-4 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-black tracking-wider uppercase shadow-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
-                      Pendiente de leer
+                      {t('nt.unreadBadge')}
                     </div>
                   )}
 
@@ -295,7 +296,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                           {notif.amount.toFixed(2)} {notif.currencySymbol}
                         </div>
                         <div className="text-[10px] text-muted-foreground">
-                          cuota a recibir
+                          {t('nt.toReceive')}
                         </div>
                       </div>
 
@@ -308,7 +309,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                             ? 'text-blue-600 dark:text-blue-400 hover:bg-blue-500/10'
                             : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                         }`}
-                        title={isUnread ? 'Marcar como leída' : 'Marcar como no leída'}
+                        title={isUnread ? t('nt.markRead') : t('nt.markUnread')}
                       >
                         {isUnread ? (
                           <Eye className="w-4 h-4" />
@@ -328,10 +329,10 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                         type="button"
                         onClick={() => handleOpenWhatsApp(notif)}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow-xs transition-all cursor-pointer"
-                        title="Enviar recordatorio por WhatsApp"
+                        title={t('nt.whatsappTitle')}
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
-                        <span>Avisar por WhatsApp</span>
+                        <span>{t('nt.whatsapp')}</span>
                       </button>
 
                       {/* Copy message CTA */}
@@ -340,9 +341,9 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                         type="button"
                         onClick={() => handleCopyReminder(notif)}
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-[11px] font-semibold border border-border transition-colors cursor-pointer"
-                        title="Copiar texto de recordatorio"
+                        title={t('nt.copyTitle')}
                       >
-                        <span>{copiedId === notif.id ? '¡Copiado! ✅' : 'Copiar texto'}</span>
+                        <span>{copiedId === notif.id ? t('nt.copiedOk') : t('nt.copyText')}</span>
                       </button>
                     </div>
 
@@ -353,10 +354,10 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                         type="button"
                         onClick={() => onMarkMemberPaid(notif.subscriptionId, notif.memberId)}
                         className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold shadow-xs transition-colors cursor-pointer"
-                        title="Marcar cuota como pagada"
+                        title={t('nt.paidTitle')}
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Marcar pagado</span>
+                        <span>{t('nt.paid')}</span>
                       </button>
 
                       {/* Open Member Detail */}
@@ -365,7 +366,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                         type="button"
                         onClick={() => handleGoToMember(notif)}
                         className="p-1.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground hover:text-blue-500 border border-border transition-colors cursor-pointer"
-                        title="Ver ficha del miembro"
+                        title={t('nt.memberTitle')}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </button>
@@ -381,7 +382,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
         <div className="px-6 py-3.5 border-t border-border bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5 font-medium">
             <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-            <span>Las alarmas se calculan en base a la fecha de próximo cobro y antelación configurada.</span>
+            <span>{t('nt.footer')}</span>
           </div>
           <button
             id="btn-footer-close-notifs"
@@ -389,7 +390,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             onClick={onClose}
             className="px-4 py-1.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground font-bold border border-border transition-colors cursor-pointer"
           >
-            Cerrar
+            {t('st.close')}
           </button>
         </div>
       </div>

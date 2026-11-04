@@ -7,6 +7,7 @@ import {
 } from '../types';
 import { leaveGroupCall } from '../lib/firebase';
 import { MessageCircle, ChevronRight } from 'lucide-react';
+import { t, tp } from '../i18n';
 
 interface ClientGroupDetailViewProps {
   group: Subscription | null;
@@ -44,7 +45,7 @@ export function ClientGroupDetailView({
     return (
       <div className="bg-card border border-border rounded-3xl p-10 text-center">
         <p className="text-sm font-semibold text-muted-foreground">
-          Selecciona un grupo de "Participo en" para ver sus detalles.
+          {t('cg.pick')}
         </p>
       </div>
     );
@@ -65,7 +66,7 @@ export function ClientGroupDetailView({
       setIsConfirmingLeave(false);
       if (onBackToList) onBackToList();
     } catch (e: any) {
-      setLeaveError(e?.message || 'No se pudo salir del grupo. Inténtalo de nuevo.');
+      setLeaveError(e?.message || t('cg.leaveErr'));
     } finally {
       setIsLeaving(false);
     }
@@ -75,50 +76,50 @@ export function ClientGroupDetailView({
     <div className="bg-card border border-border rounded-3xl p-5 sm:p-6">
       {isMobile && onBackToList && (
         <button type="button" onClick={onBackToList} className="text-xs font-bold text-blue-600 dark:text-blue-400 mb-3 cursor-pointer">
-          ← Volver
+          {t('cg.back')}
         </button>
       )}
       <div className="flex items-center justify-between gap-2 mb-4">
         <h2 className="text-xl font-black text-foreground truncate">{title}</h2>
         <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0">
-          Cliente
+          {t('cg.client')}
         </span>
       </div>
 
       <div className="p-4 rounded-2xl bg-muted/40 border border-border space-y-2.5">
         {group.showMainUserToMembers && group.mainUserName && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Titular / Usuario principal</span>
+            <span className="text-muted-foreground">{t('cg.holder')}</span>
             <span className="font-bold text-foreground text-right">{group.mainUserName}</span>
           </div>
         )}
         {platform && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Plataforma de compartición</span>
+            <span className="text-muted-foreground">{t('cg.platform')}</span>
             <span className="font-bold text-foreground text-right">{platform}</span>
           </div>
         )}
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Tu parte</span>
+          <span className="text-muted-foreground">{t('cg.yourShare')}</span>
           <span className="font-black text-foreground text-right">{amount.toFixed(2)} €</span>
         </div>
         {nextPayment && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Próximo pago</span>
+            <span className="text-muted-foreground">{t('cg.nextPayment')}</span>
             <span className="font-bold text-foreground text-right">{nextPayment}</span>
           </div>
         )}
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Estado de pago</span>
+          <span className="text-muted-foreground">{t('cg.payStatus')}</span>
           <span className={`font-bold text-right ${isPaid ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-            {isPaid ? 'Pagado' : 'Pendiente'}
+            {isPaid ? t('cg.paid') : t('cg.pending')}
           </span>
         </div>
       </div>
 
       <div className="mt-3 p-3 rounded-2xl bg-muted/40 border border-border">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-bold text-foreground">Tu alarma</p>
+          <p className="text-xs font-bold text-foreground">{t('cg.yourAlarm')}</p>
           <div
             onClick={() => {
               if (!onSaveAlarmPref) return;
@@ -134,7 +135,7 @@ export function ClientGroupDetailView({
         </div>
         {(alarmPref?.enabled ?? true) ? (
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-[11px] text-muted-foreground">Avisarme</span>
+            <span className="text-[11px] text-muted-foreground">{t('cg.notifyMe')}</span>
             <button
               type="button"
               onClick={() => {
@@ -147,7 +148,7 @@ export function ClientGroupDetailView({
               −
             </button>
             <span className="text-xs font-bold text-foreground min-w-[52px] text-center">
-              {alarmPref?.leadDays ?? 3} {(alarmPref?.leadDays ?? 3) === 1 ? 'día' : 'días'}
+              {alarmPref?.leadDays ?? 3} {tp('cg.daysUnit', alarmPref?.leadDays ?? 3)}
             </span>
             <button
               type="button"
@@ -160,17 +161,17 @@ export function ClientGroupDetailView({
             >
               +
             </button>
-            <span className="text-[11px] text-muted-foreground">antes</span>
+            <span className="text-[11px] text-muted-foreground">{t('cg.before')}</span>
           </div>
         ) : (
-          <p className="text-[11px] text-muted-foreground mt-1">No recibirás avisos de este pago.</p>
+          <p className="text-[11px] text-muted-foreground mt-1">{t('cg.noAlerts')}</p>
         )}
       </div>
 
       {group && (() => {
         const chatId = `${group.userId}_${group.id}_${currentUid}`;
         const hasUnread = unreadChatIdsForClient.has(chatId);
-        const subscriptionName = group.platformName || group.name || 'Suscripción';
+        const subscriptionName = group.platformName || group.name || t('nf.subscription');
         return (
           <button
             type="button"
@@ -188,9 +189,9 @@ export function ClientGroupDetailView({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-foreground">Mensajes con el gestor</p>
+              <p className="text-xs font-bold text-foreground">{t('cg.chatWith')}</p>
               <p className={`text-[11px] mt-0.5 ${hasUnread ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-muted-foreground'}`}>
-                {hasUnread ? 'Tienes un mensaje nuevo' : 'Toca para abrir la conversación'}
+                {hasUnread ? t('cg.newMsg') : t('cg.tapChat')}
               </p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -204,7 +205,7 @@ export function ClientGroupDetailView({
           onClick={() => { setLeaveError(null); setIsConfirmingLeave(true); }}
           className="text-xs font-bold text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
         >
-          Salir de este grupo
+          {t('cg.leave')}
         </button>
       </div>
 
@@ -217,9 +218,9 @@ export function ClientGroupDetailView({
             className="w-full max-w-sm bg-card border border-border rounded-3xl p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-black text-foreground mb-2">¿Salir de {title}?</h2>
+            <h2 className="text-lg font-black text-foreground mb-2">{t('cg.leaveQ', { title })}</h2>
             <p className="text-xs text-muted-foreground">
-              Dejarás de participar en este grupo.
+              {t('cg.leaveText')}
             </p>
             {leaveError && (
               <p className="text-xs mt-3 font-bold text-rose-600 dark:text-rose-400">
@@ -233,7 +234,7 @@ export function ClientGroupDetailView({
                 disabled={isLeaving}
                 className="flex-1 py-3 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-sm font-bold text-foreground transition-colors cursor-pointer disabled:opacity-50"
               >
-                Cancelar
+                {t('cg.cancel')}
               </button>
               <button
                 type="button"
@@ -241,7 +242,7 @@ export function ClientGroupDetailView({
                 disabled={isLeaving}
                 className="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-sm font-bold text-white transition-colors cursor-pointer"
               >
-                {isLeaving ? 'Saliendo...' : 'Salir'}
+                {isLeaving ? t('cg.leaving') : t('cg.leaveBtn')}
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { X, Send, ArrowLeft } from 'lucide-react';
 import { ChatMessage } from '../services/subscriptionService';
+import { t } from '../i18n';
 
 interface ChatWindowProps {
   subscriptionName: string;
@@ -36,7 +37,7 @@ export function ChatWindow({ subscriptionName, otherPersonName, currentUid, mess
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2 min-w-0">
             {onBack && (
-              <button type="button" onClick={onBack} className="p-1.5 rounded-lg hover:bg-muted cursor-pointer shrink-0" title="Volver a la lista">
+              <button type="button" onClick={onBack} className="p-1.5 rounded-lg hover:bg-muted cursor-pointer shrink-0" title={t('ch.back')}>
                 <ArrowLeft className="w-4 h-4 text-muted-foreground" />
               </button>
             )}
@@ -53,7 +54,7 @@ export function ChatWindow({ subscriptionName, otherPersonName, currentUid, mess
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2.5">
           {messages.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center mt-8">
-              Aún no hay mensajes. Escribe el primero.
+              {t('ch.empty')}
             </p>
           ) : (
             messages.map((msg) => {
@@ -82,7 +83,7 @@ export function ChatWindow({ subscriptionName, otherPersonName, currentUid, mess
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
-            placeholder="Escribe un mensaje..."
+            placeholder={t('ch.placeholder')}
             className="flex-1 bg-muted/60 text-foreground px-4 py-2.5 rounded-2xl border border-border text-sm focus:outline-none focus:border-blue-500"
           />
           <button

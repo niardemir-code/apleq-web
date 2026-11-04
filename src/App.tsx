@@ -383,7 +383,7 @@ function SplitzyApp() {
   const handleSaveSubscription = async (
     subData: Partial<Subscription>
   ) => {
-    const platformName = subData.platformName || subData.name || 'Suscripción';
+    const platformName = subData.platformName || subData.name || t('nf.subscription');
     const completeData: Omit<Subscription, 'id' | 'userId' | 'createdAt' | 'updatedAt'> = {
       name: platformName,
       platformName: platformName,
@@ -880,7 +880,7 @@ function SplitzyApp() {
       {/* Modals */}
       {chatListForSubscription && !openChatInfo && (
         <ChatListModal
-          subscriptionName={chatListForSubscription.platformName || chatListForSubscription.name || 'Suscripción'}
+          subscriptionName={chatListForSubscription.platformName || chatListForSubscription.name || t('nf.subscription')}
           members={chatListForSubscription.members || []}
           currentUid={user?.uid || ''}
           groupId={String(chatListForSubscription.id)}
@@ -888,7 +888,7 @@ function SplitzyApp() {
           onMemberClick={(chatId, _clientUid, clientName) => {
             setOpenChatInfo({
               chatId,
-              subscriptionName: chatListForSubscription.platformName || 'Suscripción',
+              subscriptionName: chatListForSubscription.platformName || t('nf.subscription'),
               otherPersonName: clientName,
               isOwnerSide: true,
             });

@@ -32,6 +32,7 @@ import {
 import { PlatformIconBadge } from '../utils/icons';
 import { CurrencyFlag } from './CurrencyFlag';
 import { CurrencySelect } from './CurrencySelect';
+import { t, tp, tRich } from '../i18n';
 
 interface MembersDetailModalProps {
   isOpen: boolean;
@@ -127,10 +128,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
 
   const getFrequencyPeriodLabel = () => {
     const val = paymentFrequencyValue || 1;
-    if (paymentFrequencyUnit === 'days') return val === 1 ? 'día' : `${val} días`;
-    if (paymentFrequencyUnit === 'weeks') return val === 1 ? 'sem' : `${val} sem`;
-    if (paymentFrequencyUnit === 'years') return val === 1 ? 'año' : `${val} años`;
-    return val === 1 ? 'mes' : `${val} meses`;
+    if (paymentFrequencyUnit === 'days') return val === 1 ? tp('unitw.day', 1) : `${val} ${tp('unitw.day', val)}`;
+    if (paymentFrequencyUnit === 'weeks') return val === 1 ? t('md.weekShort') : `${val} ${t('md.weekShort')}`;
+    if (paymentFrequencyUnit === 'years') return val === 1 ? tp('md.yearUnit', 1) : `${val} ${tp('md.yearUnit', val)}`;
+    return val === 1 ? tp('unitw.month', 1) : `${val} ${tp('unitw.month', val)}`;
   };
 
   const handleJoinedDateChange = (newJoinedDate: string) => {
@@ -464,7 +465,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-extrabold text-foreground tracking-tight truncate">
-                  {editingMemberId ? 'Editar usuario' : 'Añadir usuario'}
+                  {editingMemberId ? t('md.edit') : t('md.add')}
                 </h2>
               </div>
               <p className="text-xs text-muted-foreground truncate mt-0.5">
@@ -490,7 +491,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Nombre o Apodo <span className="text-rose-500">*</span>
+                {t('md.name')} <span className="text-rose-500">*</span>
               </label>
               <input
                 id="input-member-name"
@@ -498,14 +499,14 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ej. Carlos M., Laura Pérez"
+                placeholder={t('md.namePh')}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-muted/50 border border-border text-foreground text-xs font-semibold placeholder-muted-foreground outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
             <div className="relative" ref={platformDropdownRef}>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Plataforma de compartición
+                {t('md.platform')}
               </label>
               {availablePlatforms.length > 0 ? (
                 <>
@@ -520,7 +521,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                         className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs ring-1 ring-black/10 dark:ring-white/10"
                         style={{ backgroundColor: selectedPlatformColor }}
                       />
-                      <span className="truncate">{platform || 'Seleccionar plataforma'}</span>
+                      <span className="truncate">{platform || t('md.selectPlatform')}</span>
                       {currentSelectedPlatform && 'pricePerUser' in currentSelectedPlatform && (currentSelectedPlatform as any).pricePerUser > 0 && (
                         <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded-md shrink-0 flex items-center gap-1">
                           <CurrencyFlag currency={(currentSelectedPlatform as any).currency} size="xs" />
@@ -552,7 +553,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                           <span
                             className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs ring-1 ring-black/10 dark:ring-white/10 bg-slate-400 dark:bg-zinc-500"
                           />
-                          <span className="truncate">Sin plataforma</span>
+                          <span className="truncate">{t('md.noPlatform')}</span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0 ml-2">
                           {!platform && <Check className="w-4 h-4 text-blue-500 shrink-0" />}
@@ -594,9 +595,9 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 </>
               ) : (
                 <div className="px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex flex-col gap-0.5">
-                  <span className="font-bold">Sin plataformas en esta suscripción</span>
+                  <span className="font-bold">{t('md.noPlatforms')}</span>
                   <span className="text-[11px] text-muted-foreground">
-                    Añade plataformas desde la configuración de la suscripción (ej. Sharesub, Spliiit, Together Price).
+                    {t('md.addPlatformsHint')}
                   </span>
                 </div>
               )}
@@ -607,7 +608,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Importe aportado
+                {t('md.amount')}
                 <span className="text-blue-500 lowercase font-bold ml-1">
                   /{getFrequencyPeriodLabel()}
                 </span>
@@ -639,14 +640,14 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                Método habitual
+                {t('md.method')}
               </label>
               <input
                 id="input-member-method"
                 type="text"
                 value={method}
                 onChange={(e) => setMethod(e.target.value)}
-                placeholder="Bizum, Transferencia, Tarjeta..."
+                placeholder={t('md.methodPh')}
                 className="w-full px-3.5 py-2.5 rounded-xl bg-muted/50 border border-border text-foreground text-xs font-semibold placeholder-muted-foreground outline-none focus:border-blue-500 transition-colors"
               />
             </div>
@@ -657,10 +658,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-blue-500" />
-                <span>Fecha de unión</span>
+                <span>{t('md.joined')}</span>
               </span>
               <span className="text-xs font-extrabold text-blue-500 bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-lg">
-                {formatDisplayDate(joinedDate) || 'Sin fijar'}
+                {formatDisplayDate(joinedDate) || t('md.notSet')}
               </span>
             </div>
 
@@ -681,10 +682,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-blue-500" />
-                <span>Fecha del próximo pago</span>
+                <span>{t('md.nextPay')}</span>
               </span>
               <span className="text-xs font-extrabold text-blue-500 bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 rounded-lg">
-                {formatDisplayDate(nextPaymentDate) || 'Sin fijar'}
+                {formatDisplayDate(nextPaymentDate) || t('md.notSet')}
               </span>
             </div>
 
@@ -700,7 +701,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 />
               </div>
               <p className="text-[10px] text-muted-foreground mt-1 px-1">
-                Calculada automáticamente según la fecha de unión y periodicidad, o modificable a mano.
+                {t('md.autoCalc')}
               </p>
             </div>
 
@@ -709,17 +710,17 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground">
                   <Repeat className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Frecuencia del pago</span>
+                  <span>{t('md.freq')}</span>
                 </div>
                 <span className="text-[11px] font-semibold text-muted-foreground">
-                  Repetición automática
+                  {t('md.autoRepeat')}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                    Cada (número)
+                    {t('md.every')}
                   </label>
                   <input
                     id="input-payment-freq-val"
@@ -734,7 +735,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                    Unidad
+                    {t('md.unit')}
                   </label>
                   <select
                     id="select-payment-freq-unit"
@@ -743,16 +744,16 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                     className="w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-foreground text-xs font-bold outline-none cursor-pointer focus:border-blue-500 transition-colors"
                   >
                     <option value="days" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                      Día(s)
+                      {t('md.uDays')}
                     </option>
                     <option value="weeks" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                      Semana(s)
+                      {t('md.uWeeks')}
                     </option>
                     <option value="months" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                      Mes(es)
+                      {t('md.uMonths')}
                     </option>
                     <option value="years" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                      Año(s)
+                      {t('md.uYears')}
                     </option>
                   </select>
                 </div>
@@ -761,17 +762,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
               <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 pt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
                 <span>
-                  Se repite automáticamente cada{' '}
-                  <strong className="text-foreground">
-                    {paymentFrequencyValue}{' '}
-                    {paymentFrequencyUnit === 'days'
-                      ? paymentFrequencyValue === 1 ? 'día' : 'días'
-                      : paymentFrequencyUnit === 'weeks'
-                      ? paymentFrequencyValue === 1 ? 'semana' : 'semanas'
-                      : paymentFrequencyUnit === 'months'
-                      ? paymentFrequencyValue === 1 ? 'mes' : 'meses'
-                      : paymentFrequencyValue === 1 ? 'año' : 'años'}
-                  </strong>.
+                  {t('md.repeatsEvery', { value: paymentFrequencyValue, unit: paymentFrequencyUnit === 'days' ? tp('unitw.day', paymentFrequencyValue) : paymentFrequencyUnit === 'weeks' ? tp('unitw.week', paymentFrequencyValue) : paymentFrequencyUnit === 'months' ? tp('unitw.month', paymentFrequencyValue) : tp('md.yearUnit', paymentFrequencyValue) })}
                 </span>
               </p>
             </div>
@@ -792,10 +783,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground">
-                      Alarma de aviso para el gestor
+                      {t('md.alarmTitle')}
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      Recibir recordatorio personalizado antes del cobro
+                      {t('md.alarmText')}
                     </p>
                   </div>
                 </div>
@@ -813,13 +804,13 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 <div className="p-3.5 rounded-xl bg-card border border-border space-y-2.5">
                   <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
                     <Clock className="w-3.5 h-3.5 text-blue-500" />
-                    <span>Configurar antelación de la alarma:</span>
+                    <span>{t('md.alarmConfig')}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                        Cantidad
+                        {t('md.quantity')}
                       </label>
                       <input
                         id="input-alarm-val"
@@ -839,7 +830,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
 
                     <div>
                       <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                        Unidad de antelación
+                        {t('md.leadUnit')}
                       </label>
                       <select
                         id="select-alarm-unit"
@@ -856,19 +847,19 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                         className="w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-foreground text-xs font-bold outline-none cursor-pointer focus:border-blue-500 transition-colors"
                       >
                         <option value="same_day" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                          El mismo día
+                          {t('md.sameDay')}
                         </option>
                         <option value="hours" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                          Horas antes
+                          {t('sm.hoursBefore')}
                         </option>
                         <option value="days" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                          Días antes
+                          {t('sm.daysBefore')}
                         </option>
                         <option value="weeks" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                          Semanas antes
+                          {t('sm.weeksBefore')}
                         </option>
                         <option value="months" className="bg-card text-foreground dark:bg-zinc-900 dark:text-zinc-100">
-                          Meses antes
+                          {t('sm.monthsBefore')}
                         </option>
                       </select>
                     </div>
@@ -878,10 +869,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                     <Bell className="w-3 h-3" />
                     <span>
                       {alarmUnit === 'same_day' || alarmValue === 0 ? (
-                        <>Avisar <strong>el mismo día</strong> de la fecha de cobro.</>
+                        <>{tRich('md.alarmSameDayInfo')}</>
                       ) : (
                         <>
-                          Avisar <strong>{alarmValue} {alarmUnit === 'hours' ? (alarmValue === 1 ? 'hora' : 'horas') : alarmUnit === 'days' ? (alarmValue === 1 ? 'día' : 'días') : alarmUnit === 'weeks' ? (alarmValue === 1 ? 'semana' : 'semanas') : (alarmValue === 1 ? 'mes' : 'meses')} antes</strong> de la fecha de cobro.
+                          {tRich('md.alarmBeforeInfo', { n: alarmValue, unit: tp(alarmUnit === 'hours' ? 'unitw.hour' : alarmUnit === 'days' ? 'unitw.day' : alarmUnit === 'weeks' ? 'unitw.week' : 'unitw.month', alarmValue) })}
                         </>
                       )}
                     </span>
@@ -894,7 +885,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
           {/* 5. Teléfono o Email */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-              Teléfono o Email (opcional)
+              {t('md.contactLabel')}
             </label>
             <div className="relative">
               <Phone className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -903,7 +894,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 type="text"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                placeholder="Teléfono (para recordatorios WhatsApp) o correo"
+                placeholder={t('md.contactPh')}
                 className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-muted/50 border border-border text-foreground text-xs font-semibold placeholder-muted-foreground outline-none focus:border-blue-500 transition-colors"
               />
             </div>
@@ -912,14 +903,14 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
           {/* 6. Notas o perfil asignado */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-              Notas o perfil asignado (opcional)
+              {t('md.notesLabel')}
             </label>
             <input
               id="input-member-notes"
               type="text"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ej. Perfil 3 (PIN: 1234)"
+              placeholder={t('md.notesPh')}
               className="w-full px-3.5 py-2.5 rounded-xl bg-muted/50 border border-border text-foreground text-xs font-semibold placeholder-muted-foreground outline-none focus:border-blue-500 transition-colors"
             />
           </div>
@@ -927,7 +918,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
           {/* 7. Estados y alertas del usuario */}
           <div className="space-y-2.5 pt-2">
             <h4 className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">
-              Estados y alertas del usuario
+              {t('md.statesTitle')}
             </h4>
 
             {/* 1. Pendiente de pago (Amarillo) */}
@@ -954,10 +945,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 </div>
                 <div>
                   <h5 className="text-xs font-extrabold text-foreground leading-tight">
-                    Pendiente de pago
+                    {t('md.pendingPay')}
                   </h5>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Resaltado en amarillo (Pago del mes pendiente)
+                    {t('md.pendingPayInfo')}
                   </p>
                 </div>
               </div>
@@ -974,16 +965,16 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
               <div className="px-3.5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20">
                 <p className="text-xs font-extrabold text-rose-600 dark:text-rose-400">
                   {targetMember!.unpaidCycles === 1
-                    ? 'Debe 1 cuota'
-                    : `Debe ${targetMember!.unpaidCycles} cuotas`}
+                    ? t('md.owesOne')
+                    : t('md.owesMany', { n: targetMember!.unpaidCycles })}
                 </p>
                 {targetMember?.debtSinceDate && (
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Desde el {targetMember.debtSinceDate.split('-').reverse().join('/')}
+                    {t('md.since', { date: targetMember.debtSinceDate.split('-').reverse().join('/') })}
                   </p>
                 )}
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  Apaga el interruptor cuando te haya pagado: la deuda se saldará por completo.
+                  {t('md.debtHint')}
                 </p>
               </div>
             )}
@@ -1012,10 +1003,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 </div>
                 <div>
                   <h5 className="text-xs font-extrabold text-foreground leading-tight">
-                    Pendiente eliminar
+                    {t('md.pendingRemoval')}
                   </h5>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Resaltado en rojo (Para dar de baja)
+                    {t('md.hlRed')}
                   </p>
                 </div>
               </div>
@@ -1052,10 +1043,10 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 </div>
                 <div>
                   <h5 className="text-xs font-extrabold text-foreground leading-tight">
-                    Pendiente dar de alta
+                    {t('md.pendingRegistration')}
                   </h5>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Resaltado en azul (En proceso de registro)
+                    {t('md.hlBlue')}
                   </p>
                 </div>
               </div>
@@ -1077,20 +1068,20 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
               {editingMemberId && (
                 confirmDelete ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-rose-500">¿Eliminar?</span>
+                    <span className="text-xs font-bold text-rose-500">{t('md.deleteQ')}</span>
                     <button
                       type="button"
                       onClick={handleDeleteCurrentMember}
                       className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs active:scale-95"
                     >
-                      Sí, eliminar
+                      {t('md.yesDelete')}
                     </button>
                     <button
                       type="button"
                       onClick={() => setConfirmDelete(false)}
                       className="px-2.5 py-1.5 rounded-xl bg-muted text-muted-foreground hover:text-foreground text-xs font-semibold transition-colors cursor-pointer"
                     >
-                      No
+                      {t('detail.no')}
                     </button>
                   </div>
                 ) : (
@@ -1100,7 +1091,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-rose-500 hover:bg-rose-500/10 text-xs font-bold transition-colors cursor-pointer active:scale-95"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>Eliminar usuario</span>
+                    <span>{t('md.deleteUser')}</span>
                   </button>
                 )
               )}
@@ -1112,7 +1103,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors cursor-pointer"
               >
-                Cancelar
+                {t('md.cancel')}
               </button>
               <button
                 type="submit"
@@ -1120,7 +1111,7 @@ export const MembersDetailModal: React.FC<MembersDetailModalProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 transition-all active:scale-95 cursor-pointer"
               >
                 <Check className="w-4 h-4" />
-                <span>{editingMemberId ? 'Guardar cambios' : 'Añadir usuario'}</span>
+                <span>{editingMemberId ? t('md.saveChanges') : t('md.add')}</span>
               </button>
             </div>
           </div>

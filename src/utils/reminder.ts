@@ -1,5 +1,5 @@
 import { Member, Subscription, getMemberPlatformInfo, getMemberContributionAmount } from '../types';
-import { dateLocale } from '../i18n';
+import { dateLocale, t } from '../i18n';
 
 /**
  * Formats a clean, friendly payment reminder message for co-subscribers.
@@ -12,21 +12,23 @@ export function generateMemberReminderText(
   const currentMonth = new Intl.DateTimeFormat(dateLocale(), { month: 'long', year: 'numeric' }).format(new Date());
   const monthCapitalized = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
   const mInfo = getMemberPlatformInfo(subscription, member);
-  const memberName = member.memberName || member.name || 'Co-suscriptor';
+  const memberName = member.memberName || member.name || t('rem.coSub');
   const memberAmount = getMemberContributionAmount(subscription, member);
-  const memberPlatform = member.sharingPlatform || member.platform || 'Compartición';
+  const memberPlatform = member.sharingPlatform || member.platform || t('rem.platformFallback');
+  const via = `${memberPlatform}${member.paymentMethod ? ` (${member.paymentMethod})` : ''}`;
+  const cur = mInfo.currency === 'EUR' ? '€' : mInfo.currency;
 
-  return `👋 ¡Hola ${memberName}!
+  const body = t('rem.body', {
+    name: memberName,
+    sub: subscription.platformName || subscription.name,
+    cycle: monthCapitalized,
+    amount: memberAmount.toFixed(2),
+    cur,
+    period: mInfo.periodShort,
+    platform: via,
+  });
 
-Te escribo por la suscripción compartida de *${subscription.platformName || subscription.name}*.
-
-📌 *Ciclo*: ${monthCapitalized}
-💰 *Importe*: ${memberAmount.toFixed(2)} ${mInfo.currency === 'EUR' ? '€' : mInfo.currency}/${mInfo.periodShort}
-🔄 *Plataforma/Vía*: ${memberPlatform}${member.paymentMethod ? ` (${member.paymentMethod})` : ''}
-
-Cuando puedas realizar o confirmar el abono de este ciclo, házmelo saber para dejarlo marcado como pagado.
-
-¡Muchas gracias! 🙌${ownerName ? `\n— ${ownerName}` : ''}`;
+  return body + (ownerName ? `\n— ${ownerName}` : '');
 }
 
 /**
@@ -54,7 +56,7 @@ export function getTelegramShareUrl(usernameOrPhone: string, text: string): stri
  * Creates a mailto link.
  */
 export function getMailtoUrl(email: string, subscription: Subscription, text: string): string {
-  const subject = encodeURIComponent(`Recordatorio suscripción compartida: ${subscription.name}`);
+  const subject = encodeURIComponent(t('rem.mailSubject', { name: subscription.name }));
   const body = encodeURIComponent(text);
   return `mailto:${email}?subject=${subject}&body=${body}`;
 }
