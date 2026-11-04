@@ -572,31 +572,31 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
 
                         {/* Discreet Status Tag if user has an active alert/state */}
                         {member.isPendingRemoval && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-rose-500 text-white shadow-2xs">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-rose-600 text-white shadow-2xs">
                             <Trash2 className="w-2.5 h-2.5" />
                             <span>{t('detail.pendingRemoval')}</span>
                           </span>
                         )}
                         {member.isPendingPayment && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 shadow-2xs">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 shadow-2xs">
                             <Hourglass className="w-2.5 h-2.5" />
                             <span>{t('detail.pendingPayment')}</span>
                           </span>
                         )}
                         {(member.unpaidCycles || 0) >= 1 && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-rose-600 text-white shadow-2xs">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-rose-700 text-white shadow-2xs">
                             <span>{tp('detail.unpaid', member.unpaidCycles || 0)}</span>
                           </span>
                         )}
                         {member.isPendingRegistration && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-sky-500 text-white shadow-2xs">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold px-2 py-0.5 rounded-md bg-sky-700 text-white shadow-2xs">
                             <UserPlus className="w-2.5 h-2.5" />
                             <span>{t('detail.pendingSignup')}</span>
                           </span>
                         )}
                         {member.inviteCode && (
                           <span
-                            className="inline-flex items-center gap-1 text-[10px] font-black tracking-widest px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 cursor-pointer"
+                            className="inline-flex items-center gap-1 text-sm font-black font-mono tracking-[0.16em] px-3 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40 cursor-pointer"
                             title={t('detail.copyCode')}
                             onClick={(e) => { e.stopPropagation(); navigator.clipboard?.writeText(formatInviteCode(member.inviteCode!)); }}
                           >
@@ -606,7 +606,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                         {member.inviteCode && (
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 cursor-pointer"
+                            className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-500/40 cursor-pointer"
                             title={t('detail.shareTitle')}
                             onClick={(e) => { e.stopPropagation(); handleShareInvite(member.inviteCode!); }}
                           >

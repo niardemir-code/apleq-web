@@ -111,7 +111,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   {t('nt.title')}
                 </h2>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white shadow-xs">
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-black bg-rose-500 text-white shadow-xs">
                     {t('nt.unread', { n: unreadCount })}
                   </span>
                 )}
@@ -160,7 +160,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             >
               <span>{t('nt.pending')}</span>
               {unreadCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
+                <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[11px] flex items-center justify-center font-bold">
                   {unreadCount}
                 </span>
               )}
@@ -210,13 +210,13 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   id={`notif-card-${notif.id}`}
                   className={`relative p-4 rounded-2xl border transition-all duration-200 ${
                     isUnread
-                      ? 'bg-blue-500/5 dark:bg-blue-950/30 border-blue-500/40 shadow-sm ring-1 ring-blue-500/20'
-                      : 'bg-card border-border/80 opacity-85 hover:opacity-100 hover:border-border'
+                      ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-400 dark:border-blue-500/50 shadow-sm ring-1 ring-blue-300/60 dark:ring-blue-500/20'
+                      : 'bg-card border-border hover:border-blue-300'
                   }`}
                 >
                   {/* Unread Accent Pill */}
                   {isUnread && (
-                    <div className="absolute -top-2.5 left-4 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-black tracking-wider uppercase shadow-xs">
+                    <div className="absolute -top-2.5 left-4 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[11px] font-black tracking-wider uppercase shadow-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
                       {t('nt.unreadBadge')}
                     </div>
@@ -238,12 +238,14 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                           <span className="text-xs font-extrabold text-foreground">
                             {displayMemberName(notif.memberName)}
                           </span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
+                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                             {notif.subscriptionName}
                           </span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                            {notif.sharingPlatform}
-                          </span>
+                          {notif.sharingPlatform && (
+                            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                              {notif.sharingPlatform}
+                            </span>
+                          )}
                         </div>
 
                         {/* Status / Urgency info */}
@@ -275,13 +277,13 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                           )}
 
                           {notif.debtText && (
-                            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                            <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400">
                               {notif.debtText}
                             </span>
                           )}
 
                           {notif.alarmConfigText && (
-                            <span className="text-[10px] text-muted-foreground/80 italic">
+                            <span className="text-[11px] text-muted-foreground/80 italic">
                               · {notif.alarmConfigText}
                             </span>
                           )}
@@ -291,14 +293,16 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
 
                     {/* Amount & Mark read toggle */}
                     <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1">
-                      <div className="text-right">
-                        <div className="text-sm font-black text-foreground">
-                          {notif.amount.toFixed(2)} {notif.currencySymbol}
+                      {notif.amount > 0 && (
+                        <div className="text-right">
+                          <div className="text-sm font-black text-foreground">
+                            {notif.amount.toFixed(2)} {notif.currencySymbol}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {notif.memberId ? t('nt.toReceive') : t('nt.toPay')}
+                          </div>
                         </div>
-                        <div className="text-[10px] text-muted-foreground">
-                          {t('nt.toReceive')}
-                        </div>
-                      </div>
+                      )}
 
                       <button
                         id={`btn-toggle-read-${notif.id}`}
@@ -320,7 +324,8 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Actions Footer */}
+                  {/* Actions Footer (solo para avisos de cobro de un miembro) */}
+                  {notif.memberId && (
                   <div className="mt-3.5 pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {/* WhatsApp Reminder CTA */}
@@ -372,6 +377,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                       </button>
                     </div>
                   </div>
+                  )}
                 </div>
               );
             })

@@ -305,7 +305,7 @@ function SplitzyApp() {
       currency: 'EUR',
       currencySymbol: '€',
       nextPaymentDate: '',
-      dueDateText: `Nuevo mensaje: ${chat.lastMessageText.slice(0, 40)}`,
+      dueDateText: t('nt.newMessage', { text: chat.lastMessageText.slice(0, 40) }),
       daysRemaining: 0,
       status: 'today' as const,
       isRead: false,

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* La variante dark: sigue la clase .dark que pone la app (tema claro / oscuro / sistema),
+   no la preferencia del sistema operativo. Sin esto, con Windows en oscuro y la app en
+   claro se aplicaban los estilos dark: sobre fondo claro y el texto no se leía. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-blue-50: #eef6ff;
   --color-blue-100: #d9ebff;
@@ -12,18 +17,26 @@
   --color-blue-800: #0e4a94;
   --color-blue-900: #123f78;
   --color-blue-950: #0c2749;
+
+  /* Colores del tema enlazados a las variables, para que funcionen las variantes con
+     transparencia (bg-muted/30, border-border/60, text-foreground/80...). */
+  --color-card: var(--bg-card);
+  --color-muted: var(--bg-muted);
+  --color-border: var(--border-color);
+  --color-foreground: var(--text-primary);
+  --color-muted-foreground: var(--text-secondary);
 }
 
 @layer base {
   :root {
     color-scheme: light;
-    --bg-main: #f8fafc;
+    --bg-main: #e3e9f2;
     --bg-card: #ffffff;
-    --bg-muted: #f1f5f9;
-    --border-color: #e2e8f0;
-    --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
+    --bg-muted: #edf1f7;
+    --border-color: #c3ccd9;
+    --text-primary: #0b1220;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
   }
 
   html.dark {
@@ -115,3 +128,31 @@
     display: none;
   }
 }
+
+/* Sombra suave en las tarjetas y ventanas del tema claro, para que se separen del fondo.
+   Va en la capa "components" para que las utilidades de sombra de Tailwind la sustituyan. */
+@layer components {
+  html:not(.dark) .bg-card {
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.08), 0 2px 6px rgb(15 23 42 / 0.06);
+  }
+}
+
+/* Contraste del texto de color en el tema claro: los tonos 400-600 sobre blanco o sobre
+   fondos tintados se leían mal, así que se oscurecen. El tema oscuro no cambia. */
+html:not(.dark) .text-blue-400,
+html:not(.dark) .text-blue-500,
+html:not(.dark) .text-blue-600 { color: #0a58b8; }
+html:not(.dark) .text-sky-600 { color: #0369a1; }
+html:not(.dark) .text-emerald-400,
+html:not(.dark) .text-emerald-500,
+html:not(.dark) .text-emerald-600 { color: #047857; }
+html:not(.dark) .text-amber-400,
+html:not(.dark) .text-amber-500,
+html:not(.dark) .text-amber-600 { color: #b45309; }
+html:not(.dark) .text-amber-700 { color: #92400e; }
+html:not(.dark) .text-rose-400,
+html:not(.dark) .text-rose-500,
+html:not(.dark) .text-rose-600 { color: #be123c; }
+html:not(.dark) .text-red-600 { color: #b91c1c; }
+html:not(.dark) .text-violet-600 { color: #6d28d9; }
+

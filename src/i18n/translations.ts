@@ -600,6 +600,10 @@ export const es = {
   'ic.c.000000': 'Negro',
   'ic.p.Gym': 'Gimnasio / Fitness',
   'ic.p.Custom': 'Personalizado',
+
+  // --- Avisos de chat y cuota a pagar ---
+  'nt.newMessage': 'Nuevo mensaje: {text}',
+  'nt.toPay': 'tu cuota a pagar',
 } as const;
 
 export type TranslationKey = keyof typeof es;
@@ -1196,6 +1200,10 @@ export const ca: Dictionary = {
   'ic.c.000000': 'Negre',
   'ic.p.Gym': 'Gimnàs / Fitness',
   'ic.p.Custom': 'Personalitzat',
+
+  // --- Avisos de chat y cuota a pagar ---
+  'nt.newMessage': 'Missatge nou: {text}',
+  'nt.toPay': 'la teva quota a pagar',
 };
 
 export const en: Dictionary = {
@@ -1789,4 +1797,8 @@ export const en: Dictionary = {
   'ic.c.000000': 'Black',
   'ic.p.Gym': 'Gym / Fitness',
   'ic.p.Custom': 'Custom',
+
+  // --- Avisos de chat y cuota a pagar ---
+  'nt.newMessage': 'New message: {text}',
+  'nt.toPay': 'your fee to pay',
 };
