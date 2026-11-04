@@ -32,6 +32,7 @@ import {
   advancePaymentCycle,
   countElapsedCycles
 } from '../types';
+import { t } from '../i18n';
 
 export function getSubscriptionsPath(userId: string): string {
   return `users/${userId}/subscriptions`;
@@ -1351,7 +1352,7 @@ export function parseAndroidBackupPreview(jsonString: string): BackupPreview {
       membersCount: 0,
       sampleSubscriptions: [],
       isValid: false,
-      errorMessage: 'Archivo de copia de seguridad no válido o dañado',
+      errorMessage: t('st.invalidBackup'),
     };
   }
 }

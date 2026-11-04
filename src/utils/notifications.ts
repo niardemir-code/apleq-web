@@ -97,10 +97,10 @@ export function generateNotificationsFromSubscriptions(
     const members = sub.members || [];
 
     members.forEach((m) => {
-      const memberName = m.memberName || m.name || 'Co-suscriptor';
+      const memberName = m.memberName || m.name || t('rem.coSub');
       const mInfo = getMemberPlatformInfo(sub, m);
       const amount = getMemberContributionAmount(sub, m);
-      const platform = m.sharingPlatform || m.platform || 'General';
+      const platform = m.sharingPlatform || m.platform || t('catv.general');
 
       // Determine next payment date
       let paymentDateStr = m.nextPaymentDate;

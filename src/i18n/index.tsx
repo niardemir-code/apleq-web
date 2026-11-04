@@ -182,3 +182,15 @@ export function currencyName(code: string, fallback?: string): string {
   return fallback || code;
 }
 
+/** Nombre de un miembro para mostrar: traduce el marcador «Invitado (pendiente)», que se guarda en castellano. */
+export function displayMemberName(name?: string): string {
+  if (name === 'Invitado (pendiente)') return t('md.pendingEntry');
+  return name || '';
+}
+
+/** Texto traducido si existe esa clave; si no, el texto de respaldo. */
+export function tOr(key: string, fallback: string): string {
+  const v = t(key as TranslationKey);
+  return v === key ? fallback : v;
+}
+

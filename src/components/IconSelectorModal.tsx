@@ -19,7 +19,7 @@ import {
   IconOption
 } from '../utils/icons';
 import { compressImageToMax512 } from '../utils/imageUtils';
-import { t, categoryName } from '../i18n';
+import { t, tOr, categoryName } from '../i18n';
 
 interface IconSelectorModalProps {
   isOpen: boolean;
@@ -166,15 +166,19 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
   };
 
   // Filter presets and icons
+  const iconLabel = (i: { key: string; label: string }) => tOr('ic.' + i.key, i.label);
+  const colorLabel = (c: { hex: string; label: string }) => tOr('ic.c.' + c.hex.replace('#', '').toUpperCase(), c.label);
+  const presetName = (p: { key: string; name: string }) => tOr('ic.p.' + p.key, p.name);
+
   const filteredPresets = PRESET_SERVICES.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = presetName(p).toLowerCase().includes(searchTerm.toLowerCase()) || 
                           p.key.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'ALL' || p.category.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
 
   const filteredIcons = AVAILABLE_ICONS.filter((i) => {
-    const matchesSearch = i.label.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = iconLabel(i).toLowerCase().includes(searchTerm.toLowerCase()) || 
                           i.key.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'ALL' || i.category.toLowerCase() === selectedCategory.toLowerCase();
     return matchesSearch && matchesCategory;
@@ -294,7 +298,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                     key={c.hex}
                     type="button"
                     onClick={() => setSelectedColor(c.hex)}
-                    title={c.label}
+                    title={colorLabel(c)}
                     className={`w-8 h-8 rounded-full transition-transform flex items-center justify-center cursor-pointer border ${
                       isSelected 
                         ? 'scale-110 ring-2 ring-blue-500 ring-offset-2 ring-offset-card border-white' 
@@ -402,7 +406,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                             />
                             <div className="min-w-0">
                               <p className="text-xs font-extrabold truncate text-foreground">
-                                {preset.name}
+                                {presetName(preset)}
                               </p>
                               <p className="text-[10px] text-muted-foreground truncate">
                                 {categoryName(preset.category)}
@@ -430,7 +434,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                             key={item.key}
                             type="button"
                             onClick={() => handleSelectLucideIcon(item)}
-                            title={item.label}
+                            title={iconLabel(item)}
                             className={`p-2 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                               isSelected
                                 ? 'bg-blue-500/10 border-blue-500 ring-1 ring-blue-500 text-blue-500'
@@ -439,7 +443,7 @@ export const IconSelectorModal: React.FC<IconSelectorModalProps> = ({
                           >
                             <IconComp className="w-5 h-5" />
                             <span className="text-[10px] font-bold truncate max-w-full text-center">
-                              {item.label}
+                              {iconLabel(item)}
                             </span>
                           </button>
                         );

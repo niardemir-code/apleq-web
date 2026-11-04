@@ -10,7 +10,7 @@ import {
   getCurrencyFlag
 } from '../types';
 import { PlatformIconBadge } from '../utils/icons';
-import { t, tp, categoryName, dateLocale } from '../i18n';
+import { t, tp, categoryName, dateLocale, displayMemberName } from '../i18n';
 import { PlatformBadge } from './PlatformBadge';
 import { CurrencyFlag } from './CurrencyFlag';
 import { useSharingPlatforms } from '../context/SharingPlatformsContext';
@@ -525,7 +525,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           ) : (
             <div className="space-y-2">
               {sortedMembers.map((member, index) => {
-                const memberDisplayName = member.memberName || member.name || t('detail.defaultMember');
+                const memberDisplayName = displayMemberName(member.memberName || member.name) || t('detail.defaultMember');
                 const memberPlatform = member.sharingPlatform || member.platform || '';
                 const memberCost = getMemberContributionAmount(subscription, member);
                 const memberPlatformInfo = getMemberPlatformInfo(subscription, member);

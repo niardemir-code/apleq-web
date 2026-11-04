@@ -152,7 +152,7 @@ export async function loginWithGoogle() {
     }
     if (err?.code === 'auth/popup-blocked') {
       console.warn('El navegador bloqueó la ventana emergente de Google.');
-      throw new Error('La ventana emergente de inicio de sesión fue bloqueada por el navegador. Por favor, habilita las ventanas emergentes e inténtalo de nuevo.');
+      throw new Error(t('err.popupBlocked'));
     }
     console.error('Google Sign-In Error:', err);
     throw err;

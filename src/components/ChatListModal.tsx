@@ -1,6 +1,6 @@
 import { Mail, ChevronRight, MessageCircle } from 'lucide-react';
 import { Member } from '../types';
-import { t } from '../i18n';
+import { t, displayMemberName } from '../i18n';
 
 interface ChatListModalProps {
   subscriptionName: string;
@@ -44,7 +44,7 @@ export function ChatListModal({
               const clientUid = member.linkedUid as string;
               const chatId = `${currentUid}_${groupId}_${clientUid}`;
               const hasUnread = unreadChatIdsForOwner.has(chatId);
-              const displayName = member.memberName || t('ch.client');
+              const displayName = displayMemberName(member.memberName) || t('ch.client');
               const initial = displayName.trim().charAt(0).toUpperCase() || '?';
 
               return (

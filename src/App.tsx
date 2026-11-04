@@ -870,10 +870,10 @@ function SplitzyApp() {
       {/* Footer */}
       <footer className="border-t border-border py-6 mt-12 text-center text-xs text-muted-foreground">
         <p>
-          <strong className="text-foreground">Apleq</strong> · Gestor y optimizador de suscripciones compartidas
+          <strong className="text-foreground">Apleq</strong> · {t('app.footerTagline')}
         </p>
         <p className="mt-1 text-[11px] text-muted-foreground/80">
-          Soporte para Together Price, Sharesub, Sharingful, Spliiit, Gamsgo, Familia y Amigos.
+          {t('app.footerSupport')}
         </p>
       </footer>
 

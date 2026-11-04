@@ -18,7 +18,7 @@ import {
   EyeOff
 } from 'lucide-react';
 import { generateMemberReminderText, getWhatsAppShareUrl } from '../utils/reminder';
-import { t } from '../i18n';
+import { t, displayMemberName } from '../i18n';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -236,7 +236,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-xs font-extrabold text-foreground">
-                            {notif.memberName}
+                            {displayMemberName(notif.memberName)}
                           </span>
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
                             {notif.subscriptionName}
