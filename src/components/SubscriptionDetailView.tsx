@@ -33,6 +33,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { createInvite, deleteInvite, formatInviteCode } from '../services/subscriptionService';
+import { MessageCircle as ShareWhatsappIcon, Send as ShareTelegramIcon, Mail as ShareMailIcon, Copy as ShareCopyIcon, X as ShareCloseIcon } from 'lucide-react';
 
 interface SubscriptionDetailViewProps {
   subscription: Subscription | null;
@@ -65,6 +66,23 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [confirmDeleteMemberId, setConfirmDeleteMemberId] = useState<string | number | null>(null);
   const [invMsg, setInvMsg] = useState('');
+  const [toast, setToast] = useState('');
+  const [shareCode, setShareCode] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    window.setTimeout(() => setToast(''), 2500);
+  };
+
+  const copyInviteCode = async (code: string) => {
+    const formatted = formatInviteCode(code);
+    try {
+      await navigator.clipboard.writeText(formatted);
+      showToast(t('detail.codeCopied', { code: formatted }));
+    } catch {
+      showToast(formatted);
+    }
+  };
   const { convertToEur, isEur, getRateFor } = useCurrency();
   const { platforms } = useSharingPlatforms();
 
@@ -136,18 +154,35 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
     }
   };
 
-  const handleShareInvite = async (code: string) => {
-    const text = t('detail.inviteShareText', { code: formatInviteCode(code) });
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: t('detail.inviteShareTitle'), text });
-      } else {
+  const handleShareInvite = (code: string) => {
+    setShareCode(code);
+  };
+
+  const inviteShareMessage = (code: string) => t('detail.inviteShareText', { code: formatInviteCode(code) });
+
+  const shareInviteVia = async (via: 'whatsapp' | 'telegram' | 'email' | 'copy' | 'system', code: string) => {
+    const text = inviteShareMessage(code);
+    if (via === 'whatsapp') {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    } else if (via === 'telegram') {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent('https://apleq.tecnofan.app')}&text=${encodeURIComponent(text)}`, '_blank');
+    } else if (via === 'email') {
+      window.location.href = `mailto:?subject=${encodeURIComponent(t('share.mailSubject'))}&body=${encodeURIComponent(text)}`;
+    } else if (via === 'copy') {
+      try {
         await navigator.clipboard.writeText(text);
-        setInvMsg(t('detail.inviteCopied'));
+        showToast(t('detail.inviteCopied'));
+      } catch {
+        showToast(text);
       }
-    } catch {
-      // el usuario canceló el compartir
+    } else if (navigator.share) {
+      try {
+        await navigator.share({ title: t('detail.inviteShareTitle'), text });
+      } catch {
+        // el usuario canceló el compartir
+      }
     }
+    setShareCode(null);
   };
 
   // Multi-currency and period calculations
@@ -598,7 +633,7 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-sm font-black font-mono tracking-[0.16em] px-3 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40 cursor-pointer"
                             title={t('detail.copyCode')}
-                            onClick={(e) => { e.stopPropagation(); navigator.clipboard?.writeText(formatInviteCode(member.inviteCode!)); }}
+                            onClick={(e) => { e.stopPropagation(); copyInviteCode(member.inviteCode!); }}
                           >
                             {formatInviteCode(member.inviteCode)}
                           </span>
@@ -750,6 +785,58 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           </div>
         ) : null}
       </div>
+
+      {/* Aviso breve (código copiado, mensaje copiado...) */}
+      {toast && (
+        <div
+          role="status"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold shadow-2xl border border-white/10 max-w-[90vw] text-center"
+        >
+          {toast}
+        </div>
+      )}
+
+      {/* Opciones para compartir la invitación */}
+      {shareCode && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShareCode(null)} />
+          <div className="relative w-full max-w-sm bg-card border border-border rounded-3xl shadow-2xl p-5 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-base font-extrabold text-foreground">{t('share.title')}</h3>
+              <button
+                type="button"
+                onClick={() => setShareCode(null)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
+                aria-label={t('common.close')}
+              >
+                <ShareCloseIcon className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="text-center text-xl font-black font-mono tracking-[0.2em] px-3 py-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40">
+              {formatInviteCode(shareCode)}
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => shareInviteVia('whatsapp', shareCode)} className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold cursor-pointer">
+                <ShareWhatsappIcon className="w-4 h-4" /><span>{t('share.whatsapp')}</span>
+              </button>
+              <button type="button" onClick={() => shareInviteVia('telegram', shareCode)} className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold cursor-pointer">
+                <ShareTelegramIcon className="w-4 h-4" /><span>{t('share.telegram')}</span>
+              </button>
+              <button type="button" onClick={() => shareInviteVia('email', shareCode)} className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold cursor-pointer">
+                <ShareMailIcon className="w-4 h-4" /><span>{t('share.email')}</span>
+              </button>
+              <button type="button" onClick={() => shareInviteVia('copy', shareCode)} className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-muted hover:bg-muted/70 text-foreground border border-border text-sm font-bold cursor-pointer">
+                <ShareCopyIcon className="w-4 h-4" /><span>{t('share.copy')}</span>
+              </button>
+            </div>
+            {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+              <button type="button" onClick={() => shareInviteVia('system', shareCode)} className="w-full px-3 py-2.5 rounded-xl text-sm font-bold text-blue-600 hover:bg-blue-500/10 cursor-pointer">
+                {t('share.more')}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -604,6 +604,16 @@ export const es = {
   // --- Avisos de chat y cuota a pagar ---
   'nt.newMessage': 'Nuevo mensaje: {text}',
   'nt.toPay': 'tu cuota a pagar',
+
+  // --- Compartir invitación ---
+  'detail.codeCopied': 'Código copiado: {code}',
+  'share.title': 'Compartir invitación',
+  'share.whatsapp': 'WhatsApp',
+  'share.telegram': 'Telegram',
+  'share.email': 'Correo electrónico',
+  'share.copy': 'Copiar mensaje',
+  'share.more': 'Otras aplicaciones…',
+  'share.mailSubject': 'Invitación a Apleq',
 } as const;
 
 export type TranslationKey = keyof typeof es;
@@ -1204,6 +1214,16 @@ export const ca: Dictionary = {
   // --- Avisos de chat y cuota a pagar ---
   'nt.newMessage': 'Missatge nou: {text}',
   'nt.toPay': 'la teva quota a pagar',
+
+  // --- Compartir invitación ---
+  'detail.codeCopied': 'Codi copiat: {code}',
+  'share.title': 'Comparteix la invitació',
+  'share.whatsapp': 'WhatsApp',
+  'share.telegram': 'Telegram',
+  'share.email': 'Correu electrònic',
+  'share.copy': 'Copia el missatge',
+  'share.more': 'Altres aplicacions…',
+  'share.mailSubject': 'Invitació a Apleq',
 };
 
 export const en: Dictionary = {
@@ -1801,4 +1821,14 @@ export const en: Dictionary = {
   // --- Avisos de chat y cuota a pagar ---
   'nt.newMessage': 'New message: {text}',
   'nt.toPay': 'your fee to pay',
+
+  // --- Compartir invitación ---
+  'detail.codeCopied': 'Code copied: {code}',
+  'share.title': 'Share invitation',
+  'share.whatsapp': 'WhatsApp',
+  'share.telegram': 'Telegram',
+  'share.email': 'Email',
+  'share.copy': 'Copy message',
+  'share.more': 'Other apps…',
+  'share.mailSubject': 'Invitation to Apleq',
 };
