@@ -1015,6 +1015,13 @@ export async function deleteSubscription(
     // 2. Borrar el documento principal de la suscripción
     await deleteDoc(doc(db, 'users', userId, 'subscriptions', docId));
 
+    // 2b. Borrar los datos de acceso privados de la suscripción (si existen)
+    try {
+      await deleteDoc(doc(db, 'users', userId, 'accessNotes', docId));
+    } catch (err) {
+      console.warn('No se pudieron borrar los datos de acceso:', err);
+    }
+
     // 3. Borrar el logo personalizado de Storage si existe (ignorar si no hay)
     try {
       await deleteObject(storageRef(storage, `users/${userId}/subscriptions/${docId}/custom_logo.jpg`));
@@ -1700,5 +1707,23 @@ export async function markChatRead(chatId: string, asOwner: boolean): Promise<vo
     console.warn('No se pudo marcar el chat como leído', e);
   }
 }
+
+/** Datos de acceso privados del gestor para una suscripción (solo los lee su dueño). */
+export async function getAccessNote(userId: string, subId: string | number): Promise<string> {
+  const snap = await getDoc(doc(db, 'users', userId, 'accessNotes', String(subId)));
+  return snap.exists() ? String(snap.data().text || '') : '';
+}
+
+/** Guarda los datos de acceso; si el texto queda vacío, borra el documento. */
+export async function saveAccessNote(userId: string, subId: string | number, text: string): Promise<void> {
+  const ref = doc(db, 'users', userId, 'accessNotes', String(subId));
+  const clean = text.trim().slice(0, 500);
+  if (!clean) {
+    await deleteDoc(ref);
+    return;
+  }
+  await setDoc(ref, { text: clean, updatedAtMs: Date.now() });
+}
+
 
 

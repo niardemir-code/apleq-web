@@ -13,6 +13,7 @@ import { PlatformIconBadge } from '../utils/icons';
 import { t, tp, categoryName, dateLocale, displayMemberName } from '../i18n';
 import { PlatformBadge } from './PlatformBadge';
 import { CurrencyFlag } from './CurrencyFlag';
+import { AccessNoteCard } from './AccessNoteCard';
 import { useSharingPlatforms } from '../context/SharingPlatformsContext';
 import { useCurrency } from '../context/CurrencyContext';
 import confetti from 'canvas-confetti';
@@ -773,6 +774,11 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
             </div>
           )}
         </div>
+
+        {/* Datos de acceso privados: solo los ve el gestor (y solo con la sesión iniciada) */}
+        {currentUid && (
+          <AccessNoteCard userId={currentUid} subscriptionId={subscription.id} />
+        )}
 
         {/* Additional Notes if present and non-empty */}
         {subscription.notes && subscription.notes.trim().length > 0 ? (
