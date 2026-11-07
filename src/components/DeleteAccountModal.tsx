@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { deleteAccountCall, logoutUser } from '../lib/firebase';
 import { t } from '../i18n';
+import { DELETE_ACCOUNT_URL } from '../lib/legalLinks';
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -61,6 +62,16 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
         <h2 className="text-lg font-black text-foreground mb-2">{t('del.title')}</h2>
         <p className="text-xs text-muted-foreground mb-1">
           {t('del.body')}
+        </p>
+        <p className="text-[11px] text-center mt-3">
+          <a
+            href={DELETE_ACCOUNT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground underline hover:text-foreground"
+          >
+            {t('legal.deleteInfo')}
+          </a>
         </p>
         {error && (
           <p className="text-xs mt-3 font-bold text-rose-600 dark:text-rose-400">

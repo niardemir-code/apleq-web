@@ -5,6 +5,7 @@ import { EmailAuthModal } from './EmailAuthModal';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 import { LanguageSelector } from './LanguageSelector';
 import { t } from '../i18n';
+import { PRIVACY_URL, DELETE_ACCOUNT_URL } from '../lib/legalLinks';
 
 export function WelcomeScreen() {
   const { signIn, authError, clearAuthError } = useAuth();
@@ -95,6 +96,15 @@ export function WelcomeScreen() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+        <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+          {t('legal.privacy')}
+        </a>
+        <a href={DELETE_ACCOUNT_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+          {t('legal.deleteInfo')}
+        </a>
       </div>
 
       <EmailAuthModal

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { friendlyAuthErrorMessage } from '../lib/firebase';
 import { t } from '../i18n';
+import { evaluatePassword, PASSWORD_MIN_LENGTH } from '../utils/passwordRules';
+import { PRIVACY_URL } from '../lib/legalLinks';
 
 interface EmailAuthModalProps {
   isOpen: boolean;
@@ -25,13 +27,16 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
 
   if (!isOpen) return null;
 
-  const passwordTooShort = password.length > 0 && password.length < 6;
+  const rules = evaluatePassword(password);
+  const passwordTooShort = mode === 'register' && password.length > 0 && !rules.length;
   const passwordsMismatch = mode === 'register' && confirmPassword.length > 0 && password !== confirmPassword;
 
+  // En el acceso solo se pide que haya contraseña: las cuentas antiguas pueden tener reglas más flojas.
   const canSubmit =
     email.trim().length > 3 &&
-    password.length >= 6 &&
-    (mode === 'login' || (name.trim().length > 0 && password === confirmPassword));
+    (mode === 'login'
+      ? password.length > 0
+      : name.trim().length > 0 && rules.meets && password === confirmPassword);
 
   const resetFields = () => {
     setName('');
@@ -130,9 +135,29 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
               }`}
             />
             {mode === 'register' && (
-              <p className={`text-[11px] mt-1.5 px-1 ${passwordTooShort ? 'text-rose-500 font-semibold' : 'text-muted-foreground'}`}>
-                {passwordTooShort ? t('auth.passwordTooShort', { n: 6 }) : t('auth.passwordMin', { n: 6 })}
-              </p>
+              <ul className="mt-1.5 px-1 space-y-0.5">
+                {[
+                  { ok: rules.length, text: t('auth.ruleLength', { n: PASSWORD_MIN_LENGTH }) },
+                  { ok: rules.hasLetter, text: t('auth.ruleLetter') },
+                  { ok: rules.hasNumber, text: t('auth.ruleNumber') },
+                ].map((r) => (
+                  <li
+                    key={r.text}
+                    className={`text-[11px] ${
+                      password.length === 0
+                        ? 'text-muted-foreground'
+                        : r.ok
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-rose-500 font-semibold'
+                    }`}
+                  >
+                    {password.length > 0 && r.ok ? '✓' : '•'} {r.text}
+                  </li>
+                ))}
+                {rules.basicsMet && !rules.notCommon && (
+                  <li className="text-[11px] text-rose-500 font-semibold">• {t('auth.ruleNotCommon')}</li>
+                )}
+              </ul>
             )}
           </div>
           {mode === 'register' && (
@@ -154,6 +179,17 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
             </div>
           )}
         </div>
+
+        <p className="text-[11px] text-center mt-4">
+          <a
+            href={PRIVACY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground underline hover:text-foreground"
+          >
+            {t('legal.privacy')}
+          </a>
+        </p>
 
         {error && (
           <p className="text-xs mt-3 text-center font-semibold text-rose-600 dark:text-rose-400">
