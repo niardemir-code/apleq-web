@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { friendlyAuthErrorMessage } from '../lib/firebase';
 import { t } from '../i18n';
 import { evaluatePassword, PASSWORD_MIN_LENGTH } from '../utils/passwordRules';
-import { PRIVACY_URL } from '../lib/legalLinks';
+import { PRIVACY_URL, TERMS_URL } from '../lib/legalLinks';
 
 interface EmailAuthModalProps {
   isOpen: boolean;
@@ -180,15 +180,26 @@ export function EmailAuthModal({ isOpen, onClose, initialMode = 'register' }: Em
           )}
         </div>
 
-        <p className="text-[11px] text-center mt-4">
+        <p className="text-[11px] text-center mt-4 text-muted-foreground">
+          {t('legal.agree')}{' '}
+          <a
+            href={TERMS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground"
+          >
+            {t('legal.terms')}
+          </a>{' '}
+          {t('legal.and')}{' '}
           <a
             href={PRIVACY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground underline hover:text-foreground"
+            className="underline hover:text-foreground"
           >
             {t('legal.privacy')}
           </a>
+          .
         </p>
 
         {error && (

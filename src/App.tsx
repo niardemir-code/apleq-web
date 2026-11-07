@@ -41,6 +41,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { NotificationsModal } from './components/NotificationsModal';
 import { ChatWindow } from './components/ChatWindow';
 import { ChatListModal } from './components/ChatListModal';
+import { subscribeToBlockedUids, blockUser, unblockUser, reportUser, ReportReason } from './services/moderationService';
 import { EmptyState } from './components/EmptyState';
 import { SharingPlatformsProvider } from './context/SharingPlatformsContext';
 import { LanguageProvider, LanguageKeyed, t } from './i18n';
@@ -94,7 +95,13 @@ function SplitzyApp() {
     if (user) saveClientAlarmPreference(user.uid, groupId, enabled, leadDays);
   };
 
-  const [unreadChats, setUnreadChats] = useState<UnreadChatInfo[]>([]);
+  const [rawUnreadChats, setUnreadChats] = useState<UnreadChatInfo[]>([]);
+  const [blockedUids, setBlockedUids] = useState<Set<string>>(new Set());
+  // Los chats de personas bloqueadas no generan avisos de "mensaje nuevo".
+  const unreadChats = useMemo(
+    () => rawUnreadChats.filter((c) => !blockedUids.has(c.isOwnerSide ? c.clientUid : c.ownerUid)),
+    [rawUnreadChats, blockedUids]
+  );
   const [openChatInfo, setOpenChatInfo] = useState<{
     chatId: string;
     subscriptionName: string;
@@ -110,6 +117,15 @@ function SplitzyApp() {
       return;
     }
     const unsubscribe = subscribeToUnreadChats(user.uid, setUnreadChats);
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setBlockedUids(new Set());
+      return;
+    }
+    const unsubscribe = subscribeToBlockedUids(user.uid, setBlockedUids);
     return () => unsubscribe();
   }, [user]);
 
@@ -152,6 +168,40 @@ function SplitzyApp() {
       user.uid,
       text
     ).catch((e) => console.error('Error al enviar el mensaje', e));
+  };
+
+  // La otra persona del chat abierto: el cliente si soy el gestor, el gestor si soy cliente.
+  const openChatOtherUid = useMemo(() => {
+    if (!openChatInfo) return '';
+    const parts = openChatInfo.chatId.split('_');
+    if (parts.length < 3) return '';
+    return openChatInfo.isOwnerSide ? parts.slice(2).join('_') : parts[0];
+  }, [openChatInfo]);
+  const isOpenChatBlocked = !!openChatOtherUid && blockedUids.has(openChatOtherUid);
+
+  const handleBlockOpenChat = () => {
+    if (!user || !openChatOtherUid) return;
+    blockUser(user.uid, openChatOtherUid).catch((e) => console.error('Error al bloquear', e));
+  };
+
+  const handleUnblockOpenChat = () => {
+    if (!user || !openChatOtherUid) return;
+    unblockUser(user.uid, openChatOtherUid).catch((e) => console.error('Error al desbloquear', e));
+  };
+
+  const handleReportOpenChat = async (reason: ReportReason, comment: string) => {
+    if (!user || !openChatInfo || !openChatOtherUid) throw new Error('No hay chat abierto');
+    const parts = openChatInfo.chatId.split('_');
+    await reportUser({
+      reporterUid: user.uid,
+      reportedUid: openChatOtherUid,
+      chatId: openChatInfo.chatId,
+      groupId: parts[1] || '',
+      subscriptionName: openChatInfo.subscriptionName,
+      reason,
+      comment,
+      messages: chatMessages,
+    });
   };
 
   // Local demo fallback if user hasn't signed in yet
@@ -921,6 +971,10 @@ function SplitzyApp() {
           currentUid={user?.uid || ''}
           messages={chatMessages}
           onSend={handleSendChatMessage}
+          isBlocked={isOpenChatBlocked}
+          onBlock={handleBlockOpenChat}
+          onUnblock={handleUnblockOpenChat}
+          onReport={handleReportOpenChat}
           onBack={
             openChatInfo.isOwnerSide && chatListForSubscription
               ? () => setOpenChatInfo(null) // la lista se queda de fondo, reaparece sola
