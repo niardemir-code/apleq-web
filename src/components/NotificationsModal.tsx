@@ -15,7 +15,8 @@ import {
   Layers,
   ArrowRight,
   Eye,
-  EyeOff
+  EyeOff,
+  Trash2
 } from 'lucide-react';
 import { generateMemberReminderText, getWhatsAppShareUrl } from '../utils/reminder';
 import { t, displayMemberName } from '../i18n';
@@ -27,6 +28,8 @@ interface NotificationsModalProps {
   subscriptions: Subscription[];
   onMarkAllAsRead: () => void;
   onToggleRead: (notifId: string) => void;
+  onDismiss: (notifId: string) => void;
+  onDismissAll: () => void;
   onOpenMemberDetail: (subscription: Subscription, memberId: string) => void;
   onMarkMemberPaid: (subscriptionId: string, memberId: string) => void;
   ownerName?: string;
@@ -39,6 +42,8 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
   subscriptions,
   onMarkAllAsRead,
   onToggleRead,
+  onDismiss,
+  onDismissAll,
   onOpenMemberDetail,
   onMarkMemberPaid,
   ownerName,
@@ -167,17 +172,30 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
             </button>
           </div>
 
-          {unreadCount > 0 && (
-            <button
-              id="btn-mark-all-notifs-read"
-              type="button"
-              onClick={onMarkAllAsRead}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-800/60 transition-colors cursor-pointer"
-            >
-              <CheckCheck className="w-3.5 h-3.5" />
-              <span>{t('nt.markAll')}</span>
-            </button>
-          )}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {unreadCount > 0 && (
+              <button
+                id="btn-mark-all-notifs-read"
+                type="button"
+                onClick={onMarkAllAsRead}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold border border-blue-200 dark:border-blue-800/60 transition-colors cursor-pointer"
+              >
+                <CheckCheck className="w-3.5 h-3.5" />
+                <span>{t('nt.markAll')}</span>
+              </button>
+            )}
+            {notifications.length > 0 && (
+              <button
+                id="btn-dismiss-all-notifs"
+                type="button"
+                onClick={onDismissAll}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-200 dark:border-rose-800/60 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{t('nt.dismissAll')}</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Notifications Scrollable List */}
@@ -320,6 +338,17 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                         ) : (
                           <EyeOff className="w-4 h-4" />
                         )}
+                      </button>
+
+                      <button
+                        id={`btn-dismiss-${notif.id}`}
+                        type="button"
+                        onClick={() => onDismiss(notif.id)}
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        title={t('nt.dismiss')}
+                        aria-label={t('nt.dismiss')}
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

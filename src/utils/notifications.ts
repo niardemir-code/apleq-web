@@ -57,6 +57,25 @@ export function saveReadNotificationIds(ids: string[]): void {
   }
 }
 
+const DISMISSED_NOTIFICATIONS_STORAGE_KEY = 'splitzy_dismissed_notification_ids';
+
+export function getDismissedNotificationIds(): string[] {
+  try {
+    const saved = localStorage.getItem(DISMISSED_NOTIFICATIONS_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveDismissedNotificationIds(ids: string[]): void {
+  try {
+    localStorage.setItem(DISMISSED_NOTIFICATIONS_STORAGE_KEY, JSON.stringify(ids));
+  } catch (e) {
+    console.error('Error saving dismissed notifications to localStorage', e);
+  }
+}
+
 /**
  * Calculates lead time in days for an alarm unit and value
  */

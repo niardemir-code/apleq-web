@@ -398,14 +398,16 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
         {/* 4 Financial & Renewal Stat Boxes */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Coste Suscripción */}
-          <div className="p-4 rounded-2xl bg-muted/40 border border-border">
+          <div className="@container p-4 rounded-2xl bg-muted/40 border border-border min-w-0">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               {t('detail.totalCost')}
             </span>
-            <p className="text-lg sm:text-xl font-extrabold text-foreground mt-1 flex items-center gap-1.5">
-              <CurrencyFlag currency={originalCurrency} size="sm" />
-              <span>{totalCostOriginal.toFixed(2)} {getCurrencySymbol(originalCurrency)}</span>
-              <span className="text-xs font-normal text-muted-foreground ml-1">/{periodLabel.toLowerCase()}</span>
+            <p className="text-[clamp(0.9rem,13cqw,1.25rem)] leading-tight font-extrabold text-foreground mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+              <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                <CurrencyFlag currency={originalCurrency} size="sm" />
+                <span>{totalCostOriginal.toFixed(2)} {getCurrencySymbol(originalCurrency)}</span>
+              </span>
+              <span className="text-xs font-normal text-muted-foreground whitespace-nowrap">/{periodLabel.toLowerCase()}</span>
             </p>
             {isForeign ? (
               <p 
@@ -426,11 +428,11 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           </div>
 
           {/* Aportan */}
-          <div className="p-4 rounded-2xl bg-muted/40 border border-border">
+          <div className="@container p-4 rounded-2xl bg-muted/40 border border-border min-w-0">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               {tp('detail.contribute', members.length)}
             </span>
-            <p className="text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
+            <p className="text-[clamp(0.9rem,13cqw,1.25rem)] leading-tight font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 whitespace-nowrap">
               +{totalMemberIncomeInEur.toFixed(2)} {t('unit.eurPerMonth')}
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -439,11 +441,11 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           </div>
 
           {/* Ganancia neta */}
-          <div className="p-4 rounded-2xl bg-muted/40 border border-border">
+          <div className="@container p-4 rounded-2xl bg-muted/40 border border-border min-w-0">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               {t('metrics.netProfit')}
             </span>
-            <p className={`text-lg sm:text-xl font-extrabold mt-1 ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+            <p className={`text-[clamp(0.9rem,13cqw,1.25rem)] leading-tight font-extrabold mt-1 whitespace-nowrap ${isProfit ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
               {netProfitInEur > 0.001 ? `+${netProfitInEur.toFixed(2)}` : netProfitInEur.toFixed(2)} {t('unit.eurPerMonth')}
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5">
@@ -452,11 +454,11 @@ export const SubscriptionDetailView: React.FC<SubscriptionDetailViewProps> = ({
           </div>
 
           {/* Renovación */}
-          <div className="p-4 rounded-2xl bg-muted/40 border border-border">
+          <div className="@container p-4 rounded-2xl bg-muted/40 border border-border min-w-0">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
               {t('detail.renewal')}
             </span>
-            <p className="text-lg sm:text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1">
+            <p className="text-[clamp(0.9rem,13cqw,1.25rem)] leading-tight font-extrabold text-blue-600 dark:text-blue-400 mt-1 whitespace-nowrap">
               {renewalDisplayText}
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5">

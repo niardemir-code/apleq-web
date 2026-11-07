@@ -49,6 +49,8 @@ import {
   generateClientReminders,
   getReadNotificationIds, 
   saveReadNotificationIds,
+  getDismissedNotificationIds,
+  saveDismissedNotificationIds,
   AppNotification
 } from './utils/notifications';
 
@@ -284,6 +286,7 @@ function SplitzyApp() {
 
   // Read notifications IDs persistence
   const [readNotificationIds, setReadNotificationIds] = useState<string[]>(() => getReadNotificationIds());
+  const [dismissedNotificationIds, setDismissedNotificationIds] = useState<string[]>(() => getDismissedNotificationIds());
 
   // Generate active notifications from subscriptions
   const activeSubscriptions = user ? subscriptions : localGuestSubscriptions;
@@ -311,12 +314,24 @@ function SplitzyApp() {
       isRead: false,
       timestamp: new Date().toISOString(),
     }));
-    return [...managerNotifs, ...clientNotifs, ...chatNotifs];
-  }, [activeSubscriptions, readNotificationIds, participatingGroups, user, clientAlarmPrefs, unreadChats]);
+    return [...managerNotifs, ...clientNotifs, ...chatNotifs].filter((n) => !dismissedNotificationIds.includes(n.id));
+  }, [activeSubscriptions, readNotificationIds, dismissedNotificationIds, participatingGroups, user, clientAlarmPrefs, unreadChats]);
 
   const unreadNotificationsCount = useMemo(() => {
     return notifications.filter((n) => !n.isRead).length;
   }, [notifications]);
+
+  const handleDismissNotification = (notifId: string) => {
+    const updated = Array.from(new Set([...dismissedNotificationIds, notifId]));
+    setDismissedNotificationIds(updated);
+    saveDismissedNotificationIds(updated);
+  };
+
+  const handleDismissAllNotifications = () => {
+    const updated = Array.from(new Set([...dismissedNotificationIds, ...notifications.map((n) => n.id)]));
+    setDismissedNotificationIds(updated);
+    saveDismissedNotificationIds(updated);
+  };
 
   const handleMarkAllNotificationsRead = () => {
     const allIds = Array.from(new Set([...readNotificationIds, ...notifications.map((n) => n.id)]));
@@ -961,6 +976,8 @@ function SplitzyApp() {
         subscriptions={activeSubscriptions}
         onMarkAllAsRead={handleMarkAllNotificationsRead}
         onToggleRead={handleToggleNotificationRead}
+        onDismiss={handleDismissNotification}
+        onDismissAll={handleDismissAllNotifications}
         onOpenMemberDetail={(sub, memberId) => {
           setSelectedSubForMembers(sub);
           setSelectedMemberIdForModal(memberId);

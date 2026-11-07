@@ -19,10 +19,10 @@ export const CurrencyFlag: React.FC<CurrencyFlagProps> = ({
   const code = (currency || 'EUR').trim().toUpperCase();
 
   const sizeClasses = {
-    xs: 'w-3.5 h-2.5 min-w-[14px]',
-    sm: 'w-4 h-3 min-w-[16px]',
-    md: 'w-5 h-3.5 min-w-[20px]',
-    lg: 'w-6 h-4.5 min-w-[24px]',
+    xs: 'w-5 h-[15px] min-w-[20px]',
+    sm: 'w-6 h-[18px] min-w-[24px]',
+    md: 'w-7 h-[21px] min-w-[28px]',
+    lg: 'w-8 h-6 min-w-[32px]',
   }[size];
 
   const baseSvgProps: React.SVGProps<SVGSVGElement> = {
@@ -47,7 +47,7 @@ export const CurrencyFlag: React.FC<CurrencyFlagProps> = ({
                 <polygon
                   key={angle}
                   points="0,-1 0.588,0.809 -0.951,-0.309 0.951,-0.309 -0.588,0.809"
-                  transform={`translate(${x},${y}) scale(0.9)`}
+                  transform={`translate(${x},${y}) scale(1.25)`}
                 />
               );
             })}
