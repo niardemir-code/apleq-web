@@ -144,7 +144,7 @@ export const es = {
   'empty.noMatchText': 'Prueba a cambiar los términos de búsqueda o limpiar los filtros activos.',
   'empty.clearFilters': 'Limpiar todos los filtros',
   'empty.title': 'Empieza a optimizar tus suscripciones compartidas',
-  'empty.text': 'Añade los servicios que compartes en **Together Price, Sharesub, Sharingful, Spliiit, Gamsgo** o con familia y amigos para sincronizar costes y cobros mensuales.',
+  'empty.text': 'Añade los servicios que compartes, con una plataforma de suscripciones compartidas o con familia y amigos, para sincronizar costes y cobros mensuales.',
   'empty.first': 'Crear primera suscripción',
   'list.title': 'Mis suscripciones',
   'list.add': 'Añadir',
@@ -552,7 +552,7 @@ export const es = {
 
   // --- W6: iconos, colores, pie de página y mensajes sueltos ---
   'app.footerTagline': 'Gestor y optimizador de suscripciones compartidas',
-  'app.footerSupport': 'Soporte para Together Price, Sharesub, Sharingful, Spliiit, Gamsgo, Familia y Amigos.',
+  'app.footerSupport': 'Apleq es una herramienta independiente. Los nombres de plataformas son marcas de sus propietarios; Apleq no está afiliada ni respaldada por ellas.',
   'err.popupBlocked': 'La ventana emergente de inicio de sesión fue bloqueada por el navegador. Por favor, habilita las ventanas emergentes e inténtalo de nuevo.',
   'st.invalidBackup': 'Archivo de copia de seguridad no válido o dañado',
   'ic.movie': 'Películas',
@@ -762,7 +762,7 @@ export const ca: Dictionary = {
   'empty.noMatchText': 'Prova de canviar els termes de cerca o de netejar els filtres actius.',
   'empty.clearFilters': 'Neteja tots els filtres',
   'empty.title': 'Comença a optimitzar les teves subscripcions compartides',
-  'empty.text': 'Afegeix els serveis que comparteixes a **Together Price, Sharesub, Sharingful, Spliiit, Gamsgo** o amb família i amics per sincronitzar costos i cobraments mensuals.',
+  'empty.text': 'Afegeix els serveis que comparteixes, amb una plataforma de subscripcions compartides o amb família i amics, per sincronitzar costos i cobraments mensuals.',
   'empty.first': 'Crea la primera subscripció',
   'list.title': 'Les meves subscripcions',
   'list.add': 'Afegeix',
@@ -1170,7 +1170,7 @@ export const ca: Dictionary = {
 
   // --- W6: iconos, colores, pie de página y mensajes sueltos ---
   'app.footerTagline': 'Gestor i optimitzador de subscripcions compartides',
-  'app.footerSupport': 'Suport per a Together Price, Sharesub, Sharingful, Spliiit, Gamsgo, Família i Amics.',
+  'app.footerSupport': 'Apleq és una eina independent. Els noms de plataformes són marques dels seus propietaris; Apleq no hi està afiliada ni avalada.',
   'err.popupBlocked': 'El navegador ha bloquejat la finestra emergent d\'inici de sessió. Activa les finestres emergents i torna-ho a provar.',
   'st.invalidBackup': 'Arxiu de còpia de seguretat no vàlid o malmès',
   'ic.movie': 'Pel·lícules',
@@ -1377,7 +1377,7 @@ export const en: Dictionary = {
   'empty.noMatchText': 'Try changing your search terms or clearing the active filters.',
   'empty.clearFilters': 'Clear all filters',
   'empty.title': 'Start optimizing your shared subscriptions',
-  'empty.text': 'Add the services you share on **Together Price, Sharesub, Sharingful, Spliiit, Gamsgo** or with family and friends to sync costs and monthly payments.',
+  'empty.text': 'Add the services you share, through a shared-subscription platform or with family and friends, to sync costs and monthly payments.',
   'empty.first': 'Create first subscription',
   'list.title': 'My subscriptions',
   'list.add': 'Add',
@@ -1785,7 +1785,7 @@ export const en: Dictionary = {
 
   // --- W6: iconos, colores, pie de página y mensajes sueltos ---
   'app.footerTagline': 'Manager and optimizer for shared subscriptions',
-  'app.footerSupport': 'Support for Together Price, Sharesub, Sharingful, Spliiit, Gamsgo, Family and Friends.',
+  'app.footerSupport': 'Apleq is an independent tool. Platform names are trademarks of their owners; Apleq is not affiliated with or endorsed by them.',
   'err.popupBlocked': 'The browser blocked the sign-in pop-up window. Please allow pop-ups and try again.',
   'st.invalidBackup': 'Invalid or corrupted backup file',
   'ic.movie': 'Movies',
