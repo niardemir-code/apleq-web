@@ -400,7 +400,12 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         (cp) => cp.platformName.trim().toLowerCase() === pName.toLowerCase()
       );
       const computedNextPayment = resolveMemberNextPaymentDate(m, bDay);
-      if (matched && typeof matched.pricePerUser === 'number' && matched.pricePerUser > 0) {
+      if (
+        matched &&
+        typeof matched.pricePerUser === 'number' &&
+        matched.pricePerUser > 0 &&
+        !(m.contributionFixed && !(Number(m.contributionAmount) > 0))
+      ) {
         return {
           ...m,
           contributionAmount: matched.pricePerUser,

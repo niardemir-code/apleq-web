@@ -229,6 +229,9 @@ export function getMemberContributionAmount(
 ): number {
   if (!subscription || !member) return 0;
   const raw = member.contributionAmount ?? member.amount;
+  if (member.contributionFixed && typeof raw === 'number' && !isNaN(raw)) {
+    return raw;
+  }
   if (typeof raw === 'number' && !isNaN(raw) && raw > 0) {
     return raw;
   }
@@ -551,6 +554,7 @@ export interface Member {
   memberContact?: string; // Android exact (Email o teléfono)
   amount?: number; // Web alias
   contributionAmount: number; // Android exact (Dinero que aporta este usuario)
+  contributionFixed?: boolean; // true si el gestor fijó el importe a mano (aunque sea 0): no se aplica el reparto por defecto
   currency?: string; // Moneda del importe aportado (ej. EUR, USD, TRY)
   isPaidThisMonth: boolean; // Si ya ha pagado la cuota corriente
   isPendingPayment: boolean; // Interruptor: Pendiente de pago (resalta en amarillo)
