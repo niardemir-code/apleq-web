@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { ChatMessage } from './subscriptionService';
 
@@ -53,6 +53,7 @@ export async function reportUser(input: ReportInput): Promise<void> {
       createdAtMs: m.createdAtMs,
     })),
     createdAtMs: Date.now(),
+    createdAt: serverTimestamp(),
     status: 'open',
     platform: 'web',
   });
