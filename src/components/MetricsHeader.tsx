@@ -1,5 +1,5 @@
 import React from 'react';
-import { Subscription, getMemberPlatformInfo, getMemberContributionAmount } from '../types';
+import { Subscription, getMemberPlatformInfo, getMemberContributionAmount, getMemberPeriodMonths } from '../types';
 import { useCurrency } from '../context/CurrencyContext';
 import { t, tp, tpRich } from '../i18n';
 import { 
@@ -42,7 +42,7 @@ export const MetricsHeader: React.FC<MetricsHeaderProps> = ({
       totalMembersCount += 1;
       const mInfo = getMemberPlatformInfo(sub, member);
       const memberAmount = getMemberContributionAmount(sub, member);
-      const mPeriodMonths = mInfo.period === 'YEARLY' ? 12 : mInfo.period === 'SEMI_ANNUAL' ? 6 : mInfo.period === 'QUARTERLY' ? 3 : 1;
+      const mPeriodMonths = getMemberPeriodMonths(sub, member);
       const memberAmountInEur = convertToEur(memberAmount, mInfo.currency || 'EUR') / mPeriodMonths;
       totalContributed += memberAmountInEur;
 

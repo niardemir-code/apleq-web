@@ -243,6 +243,22 @@ export function getMemberContributionAmount(
 }
 
 /**
+ * Meses que cubre cada pago del miembro (para pasar su importe a equivalente mensual).
+ * Usa primero la periodicidad propia del miembro (la que se muestra como «/mes»);
+ * si no la tiene, la de su plataforma de compartición o, en último caso, la de la suscripción.
+ */
+export function getMemberPeriodMonths(subscription: Subscription, member: Member): number {
+  const unit = member.paymentFrequencyUnit;
+  const val = member.paymentFrequencyValue && member.paymentFrequencyValue > 0 ? member.paymentFrequencyValue : 1;
+  if (unit === 'months') return val;
+  if (unit === 'years') return val * 12;
+  if (unit === 'weeks') return (val * 12) / 52;
+  if (unit === 'days') return (val * 12) / 365.25;
+  const info = getMemberPlatformInfo(subscription, member);
+  return info.period === 'YEARLY' ? 12 : info.period === 'SEMI_ANNUAL' ? 6 : info.period === 'QUARTERLY' ? 3 : 1;
+}
+
+/**
  * Calculates the next upcoming payment date based on join date and payment frequency.
  * Starts from joinedDate + 1 frequency period, and if in the past, advances to the next closest future date.
  */

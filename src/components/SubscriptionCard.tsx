@@ -4,6 +4,7 @@ import {
   Member, 
   getMemberPlatformInfo, 
   getMemberContributionAmount,
+  getMemberPeriodMonths,
   getCurrencyFlag,
   getCurrencySymbol
 } from '../types';
@@ -90,7 +91,7 @@ export const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   const totalMemberIncomeInEur = members.reduce((sum, m) => {
     const mInfo = getMemberPlatformInfo(subscription, m);
     const mAmount = getMemberContributionAmount(subscription, m);
-    const mPeriodMonths = mInfo.period === 'YEARLY' ? 12 : mInfo.period === 'SEMI_ANNUAL' ? 6 : mInfo.period === 'QUARTERLY' ? 3 : 1;
+    const mPeriodMonths = getMemberPeriodMonths(subscription, m);
     return sum + (convertToEur(mAmount, mInfo.currency || 'EUR') / mPeriodMonths);
   }, 0);
   const monthlyMemberIncomeInEur = totalMemberIncomeInEur;
