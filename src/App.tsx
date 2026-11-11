@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth, AuthProvider } from './context/AuthContext';
 import { useTheme, ThemeProvider } from './context/ThemeContext';
 import { CurrencyProvider } from './context/CurrencyContext';
-import { Subscription, FilterOptions, Member } from './types';
+import { Subscription, FilterOptions, Member, resolveSubscriptionNextRenewalDate } from './types';
 import { 
   subscribeToUserSubscriptions, 
   subscribeToParticipatingGroups,
@@ -746,8 +746,22 @@ function SplitzyApp() {
             return incomeB - incomeA;
           }
           case 'renewal':
-          default:
-            return (a.billingDay || 1) - (b.billingDay || 1);
+          default: {
+            // Próxima fecha real de cobro (mes y año incluidos). Si la fecha guardada ya pasó
+            // (suscripción anual/trimestral/semestral), se recalcula desde hoy.
+            const nextRenewal = (s: Subscription): string => {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+              const stored = s.renewalDate ? String(s.renewalDate).split('T')[0] : '';
+              if (stored && stored >= todayIso) return stored;
+              return resolveSubscriptionNextRenewalDate({ ...s, renewalDate: undefined });
+            };
+            const dateA = nextRenewal(a);
+            const dateB = nextRenewal(b);
+            if (dateA !== dateB) return dateA < dateB ? -1 : 1;
+            return nameA.localeCompare(nameB);
+          }
         }
       });
   }, [subscriptions, localGuestSubscriptions, user, filters]);
